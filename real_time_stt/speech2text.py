@@ -23,10 +23,12 @@ def callback(indata, frames, time_info, status):
     if status: 
         print("Mic error: ", status)
     pcm = (indata[:, 0] * 32767).astype(np.int16) # Convert audio data (first channel) to 16-bit PCM format
-    # pcm = indata[:, 0] # Convert audio data (first channel) to 16-bit PCM format
     audio_queue.put(pcm) # Put the audio data into the queue
 
+accumulated = ""
+
 def stream_transcribe():
+    global accumulated 
     chunk_samples = int(CHUNK_SEC * SAMPLE_RATE)
     buffer = np.empty((0,), dtype=np.int16)
 
@@ -42,10 +44,12 @@ def stream_transcribe():
 
             # Transcribe the audio data
             # - returns a dictionary 
+            # - fp16=(DEVICE!="cpu") means use fp16 (half-precision) for faster inference on GPU
             result = model.transcribe(audio_float, fp16=(DEVICE!="cpu"), language="en")
 
             # Prints the value with the key "text" in the dictionary 
-            print(result["text"].strip())
+            print(str(result["text"]).strip())
+            accumulated += str(result["text"]).strip() + " "
 
 def main():
     # Start the transcription thread 
@@ -55,8 +59,8 @@ def main():
 
     # Start the audio stream
     # - callback is the function that will be called for each chunk of audio
-    # - dtype="int16" means the audio is collected as int16 (more memory efficienct)
-    # with sd.InputStream(callback=callback, dtype="float32"):
+    # - dtype="float32" for higher precision
+    # - with keyword ensures the audio stream is closed when the block exits
     with sd.InputStream(callback=callback, dtype="float32", samplerate=SAMPLE_RATE, channels=1):
         print("Recording... (Ctrl+C to stop)")
         try:
@@ -64,6 +68,8 @@ def main():
                 time.sleep(1) # The main thread will (idefinitely) sleep for 1 second until interrupted (Ctrl + C)
         except KeyboardInterrupt:
             print("Recording stopped")
+        
+        print(f"Final transcription: \n {accumulated.strip()}")
 
 if __name__ == "__main__":
     main()
