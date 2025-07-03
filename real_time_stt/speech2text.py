@@ -26,7 +26,8 @@ def callback(indata, frames, time_info, status):
     pcm = (indata[:, 0] * 32767).astype(np.int16) # Convert audio data (first channel) to 16-bit PCM format
     audio_queue.put(pcm) # Put the audio data into the queue
 
-accumulated = []
+accumulated = [] # Each entry is (text, timestamp) tuples
+accumulated_lock = threading.Lock()
 
 # Function to transcribe the audio data in real-time
 # - is called as soon as soon as the stream is started
@@ -52,15 +53,19 @@ def stream_transcribe():
 
             # Prints the value with the key "text" in the dictionary 
             print(result["text"])
-            accumulated.append(result["text"])
+            with accumulated_lock:
+                accumulated.append((str(result["text"].strip()), time.time()))
 
-# def track_pace(text, start_time):
-#     # prev_transcript = ""
-#     # end_time = time.time()
-#     # elapsed_time = (end_time - start_time) / 60 # In minutes
-#     elapsed_time = 6 / 60 # In minutes
-#     print(f"WPM: {len(text) / elapsed_time} \n")
-#     # print(text)
+def track_pace(window_seconds = 6):
+    now = time.time()
+    with accumulated_lock:
+        # Takes every text, where ts (timestamp) is within the last window_seconds 
+        recent_texts = [text for text, ts in accumulated if ts >= now - window_seconds]
+    text = " ".join(recent_texts)
+    elapsed_time =  window_seconds / 60 # In minutes
+    wpm = len(text.split()) / elapsed_time if elapsed_time > 0 else 0
+    print(f"WPM (last {window_seconds} seconds): {wpm:.2f}")
+    # print(text)
 
 def main():
 
@@ -76,18 +81,15 @@ def main():
     with sd.InputStream(callback=callback, dtype="float32", samplerate=SAMPLE_RATE, channels=1):
         print("Recording... (Ctrl+C to stop)")
         start_time = time.time()
-        # schedule.every(6).seconds.do(lambda: track_pace(accumulated, start_time)) # Schedule the track_pace function to run every 10 seconds        
+        schedule.every(6).seconds.do(lambda: track_pace(6)) # Schedule the track_pace function to run every 10 seconds        
 
         try:
             while True:
-                # schedule.run_pending() # Scheduled tasks are executed 
+                schedule.run_pending() # Scheduled tasks are executed 
                 time.sleep(1) # The main thread will (idefinitely) sleep for 1 second until interrupted (Ctrl + C)
         except KeyboardInterrupt:
             print("Recording stopped")
-                    
-        # schedule.every(6).seconds.do(track_pace, accumulated, start_time) # Schedule the track_pace function to run every 10 seconds        
-        print(f"Final transcription: \n {' '.join(accumulated).strip()} \n")
-        # track_pace(accumulated, elapsed_time)
+            print(f"Final transcription: \n {' '.join(text for text, ts in accumulated).strip()} \n")
 
 if __name__ == "__main__":
     main()
