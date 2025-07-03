@@ -4,6 +4,7 @@ import time
 import numpy as np 
 import sounddevice as sd
 import whisper 
+import schedule
 
 MODEL_SIZE = "small"
 DEVICE = "cpu"
@@ -27,6 +28,8 @@ def callback(indata, frames, time_info, status):
 
 accumulated = ""
 
+# Function to transcribe the audio data in real-time
+# - is called as soon as soon as the stream is started
 def stream_transcribe():
     global accumulated 
     chunk_samples = int(CHUNK_SEC * SAMPLE_RATE)
@@ -51,7 +54,11 @@ def stream_transcribe():
             print(str(result["text"]).strip())
             accumulated += str(result["text"]).strip() + " "
 
+def track_pace(text, elapsed_time):
+        print(f"WPM: {len(text.split()) / elapsed_time} \n")
+
 def main():
+
     # Start the transcription thread 
     # - this thread runs the stream_transcribe function in the background
     # - daemon=True means the thread will continue running even if the main thread exits
@@ -63,13 +70,21 @@ def main():
     # - with keyword ensures the audio stream is closed when the block exits
     with sd.InputStream(callback=callback, dtype="float32", samplerate=SAMPLE_RATE, channels=1):
         print("Recording... (Ctrl+C to stop)")
+        start_time = time.time()
         try:
             while True:
+                # schedule.run_pending() # Scheduled tasks are executed 
                 time.sleep(1) # The main thread will (idefinitely) sleep for 1 second until interrupted (Ctrl + C)
         except KeyboardInterrupt:
             print("Recording stopped")
+            end_time = time.time()
+            elapsed_time = (end_time - start_time) / 60 # In minutes
+            
+        # schedule.every(6).seconds.do(track_pace, accumulated, elapsed_time) # Schedule the track_pace function to run every 10 seconds
+        # schedule.run_pending() # Scheduled tasks are executed 
         
-        print(f"Final transcription: \n {accumulated.strip()}")
+        print(f"Final transcription: \n {accumulated.strip()} \n")
+        track_pace(accumulated, elapsed_time)
 
 if __name__ == "__main__":
     main()
