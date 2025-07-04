@@ -47,11 +47,11 @@ def stream_transcribe():
         if buffer.shape[0] >= chunk_samples:
             chunk, buffer = buffer[:chunk_samples], buffer[chunk_samples:]
 
-            with audio_buffer_lock:
-                audio_buffer.append((chunk, time.time()))
-
             # Normalise the audio data to the range [-1, 1] for whisper model
             audio_float = chunk.astype(np.float32) / 32767.0
+
+            with audio_buffer_lock:
+                audio_buffer.append((audio_float, time.time()))
 
             # Transcribe the audio data
             # - returns a dictionary 
@@ -113,12 +113,15 @@ def volume_reporter(window_seconds=VOLUME_WINDOW_SECONDS):
             if recent_chunks:
                 all_audio = np.concatenate(recent_chunks)
                 track_volume(all_audio, window_seconds)
+            else:
+                print("[DEBUG] No recent chunks to process for volume")
     except Exception as e:
         print(f"Error in volume reporter: {e}")
 
 def track_volume(chunk, window_seconds):
-    rms = np.sqrt(np.mean(chunk**2))
+    rms = np.sqrt(np.mean(np.square(chunk)))
     db = 20 * np.log10(rms + 1e-12)
+    print(f"Number of chunks: {len(chunk)}")
     print(f"Volume in the past {window_seconds} seconds: {db:.2f} dB")
 
 def main():
