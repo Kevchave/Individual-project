@@ -13,6 +13,10 @@ CHUNK_SEC = 3.0
 WPM_WINDOW_SECONDS = 6
 VOLUME_WINDOW_SECONDS = 6
 
+BLACKHOLE_ID = 3 # Redirects output to microphone
+MIC_INPUT = None
+device_id = BLACKHOLE_ID   # or MIC_INPUT
+
 model = whisper.load_model(MODEL_SIZE, device=DEVICE)
 audio_queue = queue.Queue()
 
@@ -120,8 +124,9 @@ def volume_reporter(window_seconds=VOLUME_WINDOW_SECONDS):
 
 def track_volume(chunk, window_seconds):
     rms = np.sqrt(np.mean(np.square(chunk)))
-    db = 20 * np.log10(rms + 1e-12)
-    print(f"Number of chunks: {len(chunk)}")
+    db = 20 * np.log10(rms + 1e-12) # 1e-12 avoids log(0)
+    # Consider computing peak dbs 
+    # print(f"Number of chunks: {len(chunk)}")
     print(f"Volume in the past {window_seconds} seconds: {db:.2f} dB")
 
 def main():
@@ -137,8 +142,9 @@ def main():
     # - callback is the function that will be called for each chunk of audio
     # - dtype="float32" for higher precision
     # - with keyword ensures the audio stream is closed when the block exits
-    with sd.InputStream(callback=callback, dtype="float32", samplerate=SAMPLE_RATE, channels=1):
-        print("Recording... (Ctrl+C to stop)")
+    with sd.InputStream(callback=callback, dtype="float32", samplerate=SAMPLE_RATE, channels=1, device=device_id): # device=BLACKHOLE_INPUT redirects output to microphone
+        source = "blackHole" if device_id == BLACKHOLE_ID else "microphone"
+        print(f"Recording from {source} (Ctrl+C to stop)")
         start_time = time.time()
 
         try:
