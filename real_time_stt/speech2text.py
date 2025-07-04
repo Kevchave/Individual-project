@@ -15,13 +15,21 @@ VOLUME_WINDOW_SECONDS = 6
 
 BLACKHOLE_ID = 3 # Redirects output to microphone
 MIC_INPUT = None
-device_id = BLACKHOLE_ID   # or MIC_INPUT
+device_id = MIC_INPUT   # or MIC_INPUT
 
 model = whisper.load_model(MODEL_SIZE, device=DEVICE)
 audio_queue = queue.Queue()
 
+
+# Global variables for WPM
+accumulated = [] # Each entry is (text, timestamp) tuples
+accumulated_lock = threading.Lock()
+
+# Global variables for Volume tracking
 audio_buffer = deque()
 audio_buffer_lock = threading.Lock()
+sum_squares = 0.0
+sample_count = 0
 
 # Callback function that will be called for each chunk of audio
 # - indata: Numpy array of shape (frames, channels) containing the audio data
@@ -33,9 +41,6 @@ def callback(indata, frames, time_info, status):
         print("Mic error: ", status)
     pcm = (indata[:, 0] * 32767).astype(np.int16) # Convert audio data (first channel) to 16-bit PCM format
     audio_queue.put(pcm) # Put the audio data into the queue
-
-accumulated = [] # Each entry is (text, timestamp) tuples
-accumulated_lock = threading.Lock()
 
 # Function to transcribe the audio data in real-time
 # - is called as soon as soon as the stream is started
@@ -54,6 +59,7 @@ def stream_transcribe():
             # Normalise the audio data to the range [-1, 1] for whisper model
             audio_float = chunk.astype(np.float32) / 32767.0
 
+            # Add the audio data to the buffer for Volume tracking
             with audio_buffer_lock:
                 audio_buffer.append((audio_float, time.time()))
 
@@ -67,7 +73,7 @@ def stream_transcribe():
             with accumulated_lock:
                 accumulated.append((str(result["text"]).strip(), time.time()))
 
-def wpm_reporter(window_seconds=WPM_WINDOW_SECONDS):
+def report_wpm(window_seconds=WPM_WINDOW_SECONDS):
     try:
         while True: 
             time.sleep(window_seconds)
@@ -100,8 +106,11 @@ def track_wpm_average(start_time):
     # print(f"Total time: {elapsed_time:.2f} minutes")
     print(f"Average WPM: {avg_wpm:.2f}")
 
-def volume_reporter(window_seconds=VOLUME_WINDOW_SECONDS):
+def report_volume(window_seconds=VOLUME_WINDOW_SECONDS):
     # Periodically computes and prints the volume of recent audio.
+
+    global sum_squares, sample_count
+
     try:
         while True:
             time.sleep(window_seconds)
@@ -115,6 +124,10 @@ def volume_reporter(window_seconds=VOLUME_WINDOW_SECONDS):
                 audio_buffer.clear()
                 audio_buffer.extend(recent_items)
             if recent_chunks:
+                for recent_chunk in recent_chunks:
+                    sum_squares += np.sum(np.square(recent_chunk))
+                    sample_count += recent_chunk.size
+
                 all_audio = np.concatenate(recent_chunks)
                 track_volume(all_audio, window_seconds)
             else:
@@ -129,14 +142,25 @@ def track_volume(chunk, window_seconds):
     # print(f"Number of chunks: {len(chunk)}")
     print(f"Volume in the past {window_seconds} seconds: {db:.2f} dB")
 
+def track_volume_average(start_time):
+    global sum_squares, sample_count
+
+    if sample_count == 0:
+        print("No audio samples collected yet")
+        return
+
+    rms = np.sqrt(sum_squares / sample_count)
+    db = 20 * np.log10(rms + 1e-12)
+    print(f"Average volume: {db:.2f} dBFS")
+
 def main():
     
     # Start the transcription, WPM and volume reporter threads 
     # - each thread runs the target function in the background
     # - daemon=True means the thread will continue running even if the main thread exits
     threading.Thread(target=stream_transcribe, daemon=True).start()
-    threading.Thread(target=wpm_reporter, args=(WPM_WINDOW_SECONDS,), daemon=True).start()
-    threading.Thread(target=volume_reporter, args=(VOLUME_WINDOW_SECONDS,), daemon=True).start()
+    threading.Thread(target=report_wpm, args=(WPM_WINDOW_SECONDS,), daemon=True).start()
+    threading.Thread(target=report_volume, args=(VOLUME_WINDOW_SECONDS,), daemon=True).start()
 
     # Start the audio stream
     # - callback is the function that will be called for each chunk of audio
@@ -154,6 +178,7 @@ def main():
             print("Recording stopped.\n")
             print(f"Final transcription: \n {' '.join(text for text, ts in accumulated).strip()} \n")
             track_wpm_average(start_time)
+            track_volume_average(start_time)
 
 if __name__ == "__main__":
     main()
