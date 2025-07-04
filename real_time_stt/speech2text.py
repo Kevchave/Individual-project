@@ -4,16 +4,20 @@ import time
 import numpy as np 
 import sounddevice as sd
 import whisper 
-import schedule
+from collections import deque
 
 MODEL_SIZE = "small"
 DEVICE = "cpu"
 SAMPLE_RATE = 16000
 CHUNK_SEC = 3.0
-
+WPM_WINDOW_SECONDS = 6
+VOLUME_WINDOW_SECONDS = 6
 
 model = whisper.load_model(MODEL_SIZE, device=DEVICE)
 audio_queue = queue.Queue()
+
+audio_buffer = deque()
+audio_buffer_lock = threading.Lock()
 
 # Callback function that will be called for each chunk of audio
 # - indata: Numpy array of shape (frames, channels) containing the audio data
@@ -43,6 +47,9 @@ def stream_transcribe():
         if buffer.shape[0] >= chunk_samples:
             chunk, buffer = buffer[:chunk_samples], buffer[chunk_samples:]
 
+            with audio_buffer_lock:
+                audio_buffer.append((chunk, time.time()))
+
             # Normalise the audio data to the range [-1, 1] for whisper model
             audio_float = chunk.astype(np.float32) / 32767.0
 
@@ -54,12 +61,15 @@ def stream_transcribe():
             # Prints the value with the key "text" in the dictionary 
             print(result["text"])
             with accumulated_lock:
-                accumulated.append((str(result["text"].strip()), time.time()))
+                accumulated.append((str(result["text"]).strip(), time.time()))
 
-def wpm_reporter(window_seconds = 6):
-    while True: 
-        time.sleep(window_seconds)
-        track_wpm(window_seconds)
+def wpm_reporter(window_seconds=WPM_WINDOW_SECONDS):
+    try:
+        while True: 
+            time.sleep(window_seconds)
+            track_wpm(window_seconds)
+    except Exception as e:
+        print(f"Error in WPM reporter: {e}")
 
 # Function to track the words per minute (WPM)
 # - can be made more effecient using deque 
@@ -86,18 +96,39 @@ def track_wpm_average(start_time):
     # print(f"Total time: {elapsed_time:.2f} minutes")
     print(f"Average WPM: {avg_wpm:.2f}")
 
-def main():
+def volume_reporter(window_seconds=VOLUME_WINDOW_SECONDS):
+    # Periodically computes and prints the volume of recent audio.
+    try:
+        while True:
+            time.sleep(window_seconds)
+            now = time.time()
+            with audio_buffer_lock:
+                # Only keep chunks that are within the last window_seconds 
+                recent_items = [(chunk, ts) for chunk, ts in audio_buffer if ts >= now - window_seconds]
+                recent_chunks = [chunk for chunk, ts in recent_items]
 
-    # Start the transcription thread 
-    # - this thread runs the stream_transcribe function in the background
+                # Clear the audio buffer and add the recent items (for memory efficiency)
+                audio_buffer.clear()
+                audio_buffer.extend(recent_items)
+            if recent_chunks:
+                all_audio = np.concatenate(recent_chunks)
+                track_volume(all_audio, window_seconds)
+    except Exception as e:
+        print(f"Error in volume reporter: {e}")
+
+def track_volume(chunk, window_seconds):
+    rms = np.sqrt(np.mean(chunk**2))
+    db = 20 * np.log10(rms + 1e-12)
+    print(f"Volume in the past {window_seconds} seconds: {db:.2f} dB")
+
+def main():
+    
+    # Start the transcription, WPM and volume reporter threads 
+    # - each thread runs the target function in the background
     # - daemon=True means the thread will continue running even if the main thread exits
     threading.Thread(target=stream_transcribe, daemon=True).start()
-    
-    # Start the WPM reporter thread 
-    # - this thread runs the wpm_reporter function in the background
-    # - args=(6,) sets window_seconds to 6, and is passed as a tuple 
-    # - daemon=True means the thread will continue running even if the main thread exits
-    threading.Thread(target=wpm_reporter, args=(6,), daemon=True).start()
+    threading.Thread(target=wpm_reporter, args=(WPM_WINDOW_SECONDS,), daemon=True).start()
+    threading.Thread(target=volume_reporter, args=(VOLUME_WINDOW_SECONDS,), daemon=True).start()
 
     # Start the audio stream
     # - callback is the function that will be called for each chunk of audio
@@ -106,11 +137,9 @@ def main():
     with sd.InputStream(callback=callback, dtype="float32", samplerate=SAMPLE_RATE, channels=1):
         print("Recording... (Ctrl+C to stop)")
         start_time = time.time()
-        # schedule.every(6).seconds.do(lambda: track_wpm(6)) # Schedule the track_pace function to run every 10 seconds        
 
         try:
             while True:
-                # schedule.run_pending() # Scheduled tasks are executed 
                 time.sleep(1) # The main thread will (idefinitely) sleep for 1 second until interrupted (Ctrl + C)
         except KeyboardInterrupt:
             print("Recording stopped.\n")
