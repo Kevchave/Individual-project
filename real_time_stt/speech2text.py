@@ -20,16 +20,14 @@ device_id = MIC_INPUT   # or MIC_INPUT
 model = whisper.load_model(MODEL_SIZE, device=DEVICE)
 audio_queue = queue.Queue()
 
-
 # Global variables for WPM
 accumulated = [] # Each entry is (text, timestamp) tuples
 accumulated_lock = threading.Lock()
 
 # Global variables for Volume tracking
-audio_buffer = deque()
-audio_buffer_lock = threading.Lock()
-sum_squares = 0.0
-sample_count = 0
+all_audio_chunks = []
+audio_chunks_lock = threading.Lock()
+
 
 # Callback function that will be called for each chunk of audio
 # - indata: Numpy array of shape (frames, channels) containing the audio data
@@ -59,9 +57,9 @@ def stream_transcribe():
             # Normalise the audio data to the range [-1, 1] for whisper model
             audio_float = chunk.astype(np.float32) / 32767.0
 
-            # Add the audio data to the buffer for Volume tracking
-            with audio_buffer_lock:
-                audio_buffer.append((audio_float, time.time()))
+            # Add the audio data to the array for Volume tracking
+            with audio_chunks_lock:
+                all_audio_chunks.append((audio_float, time.time()))
 
             # Transcribe the audio data
             # - returns a dictionary 
@@ -100,7 +98,7 @@ def track_wpm(window_seconds):
 def track_wpm_average(start_time):
     with accumulated_lock:
         all_text = " ".join(text for text, ts in accumulated)
-    total_words = len(all_text.split())
+    total_words = len(all_text.split()) # .split() splits into a list of words 
     elapsed_time = (time.time() - start_time) / 60 # In minutes
     avg_wpm = total_words / elapsed_time if elapsed_time > 0 else 0 
     # print(f"Total time: {elapsed_time:.2f} minutes")
@@ -109,27 +107,17 @@ def track_wpm_average(start_time):
 def report_volume(window_seconds=VOLUME_WINDOW_SECONDS):
     # Periodically computes and prints the volume of recent audio.
 
-    global sum_squares, sample_count
-
     try:
         while True:
             time.sleep(window_seconds)
             now = time.time()
-            with audio_buffer_lock:
+            with audio_chunks_lock:
                 # Only keep chunks that are within the last window_seconds 
-                recent_items = [(chunk, ts) for chunk, ts in audio_buffer if ts >= now - window_seconds]
-                recent_chunks = [chunk for chunk, ts in recent_items]
+                recent_chunks = [chunk for chunk, ts in all_audio_chunks if ts >= now - window_seconds]
 
-                # Clear the audio buffer and add the recent items (for memory efficiency)
-                audio_buffer.clear()
-                audio_buffer.extend(recent_items)
             if recent_chunks:
-                for recent_chunk in recent_chunks:
-                    sum_squares += np.sum(np.square(recent_chunk))
-                    sample_count += recent_chunk.size
-
-                all_audio = np.concatenate(recent_chunks)
-                track_volume(all_audio, window_seconds)
+                recent_audio = np.concatenate(recent_chunks) # Concatenate the recent chunks into a single array 
+                track_volume(recent_audio, window_seconds)
             else:
                 print("[DEBUG] No recent chunks to process for volume")
     except Exception as e:
@@ -143,13 +131,20 @@ def track_volume(chunk, window_seconds):
     print(f"Volume in the past {window_seconds} seconds: {db:.2f} dB")
 
 def track_volume_average(start_time):
-    global sum_squares, sample_count
+    """ This code is repeated in track_volume, find a way to reduce redundancy 
+        - the concatenation 
+        - the rms and db calculation 
+        - the print statement 
+    """
+    with audio_chunks_lock:
+        if not all_audio_chunks:
+            print("No audio samples collected yet")
+            return 
 
-    if sample_count == 0:
-        print("No audio samples collected yet")
-        return
+        # Concatenate all audio chunks into a single array
+        all_audio = np.concatenate([chunk for chunk, ts in all_audio_chunks])
 
-    rms = np.sqrt(sum_squares / sample_count)
+    rms = np.sqrt(np.mean(np.square(all_audio)))
     db = 20 * np.log10(rms + 1e-12)
     print(f"Average volume: {db:.2f} dBFS")
 
@@ -163,8 +158,10 @@ def main():
     threading.Thread(target=report_volume, args=(VOLUME_WINDOW_SECONDS,), daemon=True).start()
 
     # Start the audio stream
-    # - callback is the function that will be called for each chunk of audio
+    # - callback is the function that will be called when it has captured a new chunk of audio
     # - dtype="float32" for higher precision
+    # - samplerate is how many times the audio is captured per second (16000 is the default for whisper)
+    # - channels is the number of audio channels (1 for mono, 2 for stereo)
     # - with keyword ensures the audio stream is closed when the block exits
     with sd.InputStream(callback=callback, dtype="float32", samplerate=SAMPLE_RATE, channels=1, device=device_id): # device=BLACKHOLE_INPUT redirects output to microphone
         source = "blackHole" if device_id == BLACKHOLE_ID else "microphone"
