@@ -3,6 +3,7 @@ import threading
 import time
 import numpy as np 
 import sounddevice as sd
+from sympy.core.evalf import N
 import whisper 
 import librosa
 
@@ -72,16 +73,16 @@ def stream_transcribe():
             with accumulated_lock:
                 accumulated.append((str(result["text"]).strip(), time.time()))
 
-def report_pitch_variance(window_seconds=PITCH_WINDOW_SECONDS):
+def report_pitch_stdev(window_seconds=PITCH_WINDOW_SECONDS):
     try: 
         while True: 
             time.sleep(window_seconds)
-            track_pitch_variance(window_seconds, SAMPLE_RATE)
+            track_pitch_stdev(window_seconds, SAMPLE_RATE)
     except Exception as e:
         print(f"Error in Pitch reporting: {e}")
         
 
-def track_pitch_variance(window_seconds, sr):
+def track_pitch_stdev(window_seconds, sr):
     now = time.time()
     with audio_chunks_lock:
         recent_chunks = [chunk for chunk, ts in all_audio_chunks if ts >= now - window_seconds]
@@ -113,6 +114,23 @@ def track_pitch_variance(window_seconds, sr):
     std_dev_pitch = float(np.std(voiced))
     # iqr = np.percentile(voiced, 75) - np.percentile(voiced, 25)
     print(f"Pitch Variance: {std_dev_pitch:.2f} Hz")
+
+def track_overall_pitch_stdev(start_time, sr):
+    # elapsed_time = start_time - time.time()
+    with audio_chunks_lock:
+        y = np.concatenate([chunk for chunk, ts in all_audio_chunks])
+
+    f0, voiced_flag, voiced_prob = librosa.pyin(y, fmin=75, fmax=800, sr=sr, frame_length=2048, hop_length=256)
+
+    mask = (voiced_flag) & (voiced_prob >= 0.1)
+    voiced = f0[mask]
+
+    if len(voiced) == 0:
+        print("Pitch Variance: No voice audio detected")
+        return 
+
+    std_dev_pitch = float(np.std(voiced))
+    print(f"Overall Pitch Variance: {std_dev_pitch:.2f} Hz")
 
 def report_wpm(window_seconds=WPM_WINDOW_SECONDS):
     try:
@@ -199,7 +217,7 @@ def main():
     threading.Thread(target=stream_transcribe, daemon=True).start()
     threading.Thread(target=report_wpm, args=(WPM_WINDOW_SECONDS,), daemon=True).start()
     threading.Thread(target=report_volume, args=(VOLUME_WINDOW_SECONDS,), daemon=True).start()
-    threading.Thread(target=report_pitch_variance, args=(PITCH_WINDOW_SECONDS,), daemon=True).start()
+    threading.Thread(target=report_pitch_stdev, args=(PITCH_WINDOW_SECONDS,), daemon=True).start()
 
     # Start the audio stream
     # - callback is the function that will be called when it has captured a new chunk of audio
@@ -220,6 +238,8 @@ def main():
             print(f"Final transcription: \n {' '.join(text for text, ts in accumulated).strip()} \n")
             track_wpm_average(start_time)
             track_volume_average(start_time)
+            track_overall_pitch_stdev(start_time, SAMPLE_RATE)
+            print("\n")
 
 if __name__ == "__main__":
     main()
