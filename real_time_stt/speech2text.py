@@ -4,7 +4,7 @@ import time
 import numpy as np 
 import sounddevice as sd
 import whisper 
-from collections import deque
+import librosa
 
 MODEL_SIZE = "small"
 DEVICE = "cpu"
@@ -12,6 +12,7 @@ SAMPLE_RATE = 16000
 CHUNK_SEC = 3.0
 WPM_WINDOW_SECONDS = 6
 VOLUME_WINDOW_SECONDS = 6
+PITCH_WINDOW_SECONDS = 6
 
 BLACKHOLE_ID = 3 # Redirects output to microphone
 MIC_INPUT = None
@@ -71,13 +72,55 @@ def stream_transcribe():
             with accumulated_lock:
                 accumulated.append((str(result["text"]).strip(), time.time()))
 
+def report_pitch_variance(window_seconds=PITCH_WINDOW_SECONDS):
+    try: 
+        while True: 
+            time.sleep(window_seconds)
+            track_pitch_variance(window_seconds, SAMPLE_RATE)
+    except Exception as e:
+        print(f"Error in Pitch reporting: {e}")
+        
+
+def track_pitch_variance(window_seconds, sr):
+    now = time.time()
+    with audio_chunks_lock:
+        recent_chunks = [chunk for chunk, ts in all_audio_chunks if ts >= now - window_seconds]
+
+    if not recent_chunks:
+        print("Pitch Variance: No audio chunks to process")
+        return 
+    
+    y = np.concatenate(recent_chunks)
+
+    # f0 is fundamental frequency (pitch of the audio)
+    # - frame_length is the number of samples in each frame
+    # - hop_length is the number of samples to advance between frames
+    # - each estimate is still made from x samples, but only slightly shifted
+    f0, voiced_flag, voiced_prob = librosa.pyin(y, fmin=75, fmax=800, sr=sr, frame_length=2048, hop_length=256)
+
+    # Confidence threshold for voiced frames
+    mask = (voiced_flag) & (voiced_prob >= 0.1)
+    voiced = f0[mask]
+
+    if len(voiced) == 0:
+        print("Pitch Variance: No voice audio detected")
+        return 
+    
+        # print(f"  Frames: {len(f0)}, Voiced frames: {len(voiced)}")
+    # print(f"  f₀ min/max: {voiced.min():.1f}/{voiced.max():.1f} Hz")
+    # print(f"  f₀ 5th/95th pct: {np.percentile(voiced, 5):.1f}/{np.percentile(voiced,95):.1f} Hz")
+
+    std_dev_pitch = float(np.std(voiced))
+    # iqr = np.percentile(voiced, 75) - np.percentile(voiced, 25)
+    print(f"Pitch Variance: {std_dev_pitch:.2f} Hz")
+
 def report_wpm(window_seconds=WPM_WINDOW_SECONDS):
     try:
         while True: 
             time.sleep(window_seconds)
             track_wpm(window_seconds)
     except Exception as e:
-        print(f"Error in WPM reporter: {e}")
+        print(f"Error in WPM reporting: {e}")
 
 # Function to track the words per minute (WPM)
 # - can be made more effecient using deque 
@@ -121,7 +164,7 @@ def report_volume(window_seconds=VOLUME_WINDOW_SECONDS):
             else:
                 print("[DEBUG] No recent chunks to process for volume")
     except Exception as e:
-        print(f"Error in volume reporter: {e}")
+        print(f"Error in Volume reporting: {e}")
 
 def track_volume(chunk, window_seconds):
     rms = np.sqrt(np.mean(np.square(chunk)))
@@ -156,6 +199,7 @@ def main():
     threading.Thread(target=stream_transcribe, daemon=True).start()
     threading.Thread(target=report_wpm, args=(WPM_WINDOW_SECONDS,), daemon=True).start()
     threading.Thread(target=report_volume, args=(VOLUME_WINDOW_SECONDS,), daemon=True).start()
+    threading.Thread(target=report_pitch_variance, args=(PITCH_WINDOW_SECONDS,), daemon=True).start()
 
     # Start the audio stream
     # - callback is the function that will be called when it has captured a new chunk of audio
