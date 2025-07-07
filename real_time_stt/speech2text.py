@@ -7,8 +7,8 @@ from sympy.core.evalf import N
 import whisper 
 import librosa
 
-MODEL_SIZE = "small"
-DEVICE = "cpu"
+# MODEL_SIZE = "small" - transcribe.py
+# DEVICE = "cpu" - transcribe.py
 SAMPLE_RATE = 16000
 CHUNK_SEC = 3.0
 WPM_WINDOW_SECONDS = 6
@@ -19,16 +19,16 @@ BLACKHOLE_ID = 3 # Redirects output to microphone
 MIC_INPUT = None
 device_id = MIC_INPUT   # or MIC_INPUT
 
-model = whisper.load_model(MODEL_SIZE, device=DEVICE)
-audio_queue = queue.Queue()
+# model = whisper.load_model(MODEL_SIZE, device=DEVICE) - transcribe.py
+# audio_queue = queue.Queue() - audio_steam.py
 
 # Global variables for WPM
-accumulated = [] # Each entry is (text, timestamp) tuples
-accumulated_lock = threading.Lock()
+# accumulated = [] # Each entry is (text, timestamp) tuples - track_metrics.py
+# accumulated_lock = threading.Lock()
 
 # Global variables for Volume tracking
-all_audio_chunks = []
-audio_chunks_lock = threading.Lock()
+# all_audio_chunks = [] - track_metrics.py
+# audio_chunks_lock = threading.Lock()
 
 
 # Callback function that will be called for each chunk of audio
@@ -36,42 +36,42 @@ audio_chunks_lock = threading.Lock()
 # - frames: The number of frames in this chunk
 # - time_info: Time info 
 # - status: Error/status flags
-def callback(indata, frames, time_info, status):
-    if status: 
-        print("Mic error: ", status)
-    pcm = (indata[:, 0] * 32767).astype(np.int16) # Convert audio data (first channel) to 16-bit PCM format
-    audio_queue.put(pcm) # Put the audio data into the queue
+# def callback(indata, frames, time_info, status): - audio_steam.py
+#     if status: 
+#         print("Mic error: ", status)
+#     pcm = (indata[:, 0] * 32767).astype(np.int16) # Convert audio data (first channel) to 16-bit PCM format
+#     audio_queue.put(pcm) # Put the audio data into the queue
 
-# Function to transcribe the audio data in real-time
-# - is called as soon as soon as the stream is started
-def stream_transcribe():
-    global accumulated 
-    chunk_samples = int(CHUNK_SEC * SAMPLE_RATE)
-    buffer = np.empty((0,), dtype=np.int16)
+# # Function to transcribe the audio data in real-time
+# # - is called as soon as soon as the stream is started
+# def stream_transcribe(): - transcribe.py
+#     global accumulated 
+#     chunk_samples = int(CHUNK_SEC * SAMPLE_RATE)
+#     buffer = np.empty((0,), dtype=np.int16)
 
-    while True:
-        pcm = audio_queue.get()
-        buffer = np.concatenate((buffer, pcm))
+#     while True:
+#         pcm = audio_queue.get()
+#         buffer = np.concatenate((buffer, pcm))
 
-        if buffer.shape[0] >= chunk_samples:
-            chunk, buffer = buffer[:chunk_samples], buffer[chunk_samples:]
+#         if buffer.shape[0] >= chunk_samples:
+#             chunk, buffer = buffer[:chunk_samples], buffer[chunk_samples:]
 
-            # Normalise the audio data to the range [-1, 1] for whisper model
-            audio_float = chunk.astype(np.float32) / 32767.0
+#             # Normalise the audio data to the range [-1, 1] for whisper model
+#             audio_float = chunk.astype(np.float32) / 32767.0
 
-            # Add the audio data to the array for Volume tracking
-            with audio_chunks_lock:
-                all_audio_chunks.append((audio_float, time.time()))
+#             # Add the audio data to the array for Volume tracking
+#             with audio_chunks_lock:
+#                 all_audio_chunks.append((audio_float, time.time()))
 
-            # Transcribe the audio data
-            # - returns a dictionary 
-            # - fp16=(DEVICE!="cpu") means use fp16 (half-precision) for faster inference on GPU
-            result = model.transcribe(audio_float, fp16=(DEVICE!="cpu"), language="en")
+#             # Transcribe the audio data
+#             # - returns a dictionary 
+#             # - fp16=(DEVICE!="cpu") means use fp16 (half-precision) for faster inference on GPU
+#             result = model.transcribe(audio_float, fp16=(DEVICE!="cpu"), language="en")
 
-            # Prints the value with the key "text" in the dictionary 
-            print(result["text"])
-            with accumulated_lock:
-                accumulated.append((str(result["text"]).strip(), time.time()))
+#             # Prints the value with the key "text" in the dictionary 
+#             print(result["text"])
+#             with accumulated_lock:
+#                 accumulated.append((str(result["text"]).strip(), time.time()))
 
 def report_pitch_stdev(window_seconds=PITCH_WINDOW_SECONDS):
     try: 
