@@ -27,3 +27,4 @@ class AudioStream:
             channels=1, 
             device=self.device_id, 
         )
+
