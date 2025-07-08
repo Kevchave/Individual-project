@@ -3,6 +3,8 @@ import queue
 import sounddevice as sd
 
 class AudioStream:
+    # Constructor to initialize the audio stream
+    # - self is always the first argument in a method in a class
     def __init__(self, sample_rate, device_id):
         self.audio_queue = queue.Queue()
         self.sample_rate = sample_rate

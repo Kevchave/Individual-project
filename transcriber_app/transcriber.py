@@ -7,12 +7,15 @@ DEVICE = "cpu"
 
 
 class Transcriber: 
+    # Constructor to initialize the audio stream
+    # - self is always the first argument in a method in a class
     def __init__(self, model_size, device):
         self.model = whisper.load_model(model_size, device=device)
         self.device = device
 
     # Function to transcribe the audio data in real-time
     # - is called as soon as soon as the stream is started
+    # - on_transcription and on_audio_chunk are functions, passed as arguments 
     def transcribe_stream(self, audio_queue, chunk_samples, on_transcription, on_audio_chunk):
         buffer = np.empty((0,), dtype=np.int16)
 
@@ -27,7 +30,7 @@ class Transcriber:
                 audio_float = chunk.astype(np.float32) / 32767.0
 
                 # Callback for metrics (e.g., volume, pitch)
-                if on_audio_chunk:
+                if on_audio_chunk: # Checks whether on_audio_chunk is not None (i.e. if it exists)
                     on_audio_chunk(audio_float)
 
                 # Transcribe the audio data

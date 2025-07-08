@@ -4,6 +4,8 @@ import numpy as np
 import librosa 
 
 class MetricsTracker: 
+    # Constructor to initialize the metrics tracker
+    # - self is always the first argument in a method in a class
     def __init__(self, sample_rate):
         self.accumulated = [] # (text, timestamp) tuples
         self.accumulated_lock = threading.Lock()
@@ -71,7 +73,7 @@ class MetricsTracker:
         db = 20 * np.log10(rms + 1e-12) # 1e-12 avoids log(0)
         # Consider computing peak dbs 
         # print(f"Number of chunks: {len(chunk)}")
-        print(f"Volume in the past {window_seconds} seconds: {db:.2f} dB")
+        print(f"Volume (last{window_seconds} seconds): {db:.2f} dB")
 
     def track_volume_average(self, start_time):
         """ This code is repeated in track_volume, find a way to reduce redundancy 
@@ -91,15 +93,15 @@ class MetricsTracker:
     
     # PITCH TRACKING
     
-    def report_pitch_stdev(self, window_seconds):
+    def report_pitch(self, window_seconds):
         try: 
             while True: 
                 time.sleep(window_seconds)
-                self.track_pitch_stdev(window_seconds)
+                self.track_pitch(window_seconds)
         except Exception as e:
             print(f"Error in Pitch reporting: {e}")
             
-    def track_pitch_stdev(self, window_seconds):
+    def track_pitch(self, window_seconds):
         now = time.time()
         with self.audio_chunks_lock:
             # Only keep chunks that are within the last window_seconds 
@@ -112,6 +114,7 @@ class MetricsTracker:
         y = np.concatenate(recent_chunks)
 
         # f0 is fundamental frequency (pitch of the audio)
+        # - pyin estimate the pitch of the audio, and the probability that the frame is voiced 
         # - frame_length is the number of samples in each frame
         # - hop_length is the number of samples to advance between frames
         # - each estimate is still made from x samples, but only slightly shifted
@@ -131,9 +134,9 @@ class MetricsTracker:
 
         std_dev_pitch = float(np.std(voiced))
         # iqr = np.percentile(voiced, 75) - np.percentile(voiced, 25)
-        print(f"Pitch Variance: {std_dev_pitch:.2f} Hz")
+        print(f"Pitch Variance (last {window_seconds} seconds): {std_dev_pitch:.2f} Hz")
 
-    def track_overall_pitch_stdev(self, start_time):
+    def track_overall_pitch(self, start_time):
         with self.audio_chunks_lock:
             y = np.concatenate([chunk for chunk, ts in self.all_audio_chunks])
 

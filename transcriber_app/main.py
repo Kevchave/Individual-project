@@ -21,9 +21,10 @@ def main():
     chunk_samples = int(CHUNK_SEC * SAMPLE_RATE)
 
     # Start metrics reporting threads 
+    # - threads allow the different functions to run concurrently without blocking each other or the main thread/program 
     threading.Thread(target=metrics.report_wpm, args=(WPM_WINDOW_SECONDS,), daemon=True).start()
     threading.Thread(target=metrics.report_volume, args=(VOLUME_WINDOW_SECONDS,), daemon=True).start()
-    threading.Thread(target=metrics.report_pitch_stdev, args=(PITCH_WINDOW_SECONDS,), daemon=True).start()
+    threading.Thread(target=metrics.report_pitch, args=(PITCH_WINDOW_SECONDS,), daemon=True).start()
 
     def on_transcription(text):
         print(text)
@@ -50,7 +51,7 @@ def main():
             print(f"Final transcription: \n {' '.join(text for text, ts in metrics.accumulated).strip()} \n")
             metrics.track_wpm_average(start_time)
             metrics.track_volume_average(start_time)
-            metrics.track_overall_pitch_stdev(start_time)
+            metrics.track_overall_pitch(start_time)
             print("\n")
 
 if __name__ == "__main__":
