@@ -2,7 +2,29 @@
 document.addEventListener('DOMContentLoaded', function(){
     // Get references to the HTML elements 
     const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
     const transcriptBox = document.getElementById('transcript-box');
+    const wpmValue = document.getElementById('wpm-value');
+    const volumeValue = document.getElementById('volume-value');
+    const pitchValue = document.getElementById('pitch-value');
+
+    let pollingInterval = null;
+
+    function pollUpdates() {
+        fetch('/get_current_transcript')
+        .then(response => response.json())
+        .then(data => {
+            transcriptBox.textContent = data.transcript; 
+        });
+
+        fetch('/get_current_metrics')
+        .then(response => response.json())
+        .then(data => {
+            wpmValue.textContent = data.wpm.toFixed(2)
+            volumeValue.textContent = data.volume.toFixed(2)
+            pitchValue.textContent = data.pitch.toFixed(2)
+        });
+    }
 
     // Add a click event listener to the Start Recording button 
     startBtn.addEventListener('click', function(){
@@ -15,11 +37,49 @@ document.addEventListener('DOMContentLoaded', function(){
         .then(response => response.json())
 
         // Update the transcript box with the status from the Flask response 
-        .then(data => {transcriptBox.textContent = data.status;})
+        .then(data => {
+            transcriptBox.textContent = data.status;
+            if (!pollingInterval) {
+                // Poll for updates every 3 seconds 
+                pollingInterval = setInterval(pollUpdates, 3000);
+            }
+        })
 
         // If there's an error, update the transcript box with an error message 
         .catch(error => {transcriptBox.textContent = 'Error starting recording.';
             console.error('Error starting recording:', error);
         });
-    })
+    });
+
+    if (stopBtn) {
+        stopBtn.addEventListener('click', function(){
+            fetch('/stop_recording', {method: 'POST'})
+            .then(response => response.json())
+            .then(data => {
+                transcriptBox.textContent = data.status;
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                }
+                // Fetch the final transcript and metrics 
+                fetch('/get_final_transcript')
+                .then(response => response.json())
+                .then(data => {
+                    transcriptBox.textContent = data.transcript; 
+                });
+
+                fetch('/get_average_metrics')
+                .then(response => response.json())
+                .then(data => {
+                    wpmValue.textContent = data.average_wpm.toFixed(2);
+                    volumeValue.textContent = data.average_volume.toFixed(2);
+                    pitchValue.textContent = data.average_pitch.toFixed(2);
+                });
+            })
+            .catch(error => {
+                transcriptBox.textContent = 'Error stopping recording.';
+                console.error('Error stopping recording:', error);
+            });
+        });
+    }
 });

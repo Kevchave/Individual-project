@@ -1,4 +1,12 @@
 from flask import Flask, render_template, jsonify, request 
+from transcriber_app.main import (
+    start_transcription_pipeline,
+    stop_transcription_pipeline,
+    get_current_transcript,
+    get_final_transcript,
+    get_current_metrics,
+    get_average_metrics
+)
 
 # The Flask App 
 # - it provides data and handles actions via API endpoints (seen below)
@@ -26,21 +34,41 @@ app = Flask(__name__)
 def home():
     return render_template("index.html") # Serves the html page 
 
+# Start Recording
 @app.route("/start_recording", methods=['POST'])
 def start_recording():
+    start_transcription_pipeline()
     return jsonify({'status': 'Recording started...'})
 
+# Stop Recording
 @app.route("/stop_recording", methods=['POST'])
 def stop_recording():
+    stop_transcription_pipeline()
     return jsonify({'status': 'Recording stopped...'})
 
+# Live Transcript
 @app.route("/get_transcript")
 def get_transcript():
-    return jsonify(({'transcript': 'Live transcript:'}))
+    transcript = get_current_transcript()
+    return jsonify(({'transcript': transcript }))
 
+# Final Transcript
+@app.route("/get_final_transcript")
+def get_final_transcript_route():
+    final_transcript = get_final_transcript()
+    return jsonify({'transcript': final_transcript})
+
+# Live Metrics
 @app.route("/get_metrics")
 def get_metrics():
-    return jsonify({'wpm': 0, 'volume': 0, 'pitch': 0})
+    metrics = get_current_metrics()
+    return jsonify(metrics)
+
+# Average Metrics
+@app.route("/get_average_metrics")
+def get_average_metrics_route():
+    average_metrics = get_average_metrics()
+    return jsonify(average_metrics)
 
 if __name__ == "__main__":
     app.run(debug=True) # Starts the Flask application in debug mode

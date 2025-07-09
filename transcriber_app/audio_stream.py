@@ -9,6 +9,7 @@ class AudioStream:
         self.audio_queue = queue.Queue()
         self.sample_rate = sample_rate
         self.device_id = device_id
+        self.stream = None; 
 
 # Callback function that will be called for each chunk of audio
 # - indata: Numpy array of shape (frames, channels) containing the audio data
@@ -22,11 +23,34 @@ class AudioStream:
         self.audio_queue.put(pcm) # Put the audio data into the queue
 
     def start(self):
-        return sd.InputStream(
-            callback=self.callback, 
-            dtype="float32", 
-            samplerate=self.sample_rate, 
-            channels=1, 
-            device=self.device_id, 
-        )
+        if self.stream is None: 
+            self.stream = sd.InputStream(
+                callback=self.callback, 
+                dtype="float32", 
+                samplerate=self.sample_rate, 
+                channels=1, 
+                device=self.device_id, 
+            )
+            self.stream.start()
 
+    def stop(self):
+        if self.stream is not None:
+            self.stream.stop()
+            self.stream.close()
+            self.stream = None
+
+# Global instance for Flask integration
+# - accessible from anywhere in the app, and from other files (when imported) like server.py
+_audio_stream_instance = None 
+
+def start_audio_stream(sample_rate=16000, device_id=None):
+    global _audio_stream_instance
+    if _audio_stream_instance is None: 
+        _audio_stream_instance = AudioStream(sample_rate, device_id)
+    _audio_stream_instance.start()
+
+def stop_audio_stream():
+    global _audio_stream_instance
+    if _audio_stream_instance is not None:
+        _audio_stream_instance.stop()
+        _audio_stream_instance = None
