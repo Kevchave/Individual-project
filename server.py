@@ -27,7 +27,7 @@ def home():
     return render_template("index.html") # Serves the html page 
 
 @app.route("/start_recording", methods=['POST'])
-def start_recordng():
+def start_recording():
     return jsonify({'status': 'Recording started...'})
 
 @app.route("/stop_recording", methods=['POST'])

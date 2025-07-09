@@ -47,6 +47,8 @@ class MetricsTracker:
         total_words = len(all_text.split()) # .split() splits into a list of words 
         elapsed_time = (time.time() - start_time) / 60 # In minutes
         avg_wpm = total_words / elapsed_time if elapsed_time > 0 else 0 
+        print(f"Elapsed time: {elapsed_time}")
+        print(f"Total words: {total_words}")
         print(f"Average WPM: {avg_wpm:.2f}")
 
     # VOLUME TRACKING
