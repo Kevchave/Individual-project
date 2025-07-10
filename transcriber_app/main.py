@@ -85,9 +85,9 @@ def get_current_metrics():
         metrics.track_volume(VOLUME_WINDOW_SECONDS)
         metrics.track_pitch(PITCH_WINDOW_SECONDS)
         return {
-            'wpm': getattr(metrics, 'current_wpm', 0),
-            'volume': getattr(metrics, 'current_volume', 0),
-            'pitch': getattr(metrics, 'current_pitch', 0)
+            'wpm': float(getattr(metrics, 'current_wpm', 0)),
+            'volume': float(getattr(metrics, 'current_volume', 0)),
+            'pitch': float(getattr(metrics, 'current_pitch', 0))
         }
     return {'wpm': 0, 'volume': 0, 'pitch': 0}
 
@@ -99,9 +99,9 @@ def get_average_metrics():
         metrics.track_volume_average(start_time)
         metrics.track_overall_pitch(start_time)
         return {
-            'average_wpm': getattr(metrics, 'average_wpm', 0),
-            'average_volume': getattr(metrics, 'average_volume', 0),
-            'average_pitch': getattr(metrics, 'average_pitch', 0)
+            'average_wpm': float(getattr(metrics, 'average_wpm', 0)),
+            'average_volume':float(getattr(metrics, 'average_volume', 0)),
+            'average_pitch': float(getattr(metrics, 'average_pitch', 0))
         }
     return {'average_wpm': 0, 'average_volume': 0, 'average_pitch': 0}
 
@@ -126,6 +126,7 @@ def main():
 def on_transcription(text):
     global metrics
     if metrics is not None:
+        # print(f"Transcription: {text} has been added")
         metrics.add_transcription(text)
 
 def on_audio_chunk(audio_float):

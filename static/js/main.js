@@ -8,16 +8,19 @@ document.addEventListener('DOMContentLoaded', function(){
     const volumeValue = document.getElementById('volume-value');
     const pitchValue = document.getElementById('pitch-value');
 
-    let pollingInterval = null;
+    let transcriptInterval = null;
+    let metricsInterval = null;
 
-    function pollUpdates() {
-        fetch('/get_current_transcript')
+    function pollTranscript(){
+        fetch('/get_live_transcript')
         .then(response => response.json())
         .then(data => {
             transcriptBox.textContent = data.transcript; 
         });
+    }
 
-        fetch('/get_current_metrics')
+    function pollMetrics() {
+        fetch('/get_live_metrics')
         .then(response => response.json())
         .then(data => {
             wpmValue.textContent = data.wpm.toFixed(2)
@@ -39,9 +42,10 @@ document.addEventListener('DOMContentLoaded', function(){
         // Update the transcript box with the status from the Flask response 
         .then(data => {
             transcriptBox.textContent = data.status;
-            if (!pollingInterval) {
+            if (!transcriptInterval && !metricsInterval) {
                 // Poll for updates every 3 seconds 
-                pollingInterval = setInterval(pollUpdates, 3000);
+                transcriptInterval = setInterval(pollTranscript, 3000);
+                metricsInterval = setInterval(pollMetrics, 6000);
             }
         })
 
@@ -57,9 +61,13 @@ document.addEventListener('DOMContentLoaded', function(){
             .then(response => response.json())
             .then(data => {
                 transcriptBox.textContent = data.status;
-                if (pollingInterval) {
-                    clearInterval(pollingInterval);
-                    pollingInterval = null;
+                if (transcriptInterval) {
+                    clearInterval(transcriptInterval);
+                    transcriptInterval = null;
+                }
+                if (metricsInterval) {
+                    clearInterval(metricsInterval);
+                    metricsInterval = null;
                 }
                 // Fetch the final transcript and metrics 
                 fetch('/get_final_transcript')

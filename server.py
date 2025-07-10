@@ -47,22 +47,22 @@ def stop_recording():
     return jsonify({'status': 'Recording stopped...'})
 
 # Live Transcript
-@app.route("/get_transcript")
+@app.route("/get_live_transcript")
 def get_transcript():
     transcript = get_current_transcript()
     return jsonify(({'transcript': transcript }))
+
+# Live Metrics
+@app.route("/get_live_metrics")
+def get_metrics():
+    metrics = get_current_metrics()
+    return jsonify(metrics)
 
 # Final Transcript
 @app.route("/get_final_transcript")
 def get_final_transcript_route():
     final_transcript = get_final_transcript()
     return jsonify({'transcript': final_transcript})
-
-# Live Metrics
-@app.route("/get_metrics")
-def get_metrics():
-    metrics = get_current_metrics()
-    return jsonify(metrics)
 
 # Average Metrics
 @app.route("/get_average_metrics")
@@ -71,6 +71,6 @@ def get_average_metrics_route():
     return jsonify(average_metrics)
 
 if __name__ == "__main__":
-    app.run(debug=True) # Starts the Flask application in debug mode
+    app.run(debug=True, port=5001) # Starts the Flask application in debug mode
 
 # Flask will need to serve an HTML file, as well as request and display the metrics data 

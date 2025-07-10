@@ -22,6 +22,7 @@ class MetricsTracker:
     def add_transcription(self, text):
         with self.accumulated_lock:
             self.accumulated.append((str(text).strip(), time.time()))
+            # print(f"Transcription: {self.accumulated[-1][0]}")
 
     def add_audio_chunk(self, audio_float):
         with self.audio_chunks_lock:
@@ -42,7 +43,13 @@ class MetricsTracker:
         with self.accumulated_lock:
             # Takes every text, where ts (timestamp) is within the last window_seconds 
             recent_texts = [text for text, ts in self.accumulated if ts >= now - window_seconds]
-        text = " ".join(recent_texts)
+
+        if not recent_texts:
+            print("[DEBUG] No recent texts to process for WPM")
+            return
+        else: 
+            text = " ".join(recent_texts)
+
         elapsed_time =  window_seconds / 60 # In minutes
         wpm = len(text.split()) / elapsed_time if elapsed_time > 0 else 0
         self.current_wpm = wpm
@@ -71,11 +78,12 @@ class MetricsTracker:
     #         print(f"Error in Volume reporting: {e}")
 
     def track_volume(self, window_seconds):
+        now = time.time()
         with self.audio_chunks_lock:
                 # Only keep chunks that are within the last window_seconds 
-                recent_chunks = [chunk for chunk, ts in self.all_audio_chunks if ts >= time.time() - window_seconds]
+                recent_chunks = [chunk for chunk, ts in self.all_audio_chunks if ts >= now - window_seconds]
         if not recent_chunks:
-            print("[DEBUG] No recent chunks to process for volume")
+            print("[DEBUG] No recent chunks to process for VOLUME")
             return
         else:
             # Concatenate the recent chunks into a single array 
@@ -123,10 +131,10 @@ class MetricsTracker:
             recent_chunks = [chunk for chunk, ts in self.all_audio_chunks if ts >= now - window_seconds]
 
         if not recent_chunks:
-            print("Pitch Variance: No audio chunks to process")
+            print("[DEBUG] No recent chunks to process for PITCH")
             return 
-        
-        y = np.concatenate(recent_chunks)
+        else: 
+            y = np.concatenate(recent_chunks)
 
         # f0 is fundamental frequency (pitch of the audio)
         # - pyin estimate the pitch of the audio, and the probability that the frame is voiced 
