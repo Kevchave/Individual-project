@@ -1,4 +1,4 @@
-// This enres the JS code only runs once the HTML is fully loaded 
+// This ensures the JS code only runs once the HTML is fully loaded 
 document.addEventListener('DOMContentLoaded', function(){
     // Get references to the HTML elements 
     const startBtn = document.getElementById('startBtn');
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function(){
             transcriptBox.textContent = data.status;
             if (!transcriptInterval && !metricsInterval) {
                 // Poll for updates every 3 seconds 
-                transcriptInterval = setInterval(pollTranscript, 3000);
+                transcriptInterval = setInterval(pollTranscript, 1500);
                 metricsInterval = setInterval(pollMetrics, 6000);
             }
         })
@@ -79,6 +79,15 @@ document.addEventListener('DOMContentLoaded', function(){
                 fetch('/get_average_metrics')
                 .then(response => response.json())
                 .then(data => {
+
+                    // Update the labels
+                    // - textContent can set or get the text content inside of an element
+                    // - this assignment is permanent until the page is reloaded or its changed by JS again
+                    document.getElementById('wpm-label').textContent = 'Average Words per Minute';
+                    document.getElementById('volume-label').textContent = 'Average Volume (dBFS)';
+                    document.getElementById('pitch-label').textContent = 'Average Pitch Variance (Hz)';
+
+                    // Update the values 
                     wpmValue.textContent = data.average_wpm.toFixed(2);
                     volumeValue.textContent = data.average_volume.toFixed(2);
                     pitchValue.textContent = data.average_pitch.toFixed(2);
@@ -90,4 +99,12 @@ document.addEventListener('DOMContentLoaded', function(){
             });
         });
     }
+    // Maybe add a non existent route error handling 
+    // If JS requests non-existent route
+    // fetch('/nonexistent_route')
+    // .then(response => {
+    // if (!response.ok) {
+    //     console.log('Error:', response.status); // 404
+    // }
+    // });
 });

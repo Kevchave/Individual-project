@@ -39,18 +39,6 @@ class AudioStream:
             self.stream.close()
             self.stream = None
 
-# Global instance for Flask integration
-# - accessible from anywhere in the app, and from other files (when imported) like server.py
-_audio_stream_instance = None 
+    # def pause(self):
 
-def start_audio_stream(sample_rate=16000, device_id=None):
-    global _audio_stream_instance
-    if _audio_stream_instance is None: 
-        _audio_stream_instance = AudioStream(sample_rate, device_id)
-    _audio_stream_instance.start()
-
-def stop_audio_stream():
-    global _audio_stream_instance
-    if _audio_stream_instance is not None:
-        _audio_stream_instance.stop()
-        _audio_stream_instance = None
+    # def resume(self):

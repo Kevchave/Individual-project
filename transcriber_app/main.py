@@ -5,7 +5,7 @@ import threading
 import time
 
 SAMPLE_RATE = 16000
-CHUNK_SEC = 3.0
+CHUNK_SEC = 1.5
 WPM_WINDOW_SECONDS = 6
 VOLUME_WINDOW_SECONDS = 6
 PITCH_WINDOW_SECONDS = 6
@@ -23,9 +23,18 @@ start_time = None
 # Start the full pipeline: audio, transcription, metrics
 def start_transcription_pipeline(device_id=MIC_INPUT):
     global audio_stream, transcriber, metrics, transcription_thread, start_time
+
+    # Clear previous data if there is
+    if metrics is not None: 
+        if hasattr(metrics, 'accumulated'):
+            metrics.accumulated.clear()
+        if hasattr(metrics, 'all_audio_chunks'):
+            metrics.all_audio_chunks.clear()
+    transcriber = None
+    metrics = None 
+    transcription_thread = None
     
     start_time = time.time()
-
 
     if audio_stream is None:
         audio_stream = AudioStream(SAMPLE_RATE, device_id)
@@ -52,6 +61,8 @@ def start_transcription_pipeline(device_id=MIC_INPUT):
 
     if transcription_thread is None or not transcription_thread.is_alive():
         # Start the transcription process in a background thread
+        # - ensures only one thread runs at a time 
+        # - if the thread dies, it can be restarted 
         globals()['transcription_thread'] = threading.Thread(target=run_transcription, daemon=True)
         globals()['transcription_thread'].start()
 
@@ -64,6 +75,16 @@ def stop_transcription_pipeline():
         audio_stream = None
     # Optionally, add cleanup for transcriber and metrics if needed
     # (e.g., set to None, stop threads, etc.)
+
+# def pause_transcription_pipeline():
+    # global audio_stream
+    # if audio_stream is not None: 
+    #     audio_stream.pause()
+
+# def resume_transcription_pipeline():
+    # global audio_stream, transcription_thread
+    # if audio_stream is not None: 
+    #     audio_stream.resume()
 
 # Get the latest transcript
 def get_current_transcript():
