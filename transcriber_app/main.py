@@ -76,15 +76,15 @@ def stop_transcription_pipeline():
     # Optionally, add cleanup for transcriber and metrics if needed
     # (e.g., set to None, stop threads, etc.)
 
-# def pause_transcription_pipeline():
-    # global audio_stream
-    # if audio_stream is not None: 
-    #     audio_stream.pause()
+def pause_transcription_pipeline():
+    global audio_stream
+    if audio_stream is not None: 
+        audio_stream.pause()
 
-# def resume_transcription_pipeline():
-    # global audio_stream, transcription_thread
-    # if audio_stream is not None: 
-    #     audio_stream.resume()
+def resume_transcription_pipeline():
+    global audio_stream, transcription_thread
+    if audio_stream is not None: 
+        audio_stream.resume()
 
 # Get the latest transcript
 def get_current_transcript():

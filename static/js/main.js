@@ -8,8 +8,10 @@ document.addEventListener('DOMContentLoaded', function(){
     const volumeValue = document.getElementById('volume-value');
     const pitchValue = document.getElementById('pitch-value');
 
+    let metricsMode = "live"
     let transcriptInterval = null;
     let metricsInterval = null;
+    let isPaused = false;
 
     function pollTranscript(){
         fetch('/get_live_transcript')
@@ -29,11 +31,71 @@ document.addEventListener('DOMContentLoaded', function(){
         });
     }
 
+    function togglePauseResume() {
+        const btn = document.getElementById('pauseResumeBtn');
+        if (!isPaused) {
+            pauseRecording();
+        } else {
+            resumeRecording(); 
+        }
+    }
+
+    function updateMetricsDisplay() {
+        if (metricsMode === "live") {
+            // Update the labels
+            document.getElementById('wpm-label').textContent = 'Words per Minute';
+            document.getElementById('volume-label').textContent = 'Volume (dBFS)';
+            document.getElementById('pitch-label').textContent = 'Pitch Variance (Hz)';
+        } else {
+            // Update the labels
+            document.getElementById('wpm-label').textContent = 'Average Words per Minute';
+            document.getElementById('volume-label').textContent = 'Average Volume (dBFS)';
+            document.getElementById('pitch-label').textContent = 'Average Pitch Variance (Hz)';
+        }
+    }
+
+    function pauseRecording(){
+        fetch('/pause_recording', {method: 'POST'})
+        .then(response => {
+            if (response.ok) {
+                isPaused = true; 
+                document.getElementById('pauseResumeBtn').textContent = "Resume";
+            } else {
+                alert ("Failed to pause recording.");
+            }
+        })
+        .catch(error => {
+            console.error("Error pausing:", error);
+            alert("Error pausing recording.");
+        });
+    }
+
+    function resumeRecording(){
+        fetch('/resume_recording', {method: 'POST'})
+        .then(response => {
+            if (response.ok) {
+                isPaused = false; 
+                document.getElementById('pauseResumeBtn').textContent = "Pause"
+            } else {
+                alert("Failed to resume recording.");
+            }
+        })
+        .catch(error => {
+            console.error("Error resuming:", error);
+            alert("Error resuming recording.");
+        });
+    }
+
     // Add a click event listener to the Start Recording button 
+    // - structure wise, the function can be deigined separately for clarity and modularity
     startBtn.addEventListener('click', function(){
+        metricsMode = "live"
+        updateMetricsDisplay();
+
         // Sends a POST request to Flask backend after a click to /start_recording
         // - use fetch to communicate with the Flask backend 
         // - method can be GET, POST, PUT, DELETE, etc. 
+    
         fetch('/start_recording', {method: 'POST'})
 
         // Wait for Flask response and parse it as JSON 
@@ -57,6 +119,9 @@ document.addEventListener('DOMContentLoaded', function(){
 
     if (stopBtn) {
         stopBtn.addEventListener('click', function(){
+            metricsMode = "average"
+            updateMetricsDisplay();
+
             fetch('/stop_recording', {method: 'POST'})
             .then(response => response.json())
             .then(data => {
@@ -79,14 +144,6 @@ document.addEventListener('DOMContentLoaded', function(){
                 fetch('/get_average_metrics')
                 .then(response => response.json())
                 .then(data => {
-
-                    // Update the labels
-                    // - textContent can set or get the text content inside of an element
-                    // - this assignment is permanent until the page is reloaded or its changed by JS again
-                    document.getElementById('wpm-label').textContent = 'Average Words per Minute';
-                    document.getElementById('volume-label').textContent = 'Average Volume (dBFS)';
-                    document.getElementById('pitch-label').textContent = 'Average Pitch Variance (Hz)';
-
                     // Update the values 
                     wpmValue.textContent = data.average_wpm.toFixed(2);
                     volumeValue.textContent = data.average_volume.toFixed(2);
@@ -99,6 +156,9 @@ document.addEventListener('DOMContentLoaded', function(){
             });
         });
     }
+
+    document.getElementById('pauseResumeBtn').addEventListener('click', togglePauseResume);
+
     // Maybe add a non existent route error handling 
     // If JS requests non-existent route
     // fetch('/nonexistent_route')

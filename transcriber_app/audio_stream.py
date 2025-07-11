@@ -39,6 +39,10 @@ class AudioStream:
             self.stream.close()
             self.stream = None
 
-    # def pause(self):
+    def pause(self):
+        if self.stream is not None and self.stream.active: 
+            self.stream.stop()
 
-    # def resume(self):
+    def resume(self):
+        if self.stream is not None and not self.stream.active: 
+            self.stream.start()

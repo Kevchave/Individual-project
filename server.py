@@ -2,6 +2,8 @@ from flask import Flask, render_template, jsonify, request
 from transcriber_app.main import (
     start_transcription_pipeline,
     stop_transcription_pipeline,
+    pause_transcription_pipeline, 
+    resume_transcription_pipeline,
     get_current_transcript,
     get_final_transcript,
     get_current_metrics,
@@ -45,6 +47,24 @@ def start_recording():
 def stop_recording():
     stop_transcription_pipeline()
     return jsonify({'status': 'Recording stopped...'})
+
+# Pause Recording
+@app.route("/pause_recording", methods=['POST'])
+def pause_recording():
+    try:
+        pause_transcription_pipeline()
+        return jsonify({"status": "paused"}), 200
+    except Exception as e: 
+        return jsonify({"error": str(e)}), 500
+
+# Resume Recording
+@app.route("/resume_recording", methods=['POST'])
+def resume_recording():
+    try:
+        resume_transcription_pipeline()
+        return jsonify({"status": "resumed"}), 200
+    except Exception as e: 
+        return jsonify({"error": str(e)}), 500
 
 # Live Transcript
 @app.route("/get_live_transcript")
