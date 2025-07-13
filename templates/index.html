@@ -94,6 +94,39 @@
             width: 100%;
             text-align: center;
         }
+        
+        .graphs-container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 20px;
+            width: 80vw;
+            max-width: 700px;
+            margin-bottom: 40px;
+        }
+        
+        .graph-box {
+            background: #fff;
+            border: 2px solid #0077cc;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+
+            flex: 1;                 /* each box grows equally */
+            min-width: 0;            /* prevents overflow of child flex items */
+        }
+        
+        .graph-title {
+            font-weight: bold;
+            color: #155a8a;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .graph-box canvas {
+            height: 200px !important;
+            width: 100% !important;
+        }
     </style>
 </head>
 <body>
@@ -119,6 +152,24 @@
             <span class="metric-value" id="pitch-value">0</span>
         </div>
     </div>
+    
+    <div class="graphs-container">
+        <div class="graph-box">
+            <div class="graph-title">WPM Over Time</div>
+            <canvas id="wpmChart"></canvas>
+        </div>
+        <div class="graph-box">
+            <div class="graph-title">Volume Over Time</div>
+            <canvas id="volumeChart"></canvas>
+        </div>
+        <div class="graph-box">
+            <div class="graph-title">Pitch Variance Over Time</div>
+            <canvas id="pitchChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Chart.js for live graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- This tells Flask to serve your JS file from the static/js/ directory. -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>

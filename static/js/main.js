@@ -13,6 +13,196 @@ document.addEventListener('DOMContentLoaded', function(){
     let metricsInterval = null;
     let isPaused = false;
 
+    // Chart Variables 
+    let wpmChart, volumeChart, pitchChart;  //Chart.js objects that control each graph 
+    let wpmData = [], volumeData = [], pitchData = []; // Arrays storing the actual 
+    let timeLabels = []; 
+    let startTime = null; 
+
+    // Initialise the charts 
+    function initialiseCharts() {
+
+        //Shared configuration for all three charts 
+        const chartOptions = {
+            responsive: true, // Charts resize with the window 
+            maintainAspectRatio: false, 
+            animation: { duration: 0 }, // No animations for smooth real-time updates 
+            scales: {
+                x: {
+                    display: true, // Show the axis 
+                    title: {
+                        display: true, // Show the title 
+                        text: 'Time (seconds)' // Set the title
+                    }
+                }, 
+                y: {
+                    display: true, // Show the axis 
+                    beginAtZero: true // Begin at 0
+                }
+            }, 
+            plugins: {
+                legend: { display: false } // Disable the legend
+            }
+        };
+
+        // WPM Chart 
+        const wpmCtx = document.getElementById('wpmChart').getContext('2d');
+        wpmChart = new Chart(wpmCtx, { // Create a new chart.js instance, passing the canvas context and configuration object
+            type: 'line', // Specify line chart
+            data: {
+                labels: [], 
+                datasets: [{  // Define the data series
+                    label: 'WPM', 
+                    data: [], 
+                    borderColor: '#0077cc', 
+                    backgroundColor: 'rgba(0, 119, 204, 0.1)', 
+                    borderWidth: 2,     // Thickness of the line in pixels 
+                    fill: true,         // Fill area under the line
+                    tension: 0.4        // Smooth curves (instead of straight)
+                }] 
+            }, 
+            // Copy pre-defined chart options 
+            options: {
+                ...chartOptions, 
+                scales: {
+                    ...chartOptions.scales, 
+                    y: {
+                        ...chartOptions.scales.y, 
+                        title: {
+                            display: true, 
+                            text: 'Words per Minute'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Volume Chart 
+        const volumeCtx = document.getElementById('volumeChart').getContext('2d');
+        volumeChart = new Chart(volumeCtx, {
+            type: 'line', 
+            data: {
+                labels: [], 
+                datasets: [{
+                    label: 'Volume', 
+                    data: [], 
+                    borderColor: '#28a745', 
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)', 
+                    borderWidth: 2, 
+                    fill: true, 
+                    tension: 0.4 
+                }] 
+            }, 
+            options: {
+                ...chartOptions, 
+                scales: {
+                    ...chartOptions.scales, 
+                    y: {
+                        ...chartOptions.scales.y, 
+                        title: {
+                            display: true, 
+                            text: 'Volume (dBFS)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Pitch Chart 
+        const pitchCtx = document.getElementById('pitchChart').getContext('2d');
+        pitchChart = new Chart(pitchCtx, {
+            type: 'line', 
+            data: {
+                labels: [], 
+                datasets: [{
+                    label: 'Pitch Variance', 
+                    data: [], 
+                    borderColor: '#dc3545', 
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)', 
+                    borderWidth: 2, 
+                    fill: true, 
+                    tension: 0.4 
+                }] 
+            }, 
+            options: {
+                ...chartOptions, 
+                scales: {
+                    ...chartOptions.scales, 
+                    y: {
+                        ...chartOptions.scales.y, 
+                        title: {
+                            display: true, 
+                            text: 'Pitch Variance (Hz)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Update charts with new data 
+    function updateCharts(wpm, volume, pitch) {
+        if (!startTime) return;
+        
+        // Calculates time since recording staretd
+        const currentTime = Math.floor((Date.now() - startTime) / 1000);
+
+        // Add new data points to the end of arrays
+        wpmData.push(wpm);
+        volumeData.push(volume);
+        pitchData.push(pitch);
+        timeLabels.push(currentTime);
+
+        // Keep last 50 data points for performance
+        const maxPoints = 5; 
+        if (wpmData.length > maxPoints) {
+            // Shift removes the first (oldest) element
+            wpmData.shift(); 
+            volumeData.shift(); 
+            pitchData.shift(); 
+            timeLabels.shift(); 
+        }
+
+        wpmChart.data.labels = timeLabels;        // Updates the x axis with the time array 
+        wpmChart.data.datasets[0].data = wpmData; // Updates the y axis with the WPM value
+        wpmChart.update('none');                  // Redraws the chart with new data 
+
+        volumeChart.data.labels = timeLabels; 
+        volumeChart.data.datasets[0].data = volumeData; 
+        volumeChart.update('none'); 
+
+        pitchChart.data.labels = timeLabels; 
+        pitchChart.data.datasets[0].data = pitchData; 
+        pitchChart.update('none'); 
+    }
+
+    // Reset charts 
+    function resetCharts() {
+        wpmData = []; 
+        volumeData = []; 
+        pitchData = []; 
+        timeLabels = []; 
+        startTime = null; 
+
+        if (wpmChart) {
+            wpmChart.data.labels = []; 
+            wpmChart.data.datasets[0].data = []; 
+            wpmChart.update(); 
+        }
+
+        if (volumeChart) {
+            volumeChart.data.labels = []; 
+            volumeChart.data.datasets[0].data = []; 
+            volumeChart.update(); 
+        }
+
+        if (pitchChart) {
+            pitchChart.data.labels = []; 
+            pitchChart.data.datasets[0].data = []; 
+            pitchChart.update(); 
+        }
+    }
+
     function pollTranscript(){
         fetch('/get_live_transcript')
         .then(response => response.json())
@@ -28,6 +218,11 @@ document.addEventListener('DOMContentLoaded', function(){
             wpmValue.textContent = data.wpm.toFixed(2)
             volumeValue.textContent = data.volume.toFixed(2)
             pitchValue.textContent = data.pitch.toFixed(2)
+            
+            // Update charts with new data only if not paused
+            if (!isPaused) {
+                updateCharts(data.wpm, data.volume, data.pitch);
+            }
         });
     }
 
@@ -92,6 +287,13 @@ document.addEventListener('DOMContentLoaded', function(){
         metricsMode = "live"
         updateMetricsDisplay();
 
+        // Initialize charts and reset data
+        if(!wpmChart) {
+            initialiseCharts();
+        }
+        resetCharts(); 
+        startTime = Date.now();
+
         // Sends a POST request to Flask backend after a click to /start_recording
         // - use fetch to communicate with the Flask backend 
         // - method can be GET, POST, PUT, DELETE, etc. 
@@ -126,14 +328,20 @@ document.addEventListener('DOMContentLoaded', function(){
             .then(response => response.json())
             .then(data => {
                 transcriptBox.textContent = data.status;
+                
                 if (transcriptInterval) {
                     clearInterval(transcriptInterval);
                     transcriptInterval = null;
                 }
+                
                 if (metricsInterval) {
                     clearInterval(metricsInterval);
                     metricsInterval = null;
                 }
+
+                // Reset charts when stopping 
+                resetCharts(); 
+
                 // Fetch the final transcript and metrics 
                 fetch('/get_final_transcript')
                 .then(response => response.json())
