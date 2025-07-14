@@ -32,6 +32,11 @@ app = Flask(__name__)
 # Defines a route for the route URL "/"
 # - when a user visits the "/" URL, call the home() function 
 # - under the hood Flask keeps a mapping or URLs to Python functions 
+
+@app.route('/test')
+def test():
+    return render_template("test.html")
+
 @app.route('/')
 def home():
     return render_template("index.html") # Serves the html page 

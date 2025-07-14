@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- This is a block for the page title -->
+    <title>{% block title %}Live Lecture Feedback{% endblock %}</title>
+    
+    <!-- This is a block for for additional head content from child templates -->
+    {% block head %}{% endblock %}
+
+    <!-- Main CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+
+    <!-- This is a block for header content -->
+    {% block header %}{% endblock %}
+
+    <!-- This is a block for the main content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- This is a block for the footer -->
+    {% block footer %}{% endblock %}
+
+    <!-- Chart.js for live graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Main JS file -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>    {% block scripts %}{% endblock %}
+</body>
+</html>

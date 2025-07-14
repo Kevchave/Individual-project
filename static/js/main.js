@@ -3,10 +3,84 @@ document.addEventListener('DOMContentLoaded', function(){
     // Get references to the HTML elements 
     const startBtn = document.getElementById('startBtn');
     const stopBtn = document.getElementById('stopBtn');
+
     const transcriptBox = document.getElementById('transcript-box');
     const wpmValue = document.getElementById('wpm-value');
     const volumeValue = document.getElementById('volume-value');
     const pitchValue = document.getElementById('pitch-value');
+    
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeText = document.getElementById('themeText');
+
+    // Theme management
+    let currentTheme = localStorage.getItem('theme') || 'light';
+    
+    // Initialize theme
+    function initializeTheme() {
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeUI();
+    }
+    
+    // Update theme UI elements
+    function updateThemeUI() {
+        if (currentTheme === 'dark') {
+            themeIcon.textContent = '☀️';
+            themeText.textContent = 'Light Mode';
+        } else {
+            themeIcon.textContent = '🌙';
+            themeText.textContent = 'Dark Mode';
+        }
+    }
+    
+    // Toggle theme function
+    function toggleTheme() {
+        currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        localStorage.setItem('theme', currentTheme);
+        updateThemeUI();
+        
+        // Update chart colors for dark mode
+        updateChartColors();
+    }
+    
+    // Update chart colors based on theme
+    function updateChartColors() {
+        const isDark = currentTheme === 'dark';
+        const textColor = isDark ? '#e0e0e0' : '#222';
+        const gridColor = isDark ? '#444' : '#ddd';
+        
+        if (wpmChart) {
+            wpmChart.options.color = textColor;
+            wpmChart.options.scales.x.grid.color = gridColor;
+            wpmChart.options.scales.x.ticks.color = textColor;
+            wpmChart.options.scales.y.grid.color = gridColor;
+            wpmChart.options.scales.y.ticks.color = textColor;
+            wpmChart.update('none');
+        }
+        if (volumeChart) {
+            volumeChart.options.color = textColor;
+            volumeChart.options.scales.x.grid.color = gridColor;
+            volumeChart.options.scales.x.ticks.color = textColor;
+            volumeChart.options.scales.y.grid.color = gridColor;
+            volumeChart.options.scales.y.ticks.color = textColor;
+            volumeChart.update('none');
+        }
+        if (pitchChart) {
+            pitchChart.options.color = textColor;
+            pitchChart.options.scales.x.grid.color = gridColor;
+            pitchChart.options.scales.x.ticks.color = textColor;
+            pitchChart.options.scales.y.grid.color = gridColor;
+            pitchChart.options.scales.y.ticks.color = textColor;
+            pitchChart.update('none');
+        }
+    }
+    
+    // Initialize theme on load
+    initializeTheme();
+    
+    // Add event listener for theme toggle
+    themeToggle.addEventListener('click', toggleTheme);
 
     let metricsMode = "live"
     let transcriptInterval = null;
@@ -22,28 +96,43 @@ document.addEventListener('DOMContentLoaded', function(){
     // Initialise the charts 
     function initialiseCharts() {
 
+        // Get theme-aware colors
+        const isDark = currentTheme === 'dark';
+        const textColor = isDark ? '#e0e0e0' : '#222';
+        const gridColor = isDark ? '#444' : '#ddd';
+        
         //Shared configuration for all three charts 
         const chartOptions = {
             responsive: true, // Charts resize with the window 
             maintainAspectRatio: false, 
             animation: { duration: 0 }, // No animations for smooth real-time updates 
+            color: textColor,
             scales: {
                 x: {
                     display: true, // Show the axis 
                     title: {
                         display: true, // Show the title 
-                        text: 'Time (seconds)' // Set the title
-                    }
+                        text: 'Time (seconds)', // Set the title
+                        color: textColor
+                    },
+                    grid: { color: gridColor },
+                    ticks: { color: textColor }
                 }, 
                 y: {
                     display: true, // Show the axis 
-                    beginAtZero: true // Begin at 0
+                    beginAtZero: true, // Begin at 0
+                    grid: { color: gridColor },
+                    ticks: { color: textColor }
                 }
             }, 
             plugins: {
                 legend: { display: false } // Disable the legend
             }
         };
+
+        if (wpmChart) wpmChart.destroy();
+        if (volumeChart) volumeChart.destroy();
+        if (pitchChart) pitchChart.destroy();
 
         // WPM Chart 
         const wpmCtx = document.getElementById('wpmChart').getContext('2d');
@@ -163,17 +252,25 @@ document.addEventListener('DOMContentLoaded', function(){
             timeLabels.shift(); 
         }
 
-        wpmChart.data.labels = timeLabels;        // Updates the x axis with the time array 
-        wpmChart.data.datasets[0].data = wpmData; // Updates the y axis with the WPM value
-        wpmChart.update('none');                  // Redraws the chart with new data 
+        console.log('Updating charts with:', { wpm, volume, pitch, currentTime });
 
-        volumeChart.data.labels = timeLabels; 
-        volumeChart.data.datasets[0].data = volumeData; 
-        volumeChart.update('none'); 
+        if (wpmChart) {
+            wpmChart.data.labels = timeLabels;        // Updates the x axis with the time array 
+            wpmChart.data.datasets[0].data = wpmData; // Updates the y axis with the WPM value
+            wpmChart.update('none');                  // Redraws the chart with new data 
+        }
 
-        pitchChart.data.labels = timeLabels; 
-        pitchChart.data.datasets[0].data = pitchData; 
-        pitchChart.update('none'); 
+        if (volumeChart) {
+            volumeChart.data.labels = timeLabels; 
+            volumeChart.data.datasets[0].data = volumeData; 
+            volumeChart.update('none'); 
+        }
+
+        if (pitchChart) {
+            pitchChart.data.labels = timeLabels; 
+            pitchChart.data.datasets[0].data = pitchData; 
+            pitchChart.update('none'); 
+        }
     }
 
     // Reset charts 
@@ -215,6 +312,7 @@ document.addEventListener('DOMContentLoaded', function(){
         fetch('/get_live_metrics')
         .then(response => response.json())
         .then(data => {
+            console.log('Received metrics:', data);
             wpmValue.textContent = data.wpm.toFixed(2)
             volumeValue.textContent = data.volume.toFixed(2)
             pitchValue.textContent = data.pitch.toFixed(2)
@@ -222,7 +320,12 @@ document.addEventListener('DOMContentLoaded', function(){
             // Update charts with new data only if not paused
             if (!isPaused) {
                 updateCharts(data.wpm, data.volume, data.pitch);
+            } else {
+                console.log('Recording is paused, skipping chart update');
             }
+        })
+        .catch(error => {
+            console.error('Error fetching metrics:', error);
         });
     }
 
@@ -288,11 +391,11 @@ document.addEventListener('DOMContentLoaded', function(){
         updateMetricsDisplay();
 
         // Initialize charts and reset data
-        if(!wpmChart) {
-            initialiseCharts();
-        }
+        initialiseCharts();
         resetCharts(); 
+
         startTime = Date.now();
+        console.log('Recording started, startTime:', startTime);
 
         // Sends a POST request to Flask backend after a click to /start_recording
         // - use fetch to communicate with the Flask backend 
