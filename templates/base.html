@@ -29,6 +29,6 @@
     <!-- Chart.js for live graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Main JS file -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>    {% block scripts %}{% endblock %}
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>    {% block scripts %}{% endblock %}
 </body>
 </html>
