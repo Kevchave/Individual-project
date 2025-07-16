@@ -19,10 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initialiseTheme();
     initialiseCharts(currentTheme);
 
-    // // Set up polling intervals
-    // let transcriptInterval = setInterval(() => pollTranscript(transcriptBox), 2000);
-    // let metricsInterval = setInterval(() => pollMetrics(wpmValue, volumeValue, pitchValue), 6000);
-
     // Set up controls (event listeners and control logic)
     initialiseControls({
         startBtn,
@@ -32,7 +28,5 @@ document.addEventListener('DOMContentLoaded', () => {
         wpmValue,
         volumeValue,
         pitchValue,
-        // transcriptInterval,
-        // metricsInterval
     });
 });

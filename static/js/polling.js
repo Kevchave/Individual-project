@@ -29,4 +29,4 @@ function pollMetrics(wpmValue, volumeValue, pitchValue) {
         });
 }
 
-export { pollTranscript, pollMetrics };
+export { pollTranscript, pollMetrics};

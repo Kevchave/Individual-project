@@ -13,6 +13,9 @@ function updateMetricsDisplay(metricsMode) {
         document.getElementById('wpm-label').textContent = 'Words per Minute';
         document.getElementById('volume-label').textContent = 'Volume (dBFS)';
         document.getElementById('pitch-label').textContent = 'Pitch Variance (Hz)';
+        document.getElementById('wpm-value').textContent = '0';
+        document.getElementById('volume-value').textContent = '0';
+        document.getElementById('pitch-value').textContent = '0';
     } else {
         document.getElementById('wpm-label').textContent = 'Average Words per Minute';
         document.getElementById('volume-label').textContent = 'Average Volume (dBFS)';
@@ -22,20 +25,27 @@ function updateMetricsDisplay(metricsMode) {
 
 function initialiseControls({
     startBtn, stopBtn, pauseResumeBtn,
-    transcriptBox, wpmValue, volumeValue, pitchValue
-}) {
+    transcriptBox, wpmValue, volumeValue, pitchValue }) {
     // Start Recording
     startBtn.addEventListener('click', function() {
+        if (metricsMode === "live") {
+            transcriptBox.textContent = "Recording already in progress.";
+            return;
+        }
+
+        if (isPaused) {
+            setIsPaused(false);
+            pauseResumeBtn.textContent = "Pause";
+        }
+
         setMetricsMode("live");
-        updateMetricsDisplay("live");
-        initialiseCharts();
-        resetCharts();
         setStartTime(Date.now());
         transcriptBox.textContent = "Recording started...";
         fetch('/start_recording', { method: 'POST' })
             .then(response => response.json())
             .then(data => {
                 transcriptBox.textContent = data.status;
+                updateMetricsDisplay(metricsMode);
                 if (!transcriptInterval && !metricsInterval) {
                     setTranscriptInterval(setInterval(() => pollTranscript(transcriptBox), 2000));
                     setMetricsInterval(setInterval(() => pollMetrics(wpmValue, volumeValue, pitchValue), 6000));
@@ -49,12 +59,17 @@ function initialiseControls({
 
     // Stop Recording
     stopBtn.addEventListener('click', function() {
+        if (metricsMode != "live") {
+            transcriptBox.textContent = "Recording already stopped.";
+            return;
+        }
         setMetricsMode("average");
-        updateMetricsDisplay("average");
+        resetCharts();
         fetch('/stop_recording', { method: 'POST' })
             .then(response => response.json())
             .then(data => {
                 transcriptBox.textContent = data.status;
+                updateMetricsDisplay(metricsMode);
                 if (transcriptInterval) {
                     clearInterval(transcriptInterval); // JavaScript function 
                     setTranscriptInterval(null);
@@ -63,9 +78,9 @@ function initialiseControls({
                     clearInterval(metricsInterval);
                     setMetricsInterval(null);
                 }
-                resetCharts();
+                updateMetricsDisplay(metricsMode);
 
-                // Fetch the final transcript and metrics 
+                 // Fetch the final transcript and metrics 
                 fetch('/get_final_transcript')
                     .then(response => response.json())
                     .then(data => {
@@ -75,7 +90,7 @@ function initialiseControls({
                         transcriptBox.textContent = 'Error fetching final transcript.';
                         console.error('Error fetching final transcript:', error);
                     });
-              
+                
                 fetch('/get_average_metrics')
                     .then(response => response.json())
                     .then(data => {
@@ -84,9 +99,9 @@ function initialiseControls({
                         pitchValue.textContent = data.average_pitch !== undefined ? data.average_pitch.toFixed(2) : 'N/A';
                     })
                     .catch(error => {
-                        wpmValue.textContent = 'Error';
-                        volumeValue.textContent = 'Error';
-                        pitchValue.textContent = 'Error';
+                        wpmValue.textContent = 'N/A';
+                        volumeValue.textContent = 'N/A';
+                        pitchValue.textContent = 'N/A';
                         console.error('Error fetching average metrics:', error);
                     });
             })
@@ -98,6 +113,10 @@ function initialiseControls({
 
     // Pause/Resume Recording
     pauseResumeBtn.addEventListener('click', function() {
+        if (metricsMode !== "live") {
+            // transcriptBox.textContent = "Cannot pause/resume when not recording.";
+            return;
+        }
         if (!isPaused) {
             fetch('/pause_recording', { method: 'POST' })
                 .then(response => {

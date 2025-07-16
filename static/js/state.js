@@ -10,7 +10,7 @@ export let pitchData = [];
 export let timeLabels = [];
 
 export let startTime = null;
-export let metricsMode = "live";
+export let metricsMode = null;
 export let transcriptInterval = null;
 export let metricsInterval = null;
 export let isPaused = false;
