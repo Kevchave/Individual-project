@@ -45,18 +45,18 @@ def start_transcription_pipeline(device_id=MIC_INPUT):
 
     chunk_samples = int(CHUNK_SEC * SAMPLE_RATE)
 
-    # Start metrics reporting threads 
-    # - threads allow the different functions to run concurrently without blocking each other or the main thread/program 
-    threading.Thread(target=metrics.track_wpm, args=(WPM_WINDOW_SECONDS,), daemon=True).start()
-    threading.Thread(target=metrics.track_volume, args=(VOLUME_WINDOW_SECONDS,), daemon=True).start()
-    threading.Thread(target=metrics.track_pitch, args=(PITCH_WINDOW_SECONDS,), daemon=True).start()
+    # # Start metrics reporting threads 
+    # # - threads allow the different functions to run concurrently without blocking each other or the main thread/program 
+    # threading.Thread(target=metrics.track_wpm, daemon=True).start()
+    # threading.Thread(target=metrics.track_volume, daemon=True).start()
+    # threading.Thread(target=metrics.track_pitch, daemon=True).start()
 
     def run_transcription():
         if audio_stream is not None:
             audio_stream.start()
             if transcriber is not None:
                 transcriber.transcribe_stream(
-                    audio_stream.audio_queue, chunk_samples, on_transcription, on_audio_chunk
+                    audio_stream.audio_queue, on_transcription, on_audio_chunk
                 )
 
     if transcription_thread is None or not transcription_thread.is_alive():
@@ -101,30 +101,51 @@ def get_current_transcript():
 # Get the latest metrics
 def get_current_metrics():
     global metrics
-    if metrics is not None:
-        metrics.track_wpm(WPM_WINDOW_SECONDS)
-        metrics.track_volume(VOLUME_WINDOW_SECONDS)
-        metrics.track_pitch(PITCH_WINDOW_SECONDS)
-        return {
-            'wpm': float(getattr(metrics, 'current_wpm', 0)),
-            'volume': float(getattr(metrics, 'current_volume', 0)),
-            'pitch': float(getattr(metrics, 'current_pitch', 0))
-        }
-    return {'wpm': 0, 'volume': 0, 'pitch': 0}
+    if metrics is None:
+        return {'wpm': 0, 'volume': 0, 'pitch': 0}
+    return {
+        'wpm': float(metrics.current_wpm),
+        'volume': float(metrics.current_volume),
+        'pitch': float(metrics.current_pitch)
+    }
+    # if metrics is not None:
+    #     metrics.track_wpm()
+    #     metrics.track_volume()
+    #     metrics.track_pitch()
+    #     return {
+    #         'wpm': float(getattr(metrics, 'current_wpm', 0)),
+    #         'volume': float(getattr(metrics, 'current_volume', 0)),
+    #         'pitch': float(getattr(metrics, 'current_pitch', 0))
+    #     }
+    # return {'wpm': 0, 'volume': 0, 'pitch': 0}
 
 def get_average_metrics():
     global metrics
-    if metrics is not None:
-        # Call the average methods to update the attributes
-        metrics.track_wpm_average(start_time)
-        metrics.track_volume_average(start_time)
-        metrics.track_overall_pitch(start_time)
+
+    # If we haven’t initialized MetricsTracker yet, just zero‐fill.
+    if metrics is None:
         return {
-            'average_wpm': float(getattr(metrics, 'average_wpm', 0)),
-            'average_volume':float(getattr(metrics, 'average_volume', 0)),
-            'average_pitch': float(getattr(metrics, 'average_pitch', 0))
+            'average_wpm':     0.0,
+            'average_volume':  0.0,
+            'average_pitch':   0.0
         }
-    return {'average_wpm': 0, 'average_volume': 0, 'average_pitch': 0}
+
+    # Recompute the averages
+    metrics.track_wpm_average()
+    metrics.track_volume_average()
+    metrics.track_overall_pitch()
+
+    return {
+        'average_wpm':     float(metrics.average_wpm),
+        'average_volume':  float(metrics.average_volume),
+        'average_pitch':   float(metrics.average_pitch)
+    }
+    #     return {
+    #         'average_wpm': float(getattr(metrics, 'average_wpm', 0)),
+    #         'average_volume':float(getattr(metrics, 'average_volume', 0)),
+    #         'average_pitch': float(getattr(metrics, 'average_pitch', 0))
+    #     }
+    # return {'average_wpm': 0, 'average_volume': 0, 'average_pitch': 0}
 
 def get_final_transcript():
     global metrics
@@ -144,16 +165,20 @@ def main():
         stop_transcription_pipeline()
         print("Stopped.")
 
-def on_transcription(text):
+def on_transcription(text, segment_duration):
     global metrics
     if metrics is not None:
-        # print(f"Transcription: {text} has been added")
-        metrics.add_transcription(text)
+        # print(f"Transcription: {text} has been added") DEBUGGING STATEMENT
+        metrics.add_transcription(text, segment_duration)
+        metrics.track_wpm()
 
-def on_audio_chunk(audio_float):
+def on_audio_chunk(audio_float, segment_duration):
     global metrics
     if metrics is not None:
-        metrics.add_audio_chunk(audio_float)
+        # print("Audio chunk received, length:", len(audio_float)) DEBUGGING STATEMENT
+        metrics.add_audio_chunk(audio_float, segment_duration)
+        metrics.track_volume()
+        metrics.track_pitch()
 
 if __name__ == "__main__":
     main()

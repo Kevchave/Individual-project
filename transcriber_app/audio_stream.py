@@ -17,6 +17,7 @@ class AudioStream:
 # - time_info: Time info 
 # - status: Error/status flags
     def callback(self, indata, frames, time_info, status):
+        # print("Audio callback fired, frames:", frames) DEBUGGING STATEMENT
         if status: 
             print("Mic error: ", status)
         pcm = (indata[:, 0] * 32767).astype(np.int16) # Convert audio data (first channel) to 16-bit PCM format
@@ -30,6 +31,7 @@ class AudioStream:
                 samplerate=self.sample_rate, 
                 channels=1, 
                 device=self.device_id, 
+                blocksize=480
             )
             self.stream.start()
 
