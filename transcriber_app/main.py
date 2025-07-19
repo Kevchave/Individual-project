@@ -43,7 +43,7 @@ def start_transcription_pipeline(device_id=MIC_INPUT):
     if metrics is None:
         metrics = MetricsTracker(SAMPLE_RATE)
 
-    chunk_samples = int(CHUNK_SEC * SAMPLE_RATE)
+    # chunk_samples = int(CHUNK_SEC * SAMPLE_RATE)
 
     # # Start metrics reporting threads 
     # # - threads allow the different functions to run concurrently without blocking each other or the main thread/program 

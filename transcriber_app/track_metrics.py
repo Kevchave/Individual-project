@@ -61,7 +61,7 @@ class MetricsTracker:
                 print("[DEBUG] No transcriptions to process for WPM")
                 return
             text, duration = self.accumulated[-1]
-        print(f"[DEBUG] Text: {text}, Duration: {duration}")
+        print(f"[DEBUG] \n Text: {text} \n NumWords: {len(text.split())} \n Duration: {duration}")
         wpm = len(text.split()) / (duration / 60) if duration > 0 else 0
         
         # Add to history, then smooth
@@ -72,7 +72,8 @@ class MetricsTracker:
         with self.accumulated_lock:
             total_words = sum(len(text.split()) for text, duration in self.accumulated)
             total_duration = sum(duration for text, duration in self.accumulated)
-        avg_wpm = total_words / (total_duration / 60) if total_duration > 0 else 0 
+        avg_wpm = total_words / (total_duration / 60) if total_duration > 0 else 0
+        print(f"[FINAL] \n NumWords: {total_words} \n Duration: {total_duration}") 
         self.average_wpm = avg_wpm
 
     # ------------------------------------------------------------------------------------------------
