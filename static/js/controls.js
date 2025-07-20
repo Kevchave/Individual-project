@@ -26,7 +26,8 @@ function updateMetricsDisplay(metricsMode) {
 function initialiseControls({
     startBtn, stopBtn, pauseResumeBtn,
     transcriptBox, wpmValue, volumeValue, pitchValue }) {
-    // Start Recording
+    
+        // Start Recording
     startBtn.addEventListener('click', function() {
         if (metricsMode === "live") {
             transcriptBox.textContent = "Recording already in progress.";
@@ -41,11 +42,13 @@ function initialiseControls({
         setMetricsMode("live");
         setStartTime(Date.now());
         transcriptBox.textContent = "Recording started...";
+
         fetch('/start_recording', { method: 'POST' })
             .then(response => response.json())
             .then(data => {
                 transcriptBox.textContent = data.status;
                 updateMetricsDisplay(metricsMode);
+                // This is only used if we want to poll on intervals 
                 if (!transcriptInterval && !metricsInterval) {
                     setTranscriptInterval(setInterval(() => pollTranscript(transcriptBox), 2000));
                     setMetricsInterval(setInterval(() => pollMetrics(wpmValue, volumeValue, pitchValue), 6000));
@@ -70,10 +73,12 @@ function initialiseControls({
             .then(data => {
                 transcriptBox.textContent = data.status;
                 updateMetricsDisplay(metricsMode);
+
                 if (transcriptInterval) {
                     clearInterval(transcriptInterval); // JavaScript function 
                     setTranscriptInterval(null);
                 }
+                
                 if (metricsInterval) {
                     clearInterval(metricsInterval);
                     setMetricsInterval(null);

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request 
+from flask import Flask, render_template, jsonify 
 from transcriber_app.main import (
     start_transcription_pipeline,
     stop_transcription_pipeline,
@@ -19,11 +19,6 @@ from transcriber_app.main import (
 # Example: Start Recording
 # - (1) Frontend (JavaScript)sends POST request to /start_recording
 # - (2) Backend (Flask) processes the request and returns JSON data
-# - (3) Frontend (JavaScript) uses this data to update the UI 
-
-# Example 2: Live Transcript:
-# - (1) Frontend (JavaScript) periodically sends GET requests to /get_transcript
-# - (2) Backend (Flask) responds with JSON data containing the live transcript
 # - (3) Frontend (JavaScript) uses this data to update the UI 
 
 # Creates an instance of the Flask class (aka application)

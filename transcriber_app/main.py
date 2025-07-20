@@ -24,7 +24,7 @@ start_time = None
 def start_transcription_pipeline(device_id=MIC_INPUT):
     global audio_stream, transcriber, metrics, transcription_thread, start_time
 
-    # Clear previous data if there is
+    # Clear previous data if there exists
     if metrics is not None: 
         if hasattr(metrics, 'accumulated'):
             metrics.accumulated.clear()
@@ -34,8 +34,9 @@ def start_transcription_pipeline(device_id=MIC_INPUT):
     metrics = None 
     transcription_thread = None
     
-    start_time = time.time()
+    # start_time = time.time()
 
+    # Create all objects
     if audio_stream is None:
         audio_stream = AudioStream(SAMPLE_RATE, device_id)
     if transcriber is None:
@@ -43,28 +44,19 @@ def start_transcription_pipeline(device_id=MIC_INPUT):
     if metrics is None:
         metrics = MetricsTracker(SAMPLE_RATE)
 
-    # chunk_samples = int(CHUNK_SEC * SAMPLE_RATE)
-
-    # # Start metrics reporting threads 
-    # # - threads allow the different functions to run concurrently without blocking each other or the main thread/program 
-    # threading.Thread(target=metrics.track_wpm, daemon=True).start()
-    # threading.Thread(target=metrics.track_volume, daemon=True).start()
-    # threading.Thread(target=metrics.track_pitch, daemon=True).start()
-
     def run_transcription():
         if audio_stream is not None:
             audio_stream.start()
             if transcriber is not None:
-                transcriber.transcribe_stream(
-                    audio_stream.audio_queue, on_transcription, on_audio_chunk
-                )
+                transcriber.transcribe_stream(audio_stream.audio_queue, on_transcription, on_audio_chunk)
 
+    # Safeguard to ensure exactly one background thread is active 
     if transcription_thread is None or not transcription_thread.is_alive():
-        # Start the transcription process in a background thread
-        # - ensures only one thread runs at a time 
-        # - if the thread dies, it can be restarted 
-        globals()['transcription_thread'] = threading.Thread(target=run_transcription, daemon=True)
-        globals()['transcription_thread'].start()
+
+        # Start a separate transcription thread 
+        # - the transcription can now run without blocking the main thread (or program)
+        transcription_thread = threading.Thread(target=run_transcription, daemon=True)
+        transcription_thread.start()
 
 # Stop the pipeline (implement as needed)
 def stop_transcription_pipeline():
@@ -72,9 +64,16 @@ def stop_transcription_pipeline():
     # You may need to add stop/cleanup logic to your classes
     if audio_stream is not None:
         audio_stream.stop()
-        audio_stream = None
-    # Optionally, add cleanup for transcriber and metrics if needed
-    # (e.g., set to None, stop threads, etc.)
+        
+        # Signals the transcription loop to exit
+        audio_stream.audio_queue.put(None)
+
+    if transcription_thread is not None:
+        transcription_thread.join()
+        transcription_thread = None
+
+    # Clean up stream handle
+    audio_stream = None
 
 def pause_transcription_pipeline():
     global audio_stream
@@ -108,16 +107,12 @@ def get_current_metrics():
         'volume': float(metrics.current_volume),
         'pitch': float(metrics.current_pitch)
     }
-    # if metrics is not None:
-    #     metrics.track_wpm()
-    #     metrics.track_volume()
-    #     metrics.track_pitch()
-    #     return {
-    #         'wpm': float(getattr(metrics, 'current_wpm', 0)),
-    #         'volume': float(getattr(metrics, 'current_volume', 0)),
-    #         'pitch': float(getattr(metrics, 'current_pitch', 0))
-    #     }
-    # return {'wpm': 0, 'volume': 0, 'pitch': 0}
+
+def get_final_transcript():
+    global metrics
+    if metrics is not None and hasattr(metrics, 'accumulated'):
+        return ' '.join(text for text, ts in metrics.accumulated).strip()
+    return ""
 
 def get_average_metrics():
     global metrics
@@ -140,18 +135,7 @@ def get_average_metrics():
         'average_volume':  float(metrics.average_volume),
         'average_pitch':   float(metrics.average_pitch)
     }
-    #     return {
-    #         'average_wpm': float(getattr(metrics, 'average_wpm', 0)),
-    #         'average_volume':float(getattr(metrics, 'average_volume', 0)),
-    #         'average_pitch': float(getattr(metrics, 'average_pitch', 0))
-    #     }
-    # return {'average_wpm': 0, 'average_volume': 0, 'average_pitch': 0}
 
-def get_final_transcript():
-    global metrics
-    if metrics is not None and hasattr(metrics, 'accumulated'):
-        return ' '.join(text for text, ts in metrics.accumulated).strip()
-    return ""
 
 def main():
     # For manual testing: start the pipeline, print status, etc.

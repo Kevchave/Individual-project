@@ -11,17 +11,19 @@ class AudioStream:
         self.device_id = device_id
         self.stream = None; 
 
-# Callback function that will be called for each chunk of audio
-# - indata: Numpy array of shape (frames, channels) containing the audio data
-# - frames: The number of frames in this chunk
-# - time_info: Time info 
-# - status: Error/status flags
+    # Callback function -> called every time a chunk of audio is ready
+    # - indata: Numpy array of shape (frames, channels) containing the audio data
+    # - status: Error/status flags
     def callback(self, indata, frames, time_info, status):
         # print("Audio callback fired, frames:", frames) DEBUGGING STATEMENT
         if status: 
             print("Mic error: ", status)
-        pcm = (indata[:, 0] * 32767).astype(np.int16) # Convert audio data (first channel) to 16-bit PCM format
-        self.audio_queue.put(pcm) # Put the audio data into the queue
+
+        # Convert audio data (first channel) to 16-bit PCM format
+        pcm = (indata[:, 0] * 32767).astype(np.int16) 
+        
+        # Put the audio data into the queue
+        self.audio_queue.put(pcm) 
 
     def start(self):
         if self.stream is None: 
@@ -42,9 +44,14 @@ class AudioStream:
             self.stream = None
 
     def pause(self):
+        # .active is a flag in sd.InputStream
         if self.stream is not None and self.stream.active: 
+
+            # .stop() suspends callbacks, but doesnt close the stream object 
             self.stream.stop()
 
     def resume(self):
         if self.stream is not None and not self.stream.active: 
+
+            # .start() re-enables callbacks, but doesnt re-open the device 
             self.stream.start()

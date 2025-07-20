@@ -1,5 +1,4 @@
 import threading 
-import time
 import numpy as np 
 import librosa 
 from collections import deque
@@ -42,6 +41,7 @@ class MetricsTracker:
 
     def get_last_audio_chunk(self):
         with self.audio_chunks_lock:
+
             # Return the audio_float of the last chunk
             return self.all_audio_chunks[-1][0] if self.all_audio_chunks else None
 
@@ -64,7 +64,7 @@ class MetricsTracker:
         print(f"[DEBUG] \n Text: {text} \n NumWords: {len(text.split())} \n Duration: {duration}")
         wpm = len(text.split()) / (duration / 60) if duration > 0 else 0
         
-        # Add to history, then smooth
+        # Add 'wpm' into a deque list, then take the average
         self.wpm_history.append(wpm)
         self.current_wpm = float(np.mean(self.wpm_history))
 
@@ -86,6 +86,8 @@ class MetricsTracker:
             return
 
         db = self._rms_to_db(chunk)
+
+        # Add 'volume' into a deque list, then take the average
         self.vol_history.append(db)
         self.current_volume = float(np.mean(self.vol_history))
 
@@ -126,6 +128,8 @@ class MetricsTracker:
             print("Pitch Variance: No voice audio detected")
             return
         std_dev_pitch = float(np.std(voiced))
+
+        # Add 'st_dev_pitch' into a deque list, then take the average
         self.pitch_history.append(std_dev_pitch)
         self.current_pitch = float(np.mean(self.pitch_history))
 

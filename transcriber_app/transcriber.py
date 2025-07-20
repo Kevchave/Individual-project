@@ -1,7 +1,6 @@
 import whisper
 import numpy as np
 import webrtcvad
-import time
 
 MODEL_SIZE = "small"
 DEVICE = "cpu"
@@ -14,6 +13,8 @@ class Transcriber:
         self.device = device
 
     def transcribe_stream(self, audio_queue, on_transcription, on_audio_chunk):
+        
+        # Configures a VAD object
         vad = webrtcvad.Vad(2)      # Aggressiveness: 0-3
         sample_rate = 16000         # Must match AudioStream 
         frame_duration_ms = 20      # 10, 20, or 30ms
@@ -21,16 +22,21 @@ class Transcriber:
 
         speech_frames = []          # Store speech segments
         silence_counter = 0         # Counts consecutive silence frames 
-        max_silence_frames = 10     # Number of silent frames for a speech segment to be over 
+        max_silence_frames = 5     # Number of silent frames for a speech segment to be over 
 
         buffer = np.empty((0,), dtype=np.int16)     # Holds incoming audio until we have a full frame
 
         while True: 
             # print("Transcription loop running") DEBUGGING STATEMENT
             pcm = audio_queue.get()
-            buffer = np.concatenate((buffer, pcm))
 
-            # As long as have enough audio for a full frame, process it
+            # If the audio_stream stops, break the thread 
+            if pcm is None: 
+                break;
+
+            buffer = np.concatenate((buffer, pcm))        
+
+            # Once buffer is long enough, process it
             while len(buffer) >= frame_size:
                 frame = buffer[:frame_size]
                 buffer = buffer[frame_size:]
@@ -41,11 +47,15 @@ class Transcriber:
 
                 if is_speech: 
                     speech_frames.append(frame)
+                    # if silence_counter > 0:
+                        # print(f"[DEBUG] Resetting silence_counter from {silence_counter} to 0 (speech detected)")
                     silence_counter = 0 
                 else : 
                     silence_counter += 1
+                    # print(f"[DEBUG] Silence frame detected. silence_counter={silence_counter}")
                     if silence_counter > max_silence_frames:
                         if speech_frames:
+                            # print(f"[DEBUG] Finalizing segment. silence_counter={silence_counter}, segment_frames={len(speech_frames)}, segment_duration={len(np.concatenate(speech_frames))/sample_rate:.2f}s")
                             segment = np.concatenate(speech_frames)
                             audio_float = segment.astype(np.float32) / 32767.0
                             
@@ -63,6 +73,7 @@ class Transcriber:
 
                             if on_transcription: 
                                 on_transcription(result["text"], segment_duration)
-                        
+                        # else:
+                        #     print(f"[DEBUG] silence_counter={silence_counter} but no speech_frames to finalize.")
                         speech_frames = []
                         silence_counter = 0
