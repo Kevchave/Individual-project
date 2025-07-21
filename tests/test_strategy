@@ -1,0 +1,4 @@
+# Testing core python files 
+#   - metrics_tracker -> give a fake transcription/audio array/pithed signal for each metric 
+#   - audio_stream -> mock the Input Stream and test stop, start, pause, resume
+#   - transcriber -> give a controlled segment of speech and silent frames
