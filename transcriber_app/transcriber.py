@@ -1,6 +1,6 @@
 import whisper
 import numpy as np
-import webrtcvad
+import webrtcvad 
 
 MODEL_SIZE = "small"
 DEVICE = "cpu"
@@ -22,7 +22,7 @@ class Transcriber:
 
         speech_frames = []          # Store speech segments
         silence_counter = 0         # Counts consecutive silence frames 
-        max_silence_frames = 5     # Number of silent frames for a speech segment to be over 
+        max_silence_frames = 5      # Number of silent frames for a speech segment to be over 
 
         buffer = np.empty((0,), dtype=np.int16)     # Holds incoming audio until we have a full frame
 
