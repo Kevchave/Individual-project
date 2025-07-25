@@ -15,7 +15,7 @@ class Transcriber:
     def transcribe_stream(self, audio_queue, on_transcription, on_audio_chunk):
         
         # Configures a VAD object
-        vad = webrtcvad.Vad(2)      # Aggressiveness: 0-3
+        vad = webrtcvad.Vad(3)      # Aggressiveness: 0-3
         sample_rate = 16000         # Must match AudioStream 
         frame_duration_ms = 20      # 10, 20, or 30ms
         frame_size = int(sample_rate * frame_duration_ms / 1000) # Samples per frame 
