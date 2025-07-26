@@ -8,21 +8,9 @@ DEVICE = "cpu"
 class Transcriber: 
     # Constructor to initialize the audio stream
     # - self is always the first argument in a method in a class
-    def __init__(self, model_size, device, pre_padding_seconds=0.2, post_padding_seconds=0.2):
+    def __init__(self, model_size, device):
         self.model = whisper.load_model(model_size, device=device)
         self.device = device
-        self.pre_padding_seconds = pre_padding_seconds
-        self.post_padding_seconds = post_padding_seconds
-
-    def apply_silence_padding(self, audio_chunk, sample_rate=16000):
-
-        pre_pad_samples = int(self.pre_padding_seconds * sample_rate)
-        post_pad_samples = int(self.post_padding_seconds * sample_rate)
-        
-        pre_pad = np.zeros(pre_pad_samples, dtype=audio_chunk.dtype)
-        post_pad = np.zeros(post_pad_samples, dtype=audio_chunk.dtype)
-        
-        return np.concatenate([pre_pad, audio_chunk, post_pad])
 
     def transcribe_stream(self, audio_queue, on_transcription, on_audio_chunk, track_insider_metrics=None):
         """
@@ -30,7 +18,7 @@ class Transcriber:
         """
 
         # Configures a VAD object
-        vad = webrtcvad.Vad(1)      # Aggressiveness: 0 = more speech, 3 = more silence
+        vad = webrtcvad.Vad(3)      # Aggressiveness: 0 = more speech, 3 = more silence
         sample_rate = 16000         # Must match AudioStream 
         frame_duration_ms = 20      # 10, 20, or 30ms
         frame_size = int(sample_rate * frame_duration_ms / 1000) # Samples per frame 
@@ -84,17 +72,14 @@ class Transcriber:
                             segment = np.concatenate(speech_frames)
                             audio_float = segment.astype(np.float32) / 32767.0
                             
-                            # Apply silence padding to improve transcription accuracy
-                            padded_audio = self.apply_silence_padding(audio_float, sample_rate)
-                            
-                            # true audio duration in seconds (original chunk, not padded):
+                            # true audio duration in seconds:
                             segment_duration = len(segment) / sample_rate
 
                             if on_audio_chunk: 
                                 on_audio_chunk(audio_float, segment_duration)
 
                             result = self.model.transcribe(
-                                padded_audio,  # Use padded audio for transcription
+                                audio_float, 
                                 fp16=(self.device != "cpu"), 
                                 language="en"   
                             )

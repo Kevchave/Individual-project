@@ -11,10 +11,6 @@ WPM_WINDOW_SECONDS = 6
 VOLUME_WINDOW_SECONDS = 6
 PITCH_WINDOW_SECONDS = 6
 
-# Padding configuration for improved transcription accuracy
-PRE_PADDING_SECONDS = 0.2
-POST_PADDING_SECONDS = 0.2
-
 BLACKHOLE_ID = 3 # Redirects output to microphone
 MIC_INPUT = None
 device_id = MIC_INPUT   # or MIC_INPUT
@@ -48,12 +44,7 @@ def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=Tru
     if audio_stream is None:
         audio_stream = AudioStream(SAMPLE_RATE, device_id)
     if transcriber is None:
-        transcriber = Transcriber(
-            "small", 
-            "cpu", 
-            pre_padding_seconds=PRE_PADDING_SECONDS,
-            post_padding_seconds=POST_PADDING_SECONDS
-        )
+        transcriber = Transcriber("small", "cpu")
     if metrics is None:
         metrics = MetricsTracker(SAMPLE_RATE)
     if enable_insider_metrics and track_insider_metrics is None:
