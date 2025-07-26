@@ -1,7 +1,9 @@
+from whisper.model import F
 from .audio_stream import AudioStream
 from .transcriber import Transcriber
 from .track_metrics import MetricsTracker
 from .track_insider_metrics import TrackInsiderMetrics
+from .adaptive_controller import AdaptiveController
 import threading
 import time
 
@@ -24,12 +26,13 @@ audio_stream = None
 transcriber = None
 metrics = None
 track_insider_metrics = None  # Optional insider metrics for adaptive chunking
+adaptive_controller = None    # Adaptive controller for parameter tuning
 transcription_thread = None
 start_time = None
 
 # Start the full pipeline: audio, transcription, metrics
-def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=True):
-    global audio_stream, transcriber, metrics, track_insider_metrics, transcription_thread, start_time
+def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=True, enable_adaptive_control=True):
+    global audio_stream, transcriber, metrics, track_insider_metrics, adaptive_controller, transcription_thread, start_time
 
     # Clear previous data if there exists
     if metrics is not None: 
@@ -39,10 +42,13 @@ def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=Tru
             metrics.all_audio_chunks.clear()
     if track_insider_metrics is not None:
         track_insider_metrics.reset()
+    if adaptive_controller is not None:
+        adaptive_controller.reset()
     
     transcriber = None
     metrics = None 
     track_insider_metrics = None
+    adaptive_controller = None
     transcription_thread = None
     
     # Create all objects
@@ -54,19 +60,27 @@ def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=Tru
         metrics = MetricsTracker(SAMPLE_RATE)
     if enable_insider_metrics and track_insider_metrics is None:
         track_insider_metrics = TrackInsiderMetrics()
+    if enable_adaptive_control and adaptive_controller is None:
+        adaptive_controller = AdaptiveController()
 
     def run_transcription():
         if audio_stream is not None:
             audio_stream.start()
             if transcriber is not None:
+                # Get current parameters from adaptive controller (or use defaults)
+                if adaptive_controller is not None:
+                    aggressiveness, frame_duration_ms, max_silence_frames = adaptive_controller.get_current_parameters()
+                else:
+                    aggressiveness, frame_duration_ms, max_silence_frames = VAD_AGGRESSIVENESS, FRAME_DURATION_MS, MAX_SILENCE_FRAMES
+                
                 transcriber.transcribe_stream(
                     audio_stream.audio_queue, 
                     on_transcription, 
                     on_audio_chunk, 
                     track_insider_metrics,
-                    aggressiveness=VAD_AGGRESSIVENESS,
-                    frame_duration_ms=FRAME_DURATION_MS,
-                    max_silence_frames=MAX_SILENCE_FRAMES
+                    aggressiveness=aggressiveness,
+                    frame_duration_ms=frame_duration_ms,
+                    max_silence_frames=max_silence_frames
                 )
 
     # Safeguard to ensure exactly one background thread is active 
@@ -78,7 +92,7 @@ def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=Tru
 
 # Stop the pipeline (implement as needed)
 def stop_transcription_pipeline():
-    global audio_stream, transcriber, metrics, track_insider_metrics, transcription_thread
+    global audio_stream, transcriber, metrics, track_insider_metrics, adaptive_controller, transcription_thread
     # You may need to add stop/cleanup logic to your classes
     if audio_stream is not None:
         audio_stream.stop()
@@ -153,6 +167,13 @@ def get_average_metrics():
         'average_pitch':   float(metrics.average_pitch)
     }
 
+def get_adaptive_controller_status():
+    """Get the current status of the adaptive controller"""
+    global adaptive_controller
+    if adaptive_controller is None:
+        return None
+    return adaptive_controller.get_status()
+
 def main():
     # For manual testing: start the pipeline, print status, etc.
     start_transcription_pipeline()
@@ -166,7 +187,7 @@ def main():
         print("Stopped.")
 
 def on_transcription(text, segment_duration):
-    global metrics
+    global metrics, adaptive_controller, track_insider_metrics
     if metrics is not None:
         metrics.add_transcription(text, segment_duration)
         metrics.track_wpm()
@@ -174,6 +195,41 @@ def on_transcription(text, segment_duration):
 
         # Print UI metrics summary after WPM is updated
         metrics.print_ui_metrics_summary()
+        
+        # Print summary (aligned with UI metrics timing)
+        if track_insider_metrics is not None:
+            track_insider_metrics.print_summary()
+        
+        # Check if adaptive controller should adjust parameters
+        if adaptive_controller is not None and track_insider_metrics is not None:
+            # Get current metrics
+            current_metrics = {
+                'wpm': metrics.current_wpm,
+                'volume': metrics.current_volume,
+                'pitch': metrics.current_pitch,
+                'chunk_duration': metrics.current_chunk_duration
+            }
+            
+            insider_metrics = {
+                'silence_ratio': track_insider_metrics.get_silence_ratio(),
+                'confidence': track_insider_metrics.get_confidence()
+            }
+            
+            # Check if parameters should be adjusted
+            if adaptive_controller.should_adjust_parameters(current_metrics, insider_metrics):
+                print(f"[ADAPTIVE] Metrics suggest parameter adjustment needed")
+                print(f"[ADAPTIVE] Current metrics: WPM={current_metrics['wpm']:.1f}, "
+                      f"Confidence={insider_metrics['confidence']:.3f}, "
+                      f"Silence Ratio={insider_metrics['silence_ratio']:.3f}")
+                
+                # Calculate new parameters
+                new_parameters = adaptive_controller.calculate_parameter_adjustments(current_metrics, insider_metrics)
+                
+                # Update parameters
+                if adaptive_controller.update_parameters(new_parameters):
+                    print(f"[ADAPTIVE] Parameters updated successfully")
+                    # Note: In a full implementation, you would restart transcription with new parameters
+                    # For now, we just log the changes
 
 def on_audio_chunk(audio_float, segment_duration):
     global metrics

@@ -100,9 +100,9 @@ class Transcriber:
                             if on_transcription:
                                 on_transcription(result["text"], segment_duration)
                       
-                            # Print summary (aligned with UI metrics timing)
-                            if track_insider_metrics is not None:
-                                track_insider_metrics.print_summary()
+                            # # Print summary (aligned with UI metrics timing)
+                            # if track_insider_metrics is not None:
+                            #     track_insider_metrics.print_summary()
 
                         speech_frames = []
                         silence_counter = 0
