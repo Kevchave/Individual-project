@@ -1,6 +1,7 @@
 import pytest 
 import numpy as np 
 import queue 
+from unittest.mock import patch
 from transcriber_app.transcriber import Transcriber 
 
 def test_transcriber_init_loads_model(mocker):
@@ -192,3 +193,80 @@ def test_transcribe_stream_callback_exception(mocker):
     # on_transcription should not be called because the exception interrupts the flow
     on_transcription.assert_not_called()
 
+# -------------- Simple Adaptive Parameter Tests --------------
+
+def test_transcribe_stream_with_custom_aggressiveness(mocker):
+    """Test that transcribe_stream uses the custom aggressiveness parameter"""
+    # Mock the model and VAD
+    mock_model = mocker.Mock()
+    mock_model.transcribe.return_value = {"text": "test"}
+    mocker.patch("transcriber_app.transcriber.whisper.load_model", return_value=mock_model)
+    
+    # Mock VAD to verify it's created with correct aggressiveness
+    mock_vad = mocker.Mock()
+    mock_vad.is_speech.side_effect = [True, True, False, False, False, False, False, False]
+    mock_vad_class = mocker.patch("transcriber_app.transcriber.webrtcvad.Vad", return_value=mock_vad)
+
+    # Create audio queue
+    frame_size = int(16000 * 20 / 1000)
+    audio_queue = queue.Queue()
+    audio_queue.put(np.ones(frame_size, dtype=np.int16))  # speech
+    audio_queue.put(np.ones(frame_size, dtype=np.int16))  # speech
+    for _ in range(6):
+        audio_queue.put(np.zeros(frame_size, dtype=np.int16))  # silence
+    audio_queue.put(None)  # stop
+
+    on_transcription = mocker.Mock()
+    on_audio_chunk = mocker.Mock()
+
+    transcriber = Transcriber(model_size="small", device="cpu")
+    
+    # Test with custom aggressiveness
+    custom_aggressiveness = 1
+    transcriber.transcribe_stream(
+        audio_queue, 
+        on_transcription, 
+        on_audio_chunk,
+        aggressiveness=custom_aggressiveness
+    )
+
+    # Verify VAD was created with our custom aggressiveness
+    mock_vad_class.assert_called_with(custom_aggressiveness)
+
+def test_transcribe_stream_with_custom_frame_duration(mocker):
+    """Test that transcribe_stream uses the custom frame_duration_ms parameter"""
+    # Mock the model and VAD
+    mock_model = mocker.Mock()
+    mock_model.transcribe.return_value = {"text": "test"}
+    mocker.patch("transcriber_app.transcriber.whisper.load_model", return_value=mock_model)
+    
+    mock_vad = mocker.Mock()
+    mock_vad.is_speech.side_effect = [True, True, False, False, False, False, False, False]
+    mocker.patch("transcriber_app.transcriber.webrtcvad.Vad", return_value=mock_vad)
+
+    on_transcription = mocker.Mock()
+    on_audio_chunk = mocker.Mock()
+
+    transcriber = Transcriber(model_size="small", device="cpu")
+    
+    # Test with custom frame duration (30ms instead of default 20ms)
+    custom_frame_duration = 30
+    frame_size = int(16000 * custom_frame_duration / 1000)  # 30ms = 480 samples
+    
+    # Create audio queue with correct frame size
+    audio_queue = queue.Queue()
+    audio_queue.put(np.ones(frame_size, dtype=np.int16))  # speech
+    audio_queue.put(np.ones(frame_size, dtype=np.int16))  # speech
+    for _ in range(6):
+        audio_queue.put(np.zeros(frame_size, dtype=np.int16))  # silence
+    audio_queue.put(None)  # stop
+
+    transcriber.transcribe_stream(
+        audio_queue, 
+        on_transcription, 
+        on_audio_chunk,
+        frame_duration_ms=custom_frame_duration
+    )
+
+    # Verify the transcription worked (basic functionality test)
+    assert on_transcription.called or on_audio_chunk.called

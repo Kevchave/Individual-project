@@ -11,6 +11,11 @@ WPM_WINDOW_SECONDS = 6
 VOLUME_WINDOW_SECONDS = 6
 PITCH_WINDOW_SECONDS = 6
 
+# Adaptive chunking configuration
+VAD_AGGRESSIVENESS = 3      # 0-3, 0=more speech, 3=more silence
+FRAME_DURATION_MS = 20      # 10, 20, or 30ms
+MAX_SILENCE_FRAMES = 5      # Number of consecutive silence frames to end a speech segment
+
 BLACKHOLE_ID = 3 # Redirects output to microphone
 MIC_INPUT = None
 device_id = MIC_INPUT   # or MIC_INPUT
@@ -58,12 +63,14 @@ def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=Tru
                     audio_stream.audio_queue, 
                     on_transcription, 
                     on_audio_chunk, 
-                    track_insider_metrics
+                    track_insider_metrics,
+                    aggressiveness=VAD_AGGRESSIVENESS,
+                    frame_duration_ms=FRAME_DURATION_MS,
+                    max_silence_frames=MAX_SILENCE_FRAMES
                 )
 
     # Safeguard to ensure exactly one background thread is active 
     if transcription_thread is None or not transcription_thread.is_alive():
-
         # Start a separate transcription thread 
         # - the transcription can now run without blocking the main thread (or program)
         transcription_thread = threading.Thread(target=run_transcription, daemon=True)
@@ -100,7 +107,6 @@ def resume_transcription_pipeline():
 def get_current_transcript():
     global metrics
     if metrics is not None and hasattr(metrics, 'accumulated') and metrics.accumulated:
-
         # Return only the most recent transcription
         # - [-1] for the last tuple in the list (latest transcription)
         # - [0] for the first element of the tuple (the transcription text)
@@ -128,7 +134,7 @@ def get_final_transcript():
 def get_average_metrics():
     global metrics
 
-    # If we haven’t initialized MetricsTracker yet, just zero‐fill.
+    # If we haven't initialized MetricsTracker yet, just zero‐fill.
     if metrics is None:
         return {
             'average_wpm':     0.0,

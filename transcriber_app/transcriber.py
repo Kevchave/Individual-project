@@ -12,20 +12,19 @@ class Transcriber:
         self.model = whisper.load_model(model_size, device=device)
         self.device = device
 
-    def transcribe_stream(self, audio_queue, on_transcription, on_audio_chunk, track_insider_metrics=None):
+    def transcribe_stream(self, audio_queue, on_transcription, on_audio_chunk, track_insider_metrics=None, 
+                         aggressiveness=3, frame_duration_ms=20, max_silence_frames=5):
         """
         Transcribe audio stream with optional insider metrics tracking for adaptive chunking.
         """
 
-        # Configures a VAD object
-        vad = webrtcvad.Vad(3)      # Aggressiveness: 0 = more speech, 3 = more silence
+        # Configures a VAD object with configurable aggressiveness
+        vad = webrtcvad.Vad(aggressiveness)
         sample_rate = 16000         # Must match AudioStream 
-        frame_duration_ms = 20      # 10, 20, or 30ms
         frame_size = int(sample_rate * frame_duration_ms / 1000) # Samples per frame 
 
         speech_frames = []          # Store speech segments
         silence_counter = 0         # Counts consecutive silence frames 
-        max_silence_frames = 5      # Number of silent frames for a speech segment to be over 
 
         buffer = np.empty((0,), dtype=np.int16)     # Holds incoming audio until we have a full frame
 
@@ -94,18 +93,16 @@ class Transcriber:
                                 confidence = self._extract_confidence(result)
                                 track_insider_metrics.add_confidence(confidence)
                                 
-                                # # Print summary (aligned with UI metrics timing)
-                                # track_insider_metrics.print_summary()
-                                
                                 # Reset frame counters for next chunk
                                 chunk_silence_frames = 0
                                 chunk_total_frames = 0
 
-                            if on_transcription: 
+                            if on_transcription:
                                 on_transcription(result["text"], segment_duration)
-                     
+                      
                             # Print summary (aligned with UI metrics timing)
-                            track_insider_metrics.print_summary()
+                            if track_insider_metrics is not None:
+                                track_insider_metrics.print_summary()
 
                         speech_frames = []
                         silence_counter = 0
