@@ -1,6 +1,7 @@
 from .audio_stream import AudioStream
 from .transcriber import Transcriber
 from .track_metrics import MetricsTracker
+from .track_insider_metrics import TrackInsiderMetrics
 import threading
 import time
 
@@ -17,12 +18,13 @@ device_id = MIC_INPUT   # or MIC_INPUT
 audio_stream = None
 transcriber = None
 metrics = None
+track_insider_metrics = None  # Optional insider metrics for adaptive chunking
 transcription_thread = None
 start_time = None
 
 # Start the full pipeline: audio, transcription, metrics
-def start_transcription_pipeline(device_id=MIC_INPUT):
-    global audio_stream, transcriber, metrics, transcription_thread, start_time
+def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=True):
+    global audio_stream, transcriber, metrics, track_insider_metrics, transcription_thread, start_time
 
     # Clear previous data if there exists
     if metrics is not None: 
@@ -30,12 +32,14 @@ def start_transcription_pipeline(device_id=MIC_INPUT):
             metrics.accumulated.clear()
         if hasattr(metrics, 'all_audio_chunks'):
             metrics.all_audio_chunks.clear()
+    if track_insider_metrics is not None:
+        track_insider_metrics.reset()
+    
     transcriber = None
     metrics = None 
+    track_insider_metrics = None
     transcription_thread = None
     
-    # start_time = time.time()
-
     # Create all objects
     if audio_stream is None:
         audio_stream = AudioStream(SAMPLE_RATE, device_id)
@@ -43,12 +47,19 @@ def start_transcription_pipeline(device_id=MIC_INPUT):
         transcriber = Transcriber("small", "cpu")
     if metrics is None:
         metrics = MetricsTracker(SAMPLE_RATE)
+    if enable_insider_metrics and track_insider_metrics is None:
+        track_insider_metrics = TrackInsiderMetrics()
 
     def run_transcription():
         if audio_stream is not None:
             audio_stream.start()
             if transcriber is not None:
-                transcriber.transcribe_stream(audio_stream.audio_queue, on_transcription, on_audio_chunk)
+                transcriber.transcribe_stream(
+                    audio_stream.audio_queue, 
+                    on_transcription, 
+                    on_audio_chunk, 
+                    track_insider_metrics
+                )
 
     # Safeguard to ensure exactly one background thread is active 
     if transcription_thread is None or not transcription_thread.is_alive():
@@ -60,7 +71,7 @@ def start_transcription_pipeline(device_id=MIC_INPUT):
 
 # Stop the pipeline (implement as needed)
 def stop_transcription_pipeline():
-    global audio_stream, transcriber, metrics, transcription_thread
+    global audio_stream, transcriber, metrics, track_insider_metrics, transcription_thread
     # You may need to add stop/cleanup logic to your classes
     if audio_stream is not None:
         audio_stream.stop()
@@ -136,7 +147,6 @@ def get_average_metrics():
         'average_pitch':   float(metrics.average_pitch)
     }
 
-
 def main():
     # For manual testing: start the pipeline, print status, etc.
     start_transcription_pipeline()
@@ -152,9 +162,12 @@ def main():
 def on_transcription(text, segment_duration):
     global metrics
     if metrics is not None:
-        # print(f"Transcription: {text} has been added") DEBUGGING STATEMENT
         metrics.add_transcription(text, segment_duration)
         metrics.track_wpm()
+        print(f"\nTranscription: {text}\n") 
+
+        # Print UI metrics summary after WPM is updated
+        metrics.print_ui_metrics_summary()
 
 def on_audio_chunk(audio_float, segment_duration):
     global metrics
@@ -163,6 +176,7 @@ def on_audio_chunk(audio_float, segment_duration):
         metrics.add_audio_chunk(audio_float, segment_duration)
         metrics.track_volume()
         metrics.track_pitch()
+        # Note: UI metrics summary is printed in on_transcription to avoid duplicate output
 
 if __name__ == "__main__":
     main()

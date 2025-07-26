@@ -2,6 +2,7 @@ import threading
 import numpy as np 
 import librosa 
 from collections import deque
+import time
 
 class MetricsTracker: 
     # Constructor to initialize the metrics tracker
@@ -19,6 +20,7 @@ class MetricsTracker:
         self.current_wpm = 0
         self.current_volume = 0
         self.current_pitch = 0
+        self.current_chunk_duration = 0
 
         # Average metrics 
         self.average_wpm = 0
@@ -30,11 +32,20 @@ class MetricsTracker:
         self.wpm_history = deque(maxlen = window_size)
         self.vol_history = deque(maxlen = window_size)
         self.pitch_history = deque(maxlen = window_size)
+        self.chunk_duration_history = deque(maxlen=window_size)
 
+    # ------------------- Chunk Duration Tracking -------------------
+    def track_chunk_duration(self, duration):
+        self.chunk_duration_history.append(duration)
+        self.current_chunk_duration = float(np.mean(self.chunk_duration_history))
+
+    # ------------------- Text Tracking -------------------
     def add_transcription(self, text, duration):
         with self.accumulated_lock:
             self.accumulated.append((str(text).strip(), duration))
+        self.track_chunk_duration(duration)
 
+    # ------------------- Audio Tracking -------------------
     def add_audio_chunk(self, audio_float, duration):
         with self.audio_chunks_lock:
             self.all_audio_chunks.append((audio_float, duration))
@@ -52,16 +63,15 @@ class MetricsTracker:
         rms = np.sqrt(np.mean(np.square(samples)))
         return 20 * np.log10(rms + 1e-12)
 
-    # ------------------------------------------------------------------------------------------------
-    # WPM TRACKING
-    # ------------------------------------------------------------------------------------------------
+
+    # ------------------- WPM Tracking -------------------
     def track_wpm(self):
         with self.accumulated_lock:
             if not self.accumulated:
                 print("[DEBUG] No transcriptions to process for WPM")
                 return
             text, duration = self.accumulated[-1]
-        print(f"[DEBUG] \n Text: {text} \n NumWords: {len(text.split())} \n Duration: {duration}")
+        # print(f"[DEBUG] \n Text: {text} \n NumWords: {len(text.split())} \n Duration: {duration}")
         wpm = len(text.split()) / (duration / 60) if duration > 0 else 0
         
         # Add 'wpm' into a deque list, then take the average
@@ -76,9 +86,7 @@ class MetricsTracker:
         print(f"[FINAL] \n NumWords: {total_words} \n Duration: {total_duration}") 
         self.average_wpm = avg_wpm
 
-    # ------------------------------------------------------------------------------------------------
-    # VOLUME TRACKING
-    # ------------------------------------------------------------------------------------------------
+    # ------------------- Volume Tracking -------------------
     def track_volume(self):
         chunk = self.get_last_audio_chunk()
         if chunk is None:
@@ -107,9 +115,7 @@ class MetricsTracker:
         db = self._rms_to_db(all_audio)
         self.average_volume = db
     
-    # ------------------------------------------------------------------------------------------------
-    # PITCH TRACKING
-    # ------------------------------------------------------------------------------------------------
+    # ------------------- Pitch Tracking -------------------
     def track_pitch(self):
         chunk = self.get_last_audio_chunk()
         if chunk is None:
@@ -148,7 +154,7 @@ class MetricsTracker:
 
         self.average_pitch = float(np.std(voiced))
 
-
-
-
-    
+    # ------------------- Debug/Terminal Output -------------------
+    def print_ui_metrics_summary(self):
+        """Print UI metrics summary to terminal"""
+        print(f"[UI METRICS] WPM: {self.current_wpm:.2f} | Volume: {self.current_volume:.2f} dB | Pitch: {self.current_pitch:.2f} Hz | Chunk Duration: {self.current_chunk_duration:.2f}s")
