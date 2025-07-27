@@ -1,6 +1,7 @@
 import whisper
 import numpy as np
 import webrtcvad 
+import queue
 
 MODEL_SIZE = "small"
 DEVICE = "cpu"
@@ -11,6 +12,45 @@ class Transcriber:
     def __init__(self, model_size, device):
         self.model = whisper.load_model(model_size, device=device)
         self.device = device
+        
+        # Parameter queue for adaptive updates
+        self.parameter_queue = queue.Queue()
+        self.current_aggressiveness = 3
+        self.current_frame_duration_ms = 20
+        self.current_max_silence_frames = 5
+
+    def update_parameters(self, aggressiveness, frame_duration_ms, max_silence_frames):
+        """
+        Queue parameter updates to be applied at the next chunk boundary.
+        """
+        try:
+            self.parameter_queue.put_nowait({
+                'aggressiveness': aggressiveness,
+                'frame_duration_ms': frame_duration_ms,
+                'max_silence_frames': max_silence_frames
+            })
+            print(f"[TRANSCRIBER] Parameter update queued: Aggressiveness={aggressiveness}, "
+                  f"Frame Duration={frame_duration_ms}ms, Max Silence Frames={max_silence_frames}")
+        except queue.Full:
+            print(f"[TRANSCRIBER] Warning: Parameter queue full, update dropped")
+
+    def _apply_parameter_updates(self):
+        """Apply any pending parameter updates."""
+        try:
+            while not self.parameter_queue.empty():
+                new_params = self.parameter_queue.get_nowait()
+                
+                # Update current parameters
+                self.current_aggressiveness = new_params['aggressiveness']
+                self.current_frame_duration_ms = new_params['frame_duration_ms']
+                self.current_max_silence_frames = new_params['max_silence_frames']
+                
+                print(f"[TRANSCRIBER] Parameters applied: Aggressiveness={self.current_aggressiveness}, "
+                      f"Frame Duration={self.current_frame_duration_ms}ms, "
+                      f"Max Silence Frames={self.current_max_silence_frames}")
+                
+        except queue.Empty:
+            pass  # No updates to apply
 
     def transcribe_stream(self, audio_queue, on_transcription, on_audio_chunk, track_insider_metrics=None, 
                          aggressiveness=3, frame_duration_ms=20, max_silence_frames=5):
@@ -18,10 +58,15 @@ class Transcriber:
         Transcribe audio stream with optional insider metrics tracking for adaptive chunking.
         """
 
+        # Initialize current parameters
+        self.current_aggressiveness = aggressiveness
+        self.current_frame_duration_ms = frame_duration_ms
+        self.current_max_silence_frames = max_silence_frames
+
         # Configures a VAD object with configurable aggressiveness
-        vad = webrtcvad.Vad(aggressiveness)
+        vad = webrtcvad.Vad(self.current_aggressiveness)
         sample_rate = 16000         # Must match AudioStream 
-        frame_size = int(sample_rate * frame_duration_ms / 1000) # Samples per frame 
+        frame_size = int(sample_rate * self.current_frame_duration_ms / 1000) # Samples per frame 
 
         speech_frames = []          # Store speech segments
         silence_counter = 0         # Counts consecutive silence frames 
@@ -65,7 +110,7 @@ class Transcriber:
                 else : 
                     silence_counter += 1
                     # print(f"[DEBUG] Silence frame detected. silence_counter={silence_counter}")
-                    if silence_counter > max_silence_frames:
+                    if silence_counter > self.current_max_silence_frames:
                         if speech_frames:
                             # print(f"[DEBUG] Finalizing segment. silence_counter={silence_counter}, segment_frames={len(speech_frames)}, segment_duration={len(np.concatenate(speech_frames))/sample_rate:.2f}s")
                             segment = np.concatenate(speech_frames)
@@ -97,7 +142,7 @@ class Transcriber:
                                 chunk_silence_frames = 0
                                 chunk_total_frames = 0
 
-                            if on_transcription:
+                            if on_transcription: 
                                 on_transcription(result["text"], segment_duration)
                       
                             # # Print summary (aligned with UI metrics timing)
@@ -106,6 +151,17 @@ class Transcriber:
 
                         speech_frames = []
                         silence_counter = 0
+                        
+                        # Apply any pending parameter updates at chunk boundary
+                        self._apply_parameter_updates()
+                        
+                        # Recreate VAD with new parameters if they changed
+                        if hasattr(self, '_last_applied_aggressiveness') and self._last_applied_aggressiveness != self.current_aggressiveness:
+                            vad = webrtcvad.Vad(self.current_aggressiveness)
+                            self._last_applied_aggressiveness = self.current_aggressiveness
+                            print(f"[TRANSCRIBER] VAD recreated with aggressiveness {self.current_aggressiveness}")
+                        elif not hasattr(self, '_last_applied_aggressiveness'):
+                            self._last_applied_aggressiveness = self.current_aggressiveness
 
     def _extract_confidence(self, result):
         """Extract confidence score from Whisper transcription result"""

@@ -270,3 +270,65 @@ def test_transcribe_stream_with_custom_frame_duration(mocker):
 
     # Verify the transcription worked (basic functionality test)
     assert on_transcription.called or on_audio_chunk.called
+
+# -------------- Parameter Queue Tests --------------
+
+def test_transcriber_parameter_queue(mocker):
+    """Test that transcriber can queue and apply parameter updates"""
+    # Mock the model and VAD
+    mock_model = mocker.Mock()
+    mock_model.transcribe.return_value = {"text": "test"}
+    mocker.patch("transcriber_app.transcriber.whisper.load_model", return_value=mock_model)
+    
+    mock_vad = mocker.Mock()
+    mock_vad.is_speech.side_effect = [True, True, False, False, False, False, False, False]
+    mocker.patch("transcriber_app.transcriber.webrtcvad.Vad", return_value=mock_vad)
+
+    transcriber = Transcriber(model_size="small", device="cpu")
+    
+    # Test initial parameters
+    assert transcriber.current_aggressiveness == 3
+    assert transcriber.current_frame_duration_ms == 20
+    assert transcriber.current_max_silence_frames == 5
+    
+    # Queue parameter update
+    transcriber.update_parameters(aggressiveness=2, frame_duration_ms=30, max_silence_frames=8)
+    
+    # Parameters should not be applied immediately
+    assert transcriber.current_aggressiveness == 3
+    assert transcriber.current_frame_duration_ms == 20
+    assert transcriber.current_max_silence_frames == 5
+    
+    # Apply updates manually (simulating chunk boundary)
+    transcriber._apply_parameter_updates()
+    
+    # Parameters should now be updated
+    assert transcriber.current_aggressiveness == 2
+    assert transcriber.current_frame_duration_ms == 30
+    assert transcriber.current_max_silence_frames == 8
+
+def test_transcriber_parameter_queue_multiple_updates(mocker):
+    """Test that transcriber handles multiple parameter updates correctly"""
+    # Mock the model and VAD
+    mock_model = mocker.Mock()
+    mock_model.transcribe.return_value = {"text": "test"}
+    mocker.patch("transcriber_app.transcriber.whisper.load_model", return_value=mock_model)
+    
+    mock_vad = mocker.Mock()
+    mock_vad.is_speech.side_effect = [True, True, False, False, False, False, False, False]
+    mocker.patch("transcriber_app.transcriber.webrtcvad.Vad", return_value=mock_vad)
+
+    transcriber = Transcriber(model_size="small", device="cpu")
+    
+    # Queue multiple updates
+    transcriber.update_parameters(aggressiveness=1, frame_duration_ms=10, max_silence_frames=3)
+    transcriber.update_parameters(aggressiveness=2, frame_duration_ms=20, max_silence_frames=5)
+    transcriber.update_parameters(aggressiveness=0, frame_duration_ms=30, max_silence_frames=7)
+    
+    # Apply updates
+    transcriber._apply_parameter_updates()
+    
+    # Should have the last update applied
+    assert transcriber.current_aggressiveness == 0
+    assert transcriber.current_frame_duration_ms == 30
+    assert transcriber.current_max_silence_frames == 7

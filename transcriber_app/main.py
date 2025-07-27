@@ -1,4 +1,3 @@
-from whisper.model import F
 from .audio_stream import AudioStream
 from .transcriber import Transcriber
 from .track_metrics import MetricsTracker
@@ -101,11 +100,21 @@ def stop_transcription_pipeline():
         audio_stream.audio_queue.put(None)
 
     if transcription_thread is not None:
-        transcription_thread.join()
+        transcription_thread.join(timeout=2.0)  # Wait up to 2 seconds for thread to finish
         transcription_thread = None
 
     # Clean up stream handle
     audio_stream = None
+    
+    # Clear global references to help with garbage collection
+    transcriber = None
+    track_insider_metrics = None
+    adaptive_controller = None
+    
+    # Note: We don't clear metrics here to preserve the transcript data
+    # The metrics object will be cleaned up when the pipeline is restarted
+    
+    print("[CLEANUP] Transcription pipeline stopped and resources cleaned up")
 
 def pause_transcription_pipeline():
     global audio_stream
@@ -225,11 +234,17 @@ def on_transcription(text, segment_duration):
                 # Calculate new parameters
                 new_parameters = adaptive_controller.calculate_parameter_adjustments(current_metrics, insider_metrics)
                 
-                # Update parameters
+                # Update parameters in adaptive controller
                 if adaptive_controller.update_parameters(new_parameters):
                     print(f"[ADAPTIVE] Parameters updated successfully")
-                    # Note: In a full implementation, you would restart transcription with new parameters
-                    # For now, we just log the changes
+                    
+                    # Send parameter updates to transcriber
+                    if transcriber is not None:
+                        transcriber.update_parameters(
+                            new_parameters['aggressiveness'],
+                            new_parameters['frame_duration_ms'],
+                            new_parameters['max_silence_frames']
+                        )
 
 def on_audio_chunk(audio_float, segment_duration):
     global metrics
