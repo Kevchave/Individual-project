@@ -1,0 +1,178 @@
+import pytest
+from transcriber_app.adaptive_controller import AdaptiveController
+
+def test_adaptive_controller_init():
+    """Test that AdaptiveController initializes with correct default values"""
+    controller = AdaptiveController()
+    
+    # Check default parameters
+    aggressiveness, frame_duration_ms, max_silence_frames = controller.get_current_parameters()
+    assert aggressiveness == 3
+    assert frame_duration_ms == 20
+    assert max_silence_frames == 5
+    
+    # Check default thresholds
+    assert controller.confidence_threshold_low == 0.6
+    assert controller.confidence_threshold_high == 0.8
+    assert controller.silence_ratio_threshold_high == 0.7
+    assert controller.silence_ratio_threshold_low == 0.3
+    assert controller.wpm_threshold_fast == 150
+    assert controller.wpm_threshold_slow == 80
+
+def test_should_adjust_parameters_low_confidence():
+    """Test that should_adjust_parameters returns True when confidence is too low"""
+    controller = AdaptiveController()
+    
+    # Test with low confidence
+    metrics = {'wpm': 100, 'volume': -20, 'pitch': 150, 'chunk_duration': 2.0}
+    insider_metrics = {'silence_ratio': 0.5, 'confidence': 0.4}  # Below 0.6 threshold
+    
+    should_adjust = controller.should_adjust_parameters(metrics, insider_metrics)
+    assert should_adjust == True
+
+def test_should_adjust_parameters_high_confidence():
+    """Test that should_adjust_parameters returns True when confidence is too high"""
+    controller = AdaptiveController()
+    
+    # Test with high confidence
+    metrics = {'wpm': 100, 'volume': -20, 'pitch': 150, 'chunk_duration': 2.0}
+    insider_metrics = {'silence_ratio': 0.5, 'confidence': 0.9}  # Above 0.8 threshold
+    
+    should_adjust = controller.should_adjust_parameters(metrics, insider_metrics)
+    assert should_adjust == True
+
+def test_should_adjust_parameters_normal_confidence():
+    """Test that should_adjust_parameters returns False when confidence is normal"""
+    controller = AdaptiveController()
+    
+    # Test with normal confidence
+    metrics = {'wpm': 100, 'volume': -20, 'pitch': 150, 'chunk_duration': 2.0}
+    insider_metrics = {'silence_ratio': 0.5, 'confidence': 0.7}  # Between 0.6 and 0.8
+    
+    should_adjust = controller.should_adjust_parameters(metrics, insider_metrics)
+    assert should_adjust == False
+
+def test_calculate_parameter_adjustments_low_confidence():
+    """Test that low confidence increases aggressiveness"""
+    controller = AdaptiveController()
+    
+    # Start with default parameters
+    assert controller.get_current_parameters() == (3, 20, 5)
+    
+    # Test with low confidence
+    metrics = {'wpm': 100, 'volume': -20, 'pitch': 150, 'chunk_duration': 2.0}
+    insider_metrics = {'silence_ratio': 0.5, 'confidence': 0.4}
+    
+    new_parameters = controller.calculate_parameter_adjustments(metrics, insider_metrics)
+    
+    # Should increase aggressiveness (but stay within bounds)
+    assert new_parameters['aggressiveness'] == 3  # Already at max, can't increase
+    assert new_parameters['frame_duration_ms'] == 20  # Normal WPM, no change
+    assert new_parameters['max_silence_frames'] == 5  # Normal silence ratio, no change
+
+def test_calculate_parameter_adjustments_high_wpm():
+    """Test that high WPM reduces frame duration"""
+    controller = AdaptiveController()
+    
+    # Test with high WPM
+    metrics = {'wpm': 200, 'volume': -20, 'pitch': 150, 'chunk_duration': 2.0}  # Above 150 threshold
+    insider_metrics = {'silence_ratio': 0.5, 'confidence': 0.7}
+    
+    new_parameters = controller.calculate_parameter_adjustments(metrics, insider_metrics)
+    
+    # Should use smaller frame duration for fast speech
+    assert new_parameters['frame_duration_ms'] == 10
+    assert new_parameters['aggressiveness'] == 3  # Normal confidence, no change
+    assert new_parameters['max_silence_frames'] == 5  # Normal silence ratio, no change
+
+def test_calculate_parameter_adjustments_low_wpm():
+    """Test that low WPM increases frame duration"""
+    controller = AdaptiveController()
+    
+    # Test with low WPM
+    metrics = {'wpm': 50, 'volume': -20, 'pitch': 150, 'chunk_duration': 2.0}  # Below 80 threshold
+    insider_metrics = {'silence_ratio': 0.5, 'confidence': 0.7}
+    
+    new_parameters = controller.calculate_parameter_adjustments(metrics, insider_metrics)
+    
+    # Should use larger frame duration for slow speech
+    assert new_parameters['frame_duration_ms'] == 30
+    assert new_parameters['aggressiveness'] == 3  # Normal confidence, no change
+    assert new_parameters['max_silence_frames'] == 5  # Normal silence ratio, no change
+
+def test_update_parameters():
+    """Test that update_parameters correctly updates current values"""
+    controller = AdaptiveController()
+    
+    # Start with defaults
+    assert controller.get_current_parameters() == (3, 20, 5)
+    
+    # Update with new parameters
+    new_parameters = {
+        'aggressiveness': 2,
+        'frame_duration_ms': 30,
+        'max_silence_frames': 8
+    }
+    
+    # Update should return True (parameters changed)
+    changed = controller.update_parameters(new_parameters)
+    assert changed == True
+    
+    # Check that parameters were updated
+    assert controller.get_current_parameters() == (2, 30, 8)
+
+def test_update_parameters_no_change():
+    """Test that update_parameters returns False when no change is made"""
+    controller = AdaptiveController()
+    
+    # Start with defaults
+    assert controller.get_current_parameters() == (3, 20, 5)
+    
+    # Try to update with same values
+    new_parameters = {
+        'aggressiveness': 3,
+        'frame_duration_ms': 20,
+        'max_silence_frames': 5
+    }
+    
+    # Update should return False (no change)
+    changed = controller.update_parameters(new_parameters)
+    assert changed == False
+
+def test_get_status():
+    """Test that get_status returns correct information"""
+    controller = AdaptiveController()
+    
+    status = controller.get_status()
+    
+    assert 'current_aggressiveness' in status
+    assert 'current_frame_duration_ms' in status
+    assert 'current_max_silence_frames' in status
+    assert 'adjustment_count' in status
+    assert 'last_adjustment_time' in status
+    
+    assert status['current_aggressiveness'] == 3
+    assert status['current_frame_duration_ms'] == 20
+    assert status['current_max_silence_frames'] == 5
+    assert status['adjustment_count'] == 0
+
+def test_reset():
+    """Test that reset returns controller to default parameters"""
+    controller = AdaptiveController()
+    
+    # Change some parameters
+    controller.update_parameters({
+        'aggressiveness': 1,
+        'frame_duration_ms': 10,
+        'max_silence_frames': 3
+    })
+    
+    # Verify they changed
+    assert controller.get_current_parameters() == (1, 10, 3)
+    
+    # Reset
+    controller.reset()
+    
+    # Should be back to defaults
+    assert controller.get_current_parameters() == (3, 20, 5)
+    assert controller.get_status()['adjustment_count'] == 0 
