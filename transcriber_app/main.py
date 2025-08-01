@@ -15,7 +15,7 @@ PITCH_WINDOW_SECONDS = 6
 # Adaptive chunking configuration
 VAD_AGGRESSIVENESS = 3      # 0-3, 0=more speech, 3=more silence
 FRAME_DURATION_MS = 20      # 10, 20, or 30ms
-MAX_SILENCE_FRAMES = 5      # Number of consecutive silence frames to end a speech segment
+MAX_SILENCE_FRAMES = 10      # Number of consecutive silence frames to end a speech segment
 
 BLACKHOLE_ID = 3 # Redirects output to microphone
 MIC_INPUT = None
@@ -30,7 +30,7 @@ transcription_thread = None
 start_time = None
 
 # Start the full pipeline: audio, transcription, metrics
-def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=True, enable_adaptive_control=True):
+def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=True, enable_adaptive_control=True, metrics_collector=None):
     global audio_stream, transcriber, metrics, track_insider_metrics, adaptive_controller, transcription_thread, start_time
 
     # Clear previous data if there exists
@@ -79,7 +79,8 @@ def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=Tru
                     track_insider_metrics,
                     aggressiveness=aggressiveness,
                     frame_duration_ms=frame_duration_ms,
-                    max_silence_frames=max_silence_frames
+                    max_silence_frames=max_silence_frames,
+                    metrics_collector=metrics_collector
                 )
 
     # Safeguard to ensure exactly one background thread is active 

@@ -31,7 +31,7 @@ class AdaptiveController:
         # Current parameter values
         self.current_aggressiveness = 3
         self.current_frame_duration_ms = 20
-        self.current_max_silence_frames = 5
+        self.current_max_silence_frames = 10
         
         # Parameter bounds
         self.aggressiveness_bounds = (0, 3)  # 0-3 for VAD 

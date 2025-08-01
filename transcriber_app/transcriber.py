@@ -17,7 +17,7 @@ class Transcriber:
         self.parameter_queue = queue.Queue()
         self.current_aggressiveness = 3
         self.current_frame_duration_ms = 20
-        self.current_max_silence_frames = 5
+        self.current_max_silence_frames = 10
 
     def update_parameters(self, aggressiveness, frame_duration_ms, max_silence_frames):
         """
@@ -53,7 +53,7 @@ class Transcriber:
             pass  # No updates to apply
 
     def transcribe_stream(self, audio_queue, on_transcription, on_audio_chunk, track_insider_metrics=None, 
-                         aggressiveness=3, frame_duration_ms=20, max_silence_frames=5):
+                         aggressiveness=3, frame_duration_ms=20, max_silence_frames=10, metrics_collector=None):
         """
         Transcribe audio stream with optional insider metrics tracking for adaptive chunking.
         """
@@ -112,6 +112,10 @@ class Transcriber:
                     # print(f"[DEBUG] Silence frame detected. silence_counter={silence_counter}")
                     if silence_counter > self.current_max_silence_frames:
                         if speech_frames:
+                            # Record when chunk processing starts
+                            if metrics_collector:
+                                metrics_collector.record_chunk_start()
+                            
                             # print(f"[DEBUG] Finalizing segment. silence_counter={silence_counter}, segment_frames={len(speech_frames)}, segment_duration={len(np.concatenate(speech_frames))/sample_rate:.2f}s")
                             segment = np.concatenate(speech_frames)
                             audio_float = segment.astype(np.float32) / 32767.0
@@ -144,6 +148,10 @@ class Transcriber:
 
                             if on_transcription: 
                                 on_transcription(result["text"], segment_duration)
+                            
+                            # Record when transcription is completed
+                            if metrics_collector:
+                                metrics_collector.record_chunk_end(result["text"])
                       
                             # # Print summary (aligned with UI metrics timing)
                             # if track_insider_metrics is not None:

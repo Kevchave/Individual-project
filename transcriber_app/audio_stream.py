@@ -9,7 +9,7 @@ class AudioStream:
         self.audio_queue = queue.Queue()
         self.sample_rate = sample_rate
         self.device_id = device_id
-        self.stream = None; 
+        self.stream = None;  
 
     # Callback function -> called every time a chunk of audio is ready
     # - indata: Numpy array of shape (frames, channels) containing the audio data
