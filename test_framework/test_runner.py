@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 """
-Main Test Runner for Transcription Models
+Manual Test Runner for Transcription Models
 
-Orchestrates testing of all three models (fixed, VAD, adaptive) 
-with different parameters and audio files.
+To test different models:
+1. Change CURRENT_MODEL below to: 'fixed', 'vad', or 'adaptive'
+2. Modify your transcription code to use the corresponding chunking method
+3. Optionally set TEST_SPECIFIC_FILE to test a specific audio file
+4. Run: python test_runner.py
+
+This will test all parameters and audio files for the specified model.
 """
 
 import os
@@ -16,12 +21,16 @@ from pathlib import Path
 from datetime import datetime
 
 # Add transcriber_app to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'transcriber_app'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from audio_loader import AudioLoader
 from metrics_collector import MetricsCollector
 from configs import TEST_CONFIGS, AUDIO_CATEGORIES
 from transcriber_app.main import start_transcription_pipeline, stop_transcription_pipeline
+
+# MANUAL CONFIGURATION - Change this to test different models
+# Options: 'fixed', 'vad', 'adaptive'
+CURRENT_MODEL = 'fixed'
 
 class TestRunner:
     def __init__(self, test_audio_dir="test_audio", results_dir="test_results"):
@@ -34,19 +43,40 @@ class TestRunner:
         
     def find_audio_files(self):
         """Find audio files in test_audio directory"""
-        audio_files = []
-        
-        if not self.test_audio_dir.exists():
-            print(f"Warning: {self.test_audio_dir} directory not found")
-            return audio_files
-        
-        # Find all audio files
-        for audio_file in self.test_audio_dir.glob("*.mp3"):  # Finds all files ending in .mp3
-            audio_files.append(audio_file)
-        for audio_file in self.test_audio_dir.glob("*.wav"):  # Finds all files ending in .wav
-            audio_files.append(audio_file)
-            
+        # TEMPORARY: Quick test with specific file
+        audio_files = [self.test_audio_dir / '10sec_medium_pace_audio.mp3']  # Change filename here
         return audio_files
+        
+        # # ORIGINAL CODE (commented out for quick testing)
+        # audio_files = []
+        # 
+        # if not self.test_audio_dir.exists():
+        #     print(f"Warning: {self.test_audio_dir} directory not found")
+        #     return audio_files
+        # 
+        # # Find all audio files
+        # for audio_file in self.test_audio_dir.glob("*.mp3"):  # Finds all files ending in .mp3
+        #     audio_files.append(audio_file)
+        # for audio_file in self.test_audio_dir.glob("*.wav"):  # Finds all files ending in .wav
+        #     audio_files.append(audio_file)
+        # 
+        # # Filter for specific file if requested
+        # if TEST_SPECIFIC_FILE is not None:
+        #     filtered_files = []
+        #     for audio_file in audio_files:
+        #         if audio_file.name == TEST_SPECIFIC_FILE:
+        #         filtered_files.append(audio_file)
+        #         break
+        #     
+        #     if filtered_files:
+        #         print(f"Testing specific file: {TEST_SPECIFIC_FILE}")
+        #         return filtered_files
+        #     else:
+        #         print(f"Warning: File '{TEST_SPECIFIC_FILE}' not found in {self.test_audio_dir}")
+        #         print(f"Available files: {[f.name for f in audio_files]}")
+        #         return []
+        #     
+        # return audio_files
     
     def categorize_audio_file(self, audio_file):                 
         """Determine which category an audio file belongs to"""  
@@ -65,10 +95,77 @@ class TestRunner:
         """Load reference transcript for WER calculation"""
         # Look for corresponding transcript file
         transcript_file = audio_file.with_suffix('.txt')
+        # # Debug statements (commented out)
+        # print(f"      DEBUG: audio_file = {audio_file}")
+        # print(f"      DEBUG: transcript_file = {transcript_file}")
+        # print(f"      DEBUG: transcript_file.exists() = {transcript_file.exists()}")
         if transcript_file.exists():
             with open(transcript_file, 'r') as f:
-                return f.read().strip()
+                content = f.read().strip()
+                # print(f"      DEBUG: Loaded transcript content: '{content}'")
+                # print(f"      DEBUG: Content length: {len(content)}")
+                return content
         return None
+    
+    def run_model_tests(self, model_type, num_runs_per_config=1):
+        """Run tests for a specific model type with all its configurations and audio files"""
+        print(f"Starting Tests for {model_type.upper()} Model")
+        print("=" * 60)
+        
+        # Find audio files
+        audio_files = self.find_audio_files()
+        if not audio_files:
+            print("No audio files found. Please add audio files to test_audio/ directory")
+            return
+        
+        print(f"Found {len(audio_files)} audio files")
+        
+        # # Debug: Show all files in test_audio directory
+        # print(f"All files in {self.test_audio_dir}:")
+        # for file in self.test_audio_dir.iterdir():
+        #     print(f"  - {file.name}")
+        
+        # Get configurations for the specified model
+        if model_type not in TEST_CONFIGS:
+            print(f"Error: Model type '{model_type}' not found in TEST_CONFIGS")
+            return
+        
+        configs = TEST_CONFIGS[model_type]
+        print(f"Testing {len(configs)} {model_type} configurations")
+        
+        # Calculate total tests to run
+        total_tests = len(audio_files) * len(configs) * num_runs_per_config
+        print(f"Total tests to run: {total_tests}")
+        
+        current_test = 0
+        
+        # For each audio file
+        for audio_file in audio_files:
+            category_name = self.categorize_audio_file(audio_file)
+            category_info = AUDIO_CATEGORIES.get(category_name, {
+                'name': category_name,
+                'description': 'Unknown category'
+            })
+            
+            print(f"\nTesting {audio_file.name} ({category_info['description']})")
+            
+            # For each configuration of the specified model
+            for config in configs:
+                # Add model type to config
+                config_with_type = config.copy()
+                config_with_type['model_type'] = model_type
+                
+                # Run test multiple times if specified
+                for _ in range(num_runs_per_config):
+                    current_test += 1
+                    print(f"    Progress: {current_test}/{total_tests}")
+                    
+                    result = self.run_single_test(audio_file, config_with_type, category_info)
+                    self.results.append(result)
+        
+        # Save results
+        self.save_results()
+        self.print_summary()
     
     def run_single_test(self, audio_file, config, category_info):
         """Run a single test with given audio file and configuration"""
@@ -84,6 +181,14 @@ class TestRunner:
             
             # Load reference transcript for WER calculation
             reference_transcript = self.load_reference_transcript(audio_file)
+            # # Debug statements (commented out)
+            # if reference_transcript and reference_transcript.strip():
+            #     print(f"      Found reference transcript ({len(reference_transcript)} characters)")
+            # else:
+            #     print(f"      No reference transcript found for {audio_file.name}")
+            #     print(f"      Looking for: {audio_file.with_suffix('.txt')}")
+            #     if reference_transcript is not None:
+            #         print(f"      File exists but content is empty or whitespace only")
             
             # Start transcription pipeline
             start_transcription_pipeline(metrics_collector=metrics_collector)
@@ -105,22 +210,17 @@ class TestRunner:
             if reference_transcript:
                 wer_score = metrics_collector.calculate_wer(reference_transcript)
             
-            # Create result record
+            # Create simplified result record
             result = {
-                'timestamp': datetime.now().isoformat(),
-                'audio_file': str(audio_file),
-                'category': category_info['name'],
+                'audio_file': audio_file.name,  # Just the filename, not full path
                 'model_type': config.get('model_type', 'unknown'),
-                'config': config,
-                'transcript': final_transcript,
+                'config': config['description'],  # Just the description, not full config
                 'word_count': len(final_transcript.split()),
-                'latency': latency_metrics,
-                'duration_seconds': len(audio_samples) / 16000,
-                'wer_score': wer_score,
-                'reference_transcript': reference_transcript
+                'latency': latency_metrics['avg_latency'],  # Just the average latency
+                'wer_score': wer_score
             }
             
-            print(f"      Completed: {result['word_count']} words, {latency_metrics['avg_latency']:.3f}s avg latency")
+            print(f"      Completed: {result['word_count']} words, {result['latency']:.3f}s avg latency")
             if wer_score is not None:
                 print(f"      WER: {wer_score:.3f}")
             return result
@@ -128,66 +228,15 @@ class TestRunner:
         except Exception as e:
             print(f"      Error: {e}")
             return {
-                'timestamp': datetime.now().isoformat(),
-                'audio_file': str(audio_file),
-                'category': category_info['name'],
+                'audio_file': audio_file.name,
                 'model_type': config.get('model_type', 'unknown'),
-                'config': config,
+                'config': config.get('description', 'unknown'),
+                'word_count': 0,
+                'latency': 0,
+                'wer_score': None,
                 'error': str(e)
             }
-    
-    def run_comprehensive_tests(self, num_runs_per_config=1):
-        """Run all tests across all configurations and audio files"""
-        print("Starting Comprehensive Transcription Tests")
-        print("=" * 60)
-        
-        # Find audio files
-        audio_files = self.find_audio_files()
-        if not audio_files:
-            print("No audio files found. Please add audio files to test_audio/ directory")
-            return
-        
-        print(f"Found {len(audio_files)} audio files")
-        
-        # Calculate total tests to run
-        total_configs = sum(len(configs) for configs in TEST_CONFIGS.values())
-        total_tests = len(audio_files) * total_configs * num_runs_per_config
-        print(f"Total tests to run: {total_tests}")
-        
-        current_test = 0
-        
-        # For each audio file
-        for audio_file in audio_files:
-            category_name = self.categorize_audio_file(audio_file)
-            category_info = AUDIO_CATEGORIES.get(category_name, {
-                'name': category_name,
-                'description': 'Unknown category'
-            })
-            
-            print(f"\nTesting {audio_file.name} ({category_info['description']})")
-            
-            # For each model type
-            for model_type, configs in TEST_CONFIGS.items():
-                print(f"  Testing {model_type} model ({len(configs)} configurations)")
-                
-                # For each configuration
-                for config in configs:
-                    # Add model type to config
-                    config_with_type = config.copy()
-                    config_with_type['model_type'] = model_type
-                    
-                    # Run test multiple times if specified
-                    for _ in range(num_runs_per_config):
-                        current_test += 1
-                        print(f"    Progress: {current_test}/{total_tests}")
-                        
-                        result = self.run_single_test(audio_file, config_with_type, category_info)
-                        self.results.append(result)
-        
-        # Save results
-        self.save_results()
-        self.print_summary()
-    
+
     def save_results(self):
         """Save test results to files"""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -230,7 +279,7 @@ class TestRunner:
             print(f"\n{model_type.upper()} Model:")
             
             # Calculate average latency
-            latencies = [r['latency']['avg_latency'] for r in results if 'latency' in r and 'error' not in r]
+            latencies = [r['latency'] for r in results if 'error' not in r and r['latency'] is not None]
             if latencies:
                 avg_latency = sum(latencies) / len(latencies)
                 print(f"  Average latency: {avg_latency:.3f}s")
@@ -252,12 +301,14 @@ def main():
     """Main entry point"""
     print("Transcription Model Test Runner")
     print("=" * 40)
+    print(f"Testing {CURRENT_MODEL.upper()} model")
+    print("=" * 40)
     
     # Create test runner
     runner = TestRunner()
     
-    # Run comprehensive tests
-    runner.run_comprehensive_tests(num_runs_per_config=1)
+    # Run tests for the specified model
+    runner.run_model_tests(CURRENT_MODEL, num_runs_per_config=1)
     
     print("\nTesting completed!")
 
