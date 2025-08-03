@@ -217,7 +217,9 @@ class TestRunner:
                 'config': config['description'],  # Just the description, not full config
                 'word_count': len(final_transcript.split()),
                 'latency': latency_metrics['avg_latency'],  # Just the average latency
-                'wer_score': wer_score
+                'wer_score': wer_score,
+                'recorded_transcript': final_transcript,  # What was actually transcribed
+                'correct_transcript': reference_transcript  # What it should have been
             }
             
             print(f"      Completed: {result['word_count']} words, {result['latency']:.3f}s avg latency")
@@ -234,6 +236,8 @@ class TestRunner:
                 'word_count': 0,
                 'latency': 0,
                 'wer_score': None,
+                'recorded_transcript': '',
+                'correct_transcript': reference_transcript if reference_transcript else '',
                 'error': str(e)
             }
 

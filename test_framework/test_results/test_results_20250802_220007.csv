@@ -1,5 +1,0 @@
-audio_file,model_type,config,word_count,latency,wer_score
-10sec_medium_pace_audio.mp3,fixed,Small chunks (1.0s),7,2.293818553288778,
-10sec_medium_pace_audio.mp3,fixed,Medium chunks (1.5s),3,7.2675580978393555,
-10sec_medium_pace_audio.mp3,fixed,Large chunks (2.5s),3,2.665606419245402,
-10sec_medium_pace_audio.mp3,fixed,Very large chunks (3.0s),4,1.6219582557678223,

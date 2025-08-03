@@ -1,6 +1,20 @@
 import time
 import numpy as np
-import jiwer
+from jiwer import wer, Compose, ToLowerCase, RemovePunctuation, RemoveMultipleSpaces, Strip
+
+def split_into_words(sentences):
+    """Custom function to split sentences into words"""
+    if isinstance(sentences, str):
+        return sentences.split()
+    return [sentence.split() for sentence in sentences]
+
+transform = Compose([
+    ToLowerCase(),
+    RemovePunctuation(),
+    RemoveMultipleSpaces(),
+    Strip(),
+    split_into_words
+])
 
 class MetricsCollector:
     def __init__(self):
@@ -50,4 +64,10 @@ class MetricsCollector:
             return 1.0  # 100% error if no transcription
         
         predicted = self.get_final_transcript()
-        return jiwer.wer(reference_transcript, predicted)
+        
+        # Calculate WER using JIWER and normalizing both transcripts 
+        word_error_rate = wer(reference_transcript, predicted, 
+                             reference_transform=transform, 
+                             hypothesis_transform=transform)
+        
+        return word_error_rate
