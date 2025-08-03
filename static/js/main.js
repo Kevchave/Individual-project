@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const startBtn = document.getElementById('startBtn');
     const stopBtn = document.getElementById('stopBtn');
     const pauseResumeBtn = document.getElementById('pauseResumeBtn');
+    const resetBtn = document.getElementById('resetBtn');
     const transcriptBox = document.getElementById('transcript-box');
     const wpmValue = document.getElementById('wpm-value');
     const volumeValue = document.getElementById('volume-value');
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startBtn,
         stopBtn,
         pauseResumeBtn,
+        resetBtn,
         transcriptBox,
         wpmValue,
         volumeValue,

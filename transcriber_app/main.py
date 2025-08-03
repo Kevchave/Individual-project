@@ -28,6 +28,7 @@ track_insider_metrics = None  # Optional insider metrics for adaptive chunking
 adaptive_controller = None    # Adaptive controller for parameter tuning
 transcription_thread = None
 start_time = None
+metrics_collector = None  # For end-to-end latency measurement
 
 # Start the full pipeline: audio, transcription, metrics
 def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=True, enable_adaptive_control=True, metrics_collector=None):
@@ -49,6 +50,7 @@ def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=Tru
     track_insider_metrics = None
     adaptive_controller = None
     transcription_thread = None
+    metrics_collector = metrics_collector
     
     # Create all objects
     if audio_stream is None:
@@ -197,11 +199,15 @@ def main():
         print("Stopped.")
 
 def on_transcription(text, segment_duration):
-    global metrics, adaptive_controller, track_insider_metrics
+    global metrics, adaptive_controller, track_insider_metrics, metrics_collector
     if metrics is not None:
         metrics.add_transcription(text, segment_duration)
         metrics.track_wpm()
         print(f"\nTranscription: {text}\n") 
+
+        # Record when text appears on screen for end-to-end latency
+        if metrics_collector is not None:
+            metrics_collector.record_chunk_display()
 
         # Print UI metrics summary after WPM is updated
         metrics.print_ui_metrics_summary()

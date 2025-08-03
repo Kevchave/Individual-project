@@ -7,6 +7,8 @@ class AudioLoader:
     
     def load_audio(self, file_path):
         """Load audio file and convert to required format"""
+
+        # Load the audio file using pydub.AudioSegment
         audio = AudioSegment.from_file(str(file_path))
         
         # Convert to mono if stereo

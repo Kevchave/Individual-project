@@ -24,7 +24,7 @@ function updateMetricsDisplay(metricsMode) {
 }
 
 function initialiseControls({
-    startBtn, stopBtn, pauseResumeBtn,
+    startBtn, stopBtn, pauseResumeBtn, resetBtn,
     transcriptBox, wpmValue, volumeValue, pitchValue }) {
     
         // Start Recording
@@ -67,7 +67,7 @@ function initialiseControls({
             return;
         }
         setMetricsMode("average");
-        resetCharts();
+        // Note: Removed resetCharts() call - graphs will be preserved
         fetch('/stop_recording', { method: 'POST' })
             .then(response => response.json())
             .then(data => {
@@ -149,6 +149,30 @@ function initialiseControls({
                     alert("Error resuming recording.");
                 });
         }
+    });
+
+    // Reset Button - clears graphs and transcript, only works when not recording
+    resetBtn.addEventListener('click', function() {
+        if (metricsMode === "live") {
+            transcriptBox.textContent = "Cannot reset while recording is in progress.";
+            return;
+        }
+        
+        // Clear the transcript
+        transcriptBox.textContent = "Live transcript will appear here...";
+        
+        // Reset the charts
+        resetCharts();
+        
+        // Reset metrics display to live mode labels
+        document.getElementById('wpm-label').textContent = 'Words per Minute';
+        document.getElementById('volume-label').textContent = 'Volume (dBFS)';
+        document.getElementById('pitch-label').textContent = 'Pitch Variance (Hz)';
+        document.getElementById('wpm-value').textContent = '0';
+        document.getElementById('volume-value').textContent = '0';
+        document.getElementById('pitch-value').textContent = '0';
+        
+        console.log("Reset completed - graphs and transcript cleared");
     });
 }
 
