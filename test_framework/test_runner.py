@@ -16,17 +16,16 @@ import sys
 import time
 import json
 import pandas as pd
-import sounddevice as sd
 from pathlib import Path
 from datetime import datetime
 
 # Add transcriber_app to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from audio_loader import AudioLoader
 from metrics_collector import MetricsCollector
 from configs import TEST_CONFIGS, AUDIO_CATEGORIES
-from transcriber_app.main import start_transcription_pipeline, stop_transcription_pipeline
+from transcriber_app.main import start_transcription_pipeline, start_transcription_pipeline_with_virtual_audio, stop_transcription_pipeline
+import transcriber_app.main as main_module
 
 # MANUAL CONFIGURATION - Change this to test different models
 # Options: 'fixed', 'vad', 'adaptive'
@@ -39,13 +38,12 @@ class TestRunner:
         self.results_dir = Path(results_dir)        
         self.results_dir.mkdir(exist_ok=True)       # Creates directory if it doesn't exist
         
-        self.audio_loader = AudioLoader()           # Creates instance of AudioLoader class 
         self.results = []                           # Creates empty list to store test results
         
     def find_audio_files(self):
         """Find audio files in test_audio directory"""
         # TEMPORARY CODE (quick test with specific file)
-        audio_files = [self.test_audio_dir / '1min_medium_pace_audio.mp3']  # Change filename here
+        audio_files = [self.test_audio_dir / '10sec_medium_pace_audio.mp3']  # Change filename here
         return audio_files
         
         # # ORIGINAL CODE (testing with all files)
@@ -149,14 +147,14 @@ class TestRunner:
     def run_single_test(self, audio_file, config, category_info):
         """Run a single test with given audio file and configuration"""
         print(f" -> Testing: {config['description']}")
+        print(f" -> Config: {config}")  # Debug: show the actual configuration
         
         # Create metrics collector for this test
         metrics_collector = MetricsCollector()
         metrics_collector.start_test()
         
         try:
-            # Load audio file
-            audio_samples = self.audio_loader.load_audio(audio_file)
+            # Audio file will be loaded directly by the virtual audio stream
             
             # Load reference transcript for WER calculation
             reference_transcript = self.load_reference_transcript(audio_file)
@@ -170,13 +168,19 @@ class TestRunner:
             #     if reference_transcript is not None:
             #         print(f"      File exists but content is empty or whitespace only")
             
-            # Start transcription pipeline
-            start_transcription_pipeline(metrics_collector=metrics_collector)
+            # Start transcription pipeline with virtual audio injection
+            print(f"\nStarting transcription with virtual audio...")
+            start_transcription_pipeline_with_virtual_audio(
+                audio_file_path=str(audio_file),
+                metrics_collector=metrics_collector,
+                real_time_simulation=False,  # Faster testing without real-time delays
+                config=config  # Pass the configuration to the transcription pipeline
+            )
             
-            # Actually play the audio through system audio
-            print(f"\nPlaying audio ({len(audio_samples)/16000:.1f}s)...")
-            sd.play(audio_samples, 16000)
-            sd.wait()  # Wait for audio to finish playing
+            # Wait for transcription to complete
+            # The virtual audio stream will automatically finish when all audio is processed
+            while main_module.transcription_thread and main_module.transcription_thread.is_alive():
+                time.sleep(0.1)
             
             # Stop transcription
             stop_transcription_pipeline()

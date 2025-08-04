@@ -1,0 +1,35 @@
+[
+  {
+    "audio_file": "10sec_medium_pace_audio.mp3",
+    "model_type": "adaptive",
+    "config": "Conservative start",
+    "word_count": 9,
+    "processing_latency": 1.2284139394760132,
+    "end_to_end_latency": 1.2284139394760132,
+    "wer_score": 0.5,
+    "recorded_transcript": " The human voice.  It's the instrument we all play.",
+    "correct_transcript": "The human voice:\nIt's the instrument we all play.\nIt's the most powerful sound in the world, probably."
+  },
+  {
+    "audio_file": "10sec_medium_pace_audio.mp3",
+    "model_type": "adaptive",
+    "config": "Balanced start",
+    "word_count": 9,
+    "processing_latency": 0.883512020111084,
+    "end_to_end_latency": 0.883512020111084,
+    "wer_score": 0.5,
+    "recorded_transcript": " The human voice.  It's the instrument we all play.",
+    "correct_transcript": "The human voice:\nIt's the instrument we all play.\nIt's the most powerful sound in the world, probably."
+  },
+  {
+    "audio_file": "10sec_medium_pace_audio.mp3",
+    "model_type": "adaptive",
+    "config": "Aggressive start",
+    "word_count": 9,
+    "processing_latency": 0.971453070640564,
+    "end_to_end_latency": 0.971453070640564,
+    "wer_score": 0.5,
+    "recorded_transcript": " The human voice.  It's the instrument we all play.",
+    "correct_transcript": "The human voice:\nIt's the instrument we all play.\nIt's the most powerful sound in the world, probably."
+  }
+]
