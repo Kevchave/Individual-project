@@ -1,0 +1,575 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Live Lecture Feedback{% endblock %}
+
+{% block head %}
+<style>
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .user-welcome {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: var(--surface-color);
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .stat-title {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-change {
+        font-size: 0.875rem;
+        color: #28a745;
+    }
+
+    .stat-change.negative {
+        color: #dc3545;
+    }
+
+    .dashboard-tabs {
+        display: flex;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .dashboard-tab {
+        padding: 1rem 2rem;
+        cursor: pointer;
+        border: none;
+        background: none;
+        color: var(--text-secondary);
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-bottom: 2px solid transparent;
+    }
+
+    .dashboard-tab.active {
+        color: var(--primary-color);
+        border-bottom-color: var(--primary-color);
+    }
+
+    .dashboard-content {
+        display: none;
+    }
+
+    .dashboard-content.active {
+        display: block;
+    }
+
+    .sessions-list {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .session-card {
+        background: var(--surface-color);
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--border-color);
+        transition: transform 0.2s ease;
+    }
+
+    .session-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .session-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .session-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .session-date {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .session-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .session-metric {
+        text-align: center;
+    }
+
+    .session-metric-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .session-metric-value {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .session-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+        background: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+        background: var(--text-secondary);
+        color: white;
+    }
+
+    .settings-form {
+        max-width: 600px;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .save-btn {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .save-btn:hover {
+        background: var(--primary-dark);
+    }
+
+    .save-btn:disabled {
+        background: var(--text-secondary);
+        cursor: not-allowed;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-state h3 {
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-secondary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <div class="user-welcome">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <div>
+                <h1>Welcome back, <span id="userName">User</span>!</h1>
+                <p>Track your lecture performance and improve your speaking skills</p>
+            </div>
+        </div>
+        <div class="session-actions">
+            <a href="/" class="btn btn-primary">Start New Session</a>
+            <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-title">Total Sessions</div>
+            <div class="stat-value" id="totalSessions">0</div>
+            <div class="stat-change">+2 this week</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">Average WPM</div>
+            <div class="stat-value" id="avgWPM">0</div>
+            <div class="stat-change">+5 from last week</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">Total Speaking Time</div>
+            <div class="stat-value" id="totalTime">0h</div>
+            <div class="stat-change">+1.5h this month</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">Best Session</div>
+            <div class="stat-value" id="bestSession">-</div>
+            <div class="stat-change">2 days ago</div>
+        </div>
+    </div>
+
+    <!-- Dashboard Tabs -->
+    <div class="dashboard-tabs">
+        <button class="dashboard-tab active" data-tab="sessions">Recent Sessions</button>
+        <button class="dashboard-tab" data-tab="settings">Settings</button>
+        <button class="dashboard-tab" data-tab="insights">Insights</button>
+    </div>
+
+    <!-- Sessions Tab -->
+    <div id="sessionsContent" class="dashboard-content active">
+        <div class="loading" id="sessionsLoading">Loading sessions...</div>
+        <div class="sessions-list" id="sessionsList" style="display: none;"></div>
+        <div class="empty-state" id="sessionsEmpty" style="display: none;">
+            <h3>No sessions yet</h3>
+            <p>Start your first lecture session to see your data here</p>
+            <a href="/" class="btn btn-primary">Start Recording</a>
+        </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div id="settingsContent" class="dashboard-content">
+        <div class="settings-form">
+            <h2>Personal Settings</h2>
+            <form id="settingsForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="targetWPM">Target Words Per Minute</label>
+                        <input type="number" id="targetWPM" min="100" max="300" value="150">
+                    </div>
+                    <div class="form-group">
+                        <label for="targetVolume">Target Volume (dBFS)</label>
+                        <input type="number" id="targetVolume" min="-60" max="0" value="-20">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="preferredLayout">Preferred Layout</label>
+                    <select id="preferredLayout">
+                        <option value="default">Default</option>
+                        <option value="compact">Compact</option>
+                        <option value="detailed">Detailed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="showMetrics">Show Metrics During Recording</label>
+                    <select id="showMetrics">
+                        <option value="all">All Metrics</option>
+                        <option value="wpm">WPM Only</option>
+                        <option value="volume">Volume Only</option>
+                        <option value="pitch">Pitch Only</option>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+                <button type="submit" class="save-btn" id="saveSettings">Save Settings</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Insights Tab -->
+    <div id="insightsContent" class="dashboard-content">
+        <h2>Performance Insights</h2>
+        <div class="empty-state">
+            <h3>Coming Soon</h3>
+            <p>Detailed insights and recommendations will be available here</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module">
+    import { getCurrentUser, signOut, getUserSessions, getUserPreferences, saveUserPreferences } from '/static/js/supabase-cllient.js';
+
+    let currentUser = null;
+    let userSessions = [];
+    let userPreferences = {};
+
+    // Initialize dashboard
+    async function initDashboard() {
+        currentUser = await getCurrentUser();
+        if (!currentUser) {
+            window.location.href = '/login';
+            return;
+        }
+
+        // Update user info
+        updateUserInfo();
+        
+        // Load data
+        await Promise.all([
+            loadUserSessions(),
+            loadUserPreferences()
+        ]);
+
+        // Update statistics
+        updateStatistics();
+    }
+
+    function updateUserInfo() {
+        const userName = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User';
+        const userInitial = userName.charAt(0).toUpperCase();
+        
+        document.getElementById('userName').textContent = userName;
+        document.getElementById('userAvatar').textContent = userInitial;
+    }
+
+    async function loadUserSessions() {
+        const { data, error } = await getUserSessions(10);
+        if (!error && data) {
+            userSessions = data;
+            displaySessions();
+        }
+    }
+
+    async function loadUserPreferences() {
+        const { data, error } = await getUserPreferences();
+        if (!error && data) {
+            userPreferences = data;
+            populateSettingsForm();
+        }
+    }
+
+    function displaySessions() {
+        const sessionsList = document.getElementById('sessionsList');
+        const sessionsLoading = document.getElementById('sessionsLoading');
+        const sessionsEmpty = document.getElementById('sessionsEmpty');
+
+        sessionsLoading.style.display = 'none';
+
+        if (userSessions.length === 0) {
+            sessionsEmpty.style.display = 'block';
+            return;
+        }
+
+        sessionsList.style.display = 'grid';
+        sessionsList.innerHTML = userSessions.map(session => `
+            <div class="session-card">
+                <div class="session-header">
+                    <div>
+                        <div class="session-title">Lecture Session</div>
+                        <div class="session-date">${new Date(session.created_at).toLocaleDateString()}</div>
+                    </div>
+                </div>
+                <div class="session-metrics">
+                    <div class="session-metric">
+                        <div class="session-metric-label">Duration</div>
+                        <div class="session-metric-value">${formatDuration(session.duration || 0)}</div>
+                    </div>
+                    <div class="session-metric">
+                        <div class="session-metric-label">Avg WPM</div>
+                        <div class="session-metric-value">${session.avg_wpm || 0}</div>
+                    </div>
+                    <div class="session-metric">
+                        <div class="session-metric-label">Avg Volume</div>
+                        <div class="session-metric-value">${session.avg_volume || 0} dB</div>
+                    </div>
+                </div>
+                <div class="session-actions">
+                    <button class="btn btn-secondary" onclick="viewSessionDetails('${session.id}')">View Details</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function updateStatistics() {
+        if (userSessions.length === 0) return;
+
+        const totalSessions = userSessions.length;
+        const avgWPM = Math.round(userSessions.reduce((sum, s) => sum + (s.avg_wpm || 0), 0) / totalSessions);
+        const totalTime = userSessions.reduce((sum, s) => sum + (s.duration || 0), 0);
+        const bestSession = userSessions.reduce((best, current) => 
+            (current.avg_wpm || 0) > (best.avg_wpm || 0) ? current : best
+        );
+
+        document.getElementById('totalSessions').textContent = totalSessions;
+        document.getElementById('avgWPM').textContent = avgWPM;
+        document.getElementById('totalTime').textContent = formatDuration(totalTime);
+        document.getElementById('bestSession').textContent = bestSession.avg_wpm || 0;
+    }
+
+    function formatDuration(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        
+        if (hours > 0) {
+            return `${hours}h ${minutes}m`;
+        }
+        return `${minutes}m`;
+    }
+
+    function populateSettingsForm() {
+        document.getElementById('targetWPM').value = userPreferences.target_wpm || 150;
+        document.getElementById('targetVolume').value = userPreferences.target_volume || -20;
+        document.getElementById('preferredLayout').value = userPreferences.preferred_layout || 'default';
+        document.getElementById('showMetrics').value = userPreferences.show_metrics || 'all';
+    }
+
+    // Tab switching
+    document.querySelectorAll('.dashboard-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.dashboard-content').forEach(c => c.classList.remove('active'));
+            
+            tab.classList.add('active');
+            const contentId = tab.dataset.tab + 'Content';
+            document.getElementById(contentId).classList.add('active');
+        });
+    });
+
+    // Settings form
+    document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const saveBtn = document.getElementById('saveSettings');
+        
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        const preferences = {
+            target_wpm: parseInt(document.getElementById('targetWPM').value),
+            target_volume: parseInt(document.getElementById('targetVolume').value),
+            preferred_layout: document.getElementById('preferredLayout').value,
+            show_metrics: document.getElementById('showMetrics').value
+        };
+
+        try {
+            const { error } = await saveUserPreferences(preferences);
+            if (!error) {
+                userPreferences = preferences;
+                alert('Settings saved successfully!');
+            } else {
+                alert('Failed to save settings: ' + error.message);
+            }
+        } catch (err) {
+            alert('An error occurred while saving settings');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Settings';
+        }
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        await signOut();
+        window.location.href = '/login';
+    });
+
+    // Initialize
+    initDashboard();
+
+    // Global function for session details (placeholder)
+    window.viewSessionDetails = function(sessionId) {
+        alert('Session details feature coming soon!');
+    };
+</script>
+{% endblock %} 

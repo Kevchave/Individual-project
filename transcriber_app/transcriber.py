@@ -17,7 +17,7 @@ class Transcriber:
         self.parameter_queue = queue.Queue()
         self.current_aggressiveness = 3
         self.current_frame_duration_ms = 20
-        self.current_max_silence_frames = 10
+        self.current_max_silence_frames = 5
 
     def update_parameters(self, aggressiveness, frame_duration_ms, max_silence_frames):
         """

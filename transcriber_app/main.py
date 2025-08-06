@@ -1,10 +1,12 @@
 from .audio_stream import AudioStream
+from .virtual_audio_stream import VirtualAudioStream
 from .transcriber import Transcriber
 from .track_metrics import MetricsTracker
 from .track_insider_metrics import TrackInsiderMetrics
 from .adaptive_controller import AdaptiveController
 import threading
 import time
+import numpy as np
 
 SAMPLE_RATE = 16000
 CHUNK_SEC = 1.5
@@ -73,6 +75,120 @@ def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=Tru
                     aggressiveness, frame_duration_ms, max_silence_frames = adaptive_controller.get_current_parameters()
                 else:
                     aggressiveness, frame_duration_ms, max_silence_frames = VAD_AGGRESSIVENESS, FRAME_DURATION_MS, MAX_SILENCE_FRAMES
+                
+                transcriber.transcribe_stream(
+                    audio_stream.audio_queue, 
+                    on_transcription, 
+                    on_audio_chunk, 
+                    track_insider_metrics,
+                    aggressiveness=aggressiveness,
+                    frame_duration_ms=frame_duration_ms,
+                    max_silence_frames=max_silence_frames,
+                    metrics_collector=metrics_collector
+                )
+
+    # Safeguard to ensure exactly one background thread is active 
+    if transcription_thread is None or not transcription_thread.is_alive():
+        # Start a separate transcription thread 
+        # - the transcription can now run without blocking the main thread (or program)
+        transcription_thread = threading.Thread(target=run_transcription, daemon=True)
+        transcription_thread.start()
+
+# Start the pipeline with virtual audio (for testing)
+def start_transcription_pipeline_with_virtual_audio(audio_file_path, enable_insider_metrics=True, enable_adaptive_control=True, metrics_collector=None, real_time_simulation=True, config=None):
+    global audio_stream, transcriber, metrics, track_insider_metrics, adaptive_controller, transcription_thread, start_time
+
+    # Clear previous data if there exists
+    if metrics is not None: 
+        if hasattr(metrics, 'accumulated'):
+            metrics.accumulated.clear()
+        if hasattr(metrics, 'all_audio_chunks'):
+            metrics.all_audio_chunks.clear()
+    if track_insider_metrics is not None:
+        track_insider_metrics.reset()
+    if adaptive_controller is not None:
+        adaptive_controller.reset()
+    
+    transcriber = None
+    metrics = None 
+    track_insider_metrics = None
+    adaptive_controller = None
+    transcription_thread = None
+    metrics_collector = metrics_collector
+    
+    # Create virtual audio stream instead of real microphone stream
+    audio_stream = VirtualAudioStream(SAMPLE_RATE)
+    audio_stream.load_audio_file(audio_file_path)
+    
+    # Disable real-time simulation for faster testing if requested
+    if not real_time_simulation:
+        # Override the _stream_audio method to remove delays
+        def fast_stream_audio():
+            if audio_stream.audio_data is None:
+                print("No audio data loaded")
+                return
+                
+            position = 0
+            while audio_stream.is_playing and position < len(audio_stream.audio_data):
+                # Get next chunk
+                end_position = min(position + audio_stream.chunk_size, len(audio_stream.audio_data))
+                chunk = audio_stream.audio_data[position:end_position]
+                
+                # Pad with zeros if chunk is smaller than expected
+                if len(chunk) < audio_stream.chunk_size:
+                    chunk = np.pad(chunk, (0, audio_stream.chunk_size - len(chunk)), 'constant')
+                
+                # Put chunk in queue (same interface as AudioStream)
+                audio_stream.audio_queue.put(chunk)
+                
+                position = end_position
+                # No time.sleep() for faster testing
+            
+            # Signal end of stream
+            audio_stream.audio_queue.put(None)
+            print("Virtual audio stream finished (fast mode)")
+        
+        audio_stream._stream_audio = fast_stream_audio
+    
+    if transcriber is None:
+        transcriber = Transcriber("small", "cpu")
+    if metrics is None:
+        metrics = MetricsTracker(SAMPLE_RATE)
+    if enable_insider_metrics and track_insider_metrics is None:
+        track_insider_metrics = TrackInsiderMetrics()
+    if enable_adaptive_control and adaptive_controller is None:
+        adaptive_controller = AdaptiveController()
+
+    def run_transcription():
+        if audio_stream is not None:
+            audio_stream.start()
+            if transcriber is not None:
+                # Use configuration parameters if provided, otherwise use defaults
+                if config is not None:
+                    # Extract parameters based on model type
+                    if 'aggressiveness' in config:
+                        # VAD or adaptive model
+                        aggressiveness = config['aggressiveness']
+                        frame_duration_ms = config.get('frame_duration_ms', FRAME_DURATION_MS)
+                        max_silence_frames = config.get('max_silence_frames', MAX_SILENCE_FRAMES)
+                    elif 'starting_aggressiveness' in config:
+                        # Adaptive model with starting aggressiveness
+                        aggressiveness = config['starting_aggressiveness']
+                        frame_duration_ms = config.get('frame_duration_ms', FRAME_DURATION_MS)
+                        max_silence_frames = config.get('max_silence_frames', MAX_SILENCE_FRAMES)
+                    elif 'chunk_size' in config:
+                        # Fixed chunk model - these parameters don't apply
+                        aggressiveness = VAD_AGGRESSIVENESS
+                        frame_duration_ms = FRAME_DURATION_MS
+                        max_silence_frames = MAX_SILENCE_FRAMES
+                    else:
+                        # Fallback to defaults
+                        aggressiveness, frame_duration_ms, max_silence_frames = VAD_AGGRESSIVENESS, FRAME_DURATION_MS, MAX_SILENCE_FRAMES
+                else:
+                    # Use defaults if no config provided
+                    aggressiveness, frame_duration_ms, max_silence_frames = VAD_AGGRESSIVENESS, FRAME_DURATION_MS, MAX_SILENCE_FRAMES
+                
+                print(f"      Using config: aggressiveness={aggressiveness}, frame_duration_ms={frame_duration_ms}, max_silence_frames={max_silence_frames}")
                 
                 transcriber.transcribe_stream(
                     audio_stream.audio_queue, 

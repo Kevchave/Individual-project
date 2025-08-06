@@ -34,7 +34,11 @@ def test():
 
 @app.route('/')
 def home():
-    return render_template("index.html") # Serves the html page 
+    return render_template("index.html") # Serves the html page
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template("dashboard.html") 
 
 # Start Recording
 @app.route("/start_recording", methods=['POST'])

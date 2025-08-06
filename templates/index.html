@@ -3,9 +3,10 @@
 {% block title %}Live Lecture Feedback{% endblock %}
 
 {% block head %}
-    <!-- Anything in here will fill the block in base.html-->
-    <style>
-    </style>
+<!-- CSS Files -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/recording.css') }}">
 {% endblock %}
 
 {% block header %}
@@ -13,41 +14,167 @@
 {% endblock %}
 
 {% block content %}
-    <div class="button-row">
-        <button id="startBtn" class="action-btn">Start Recording</button>
-        <button id="pauseResumeBtn" class="action-btn"> Pause </button>
-        <button id="resetBtn" class="action-btn">Reset</button>
-        <button id="stopBtn" class="action-btn">Stop Recording</button>
+<!-- Page Structure -->
+<div class="main-container">
+    <!-- App Title -->
+    <div class="app-title">
+        <h1>Live Lecture Feedback</h1>
     </div>
-    <div id="transcript-box">Live transcript will appear here...</div>
-    <div class="metrics-container">
-        <div class="metric-box" id="wpm-box">
-            <span class="metric-label" id="wpm-label">Words per Minute</span>
-            <span class="metric-value" id="wpm-value">0</span>
+
+    <!-- Authentication Section (shown when not logged in) -->
+    <div id="authSection" class="auth-section">
+        <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">Login</button>
+            <button class="auth-tab" data-tab="signup">Sign Up</button>
         </div>
-        <div class="metric-box" id="volume-box">
-            <span class="metric-label" id="volume-label">Volume (dBFS)</span>
-            <span class="metric-value" id="volume-value">0</span>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form active">
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+            <button type="submit" class="auth-btn" id="loginBtn">Login</button>
+            <div class="error-message" id="loginError"></div>
+        </form>
+
+        <!-- Sign Up Form -->
+        <form id="signupForm" class="auth-form">
+            <div class="form-group">
+                <label for="signupName">Full Name</label>
+                <input type="text" id="signupName" required>
+            </div>
+            <div class="form-group">
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" required minlength="6">
+            </div>
+            <div class="form-group">
+                <label for="signupConfirmPassword">Confirm Password</label>
+                <input type="password" id="signupConfirmPassword" required>
+            </div>
+            <button type="submit" class="auth-btn" id="signupBtn">Sign Up</button>
+            <div class="error-message" id="signupError"></div>
+            <div class="success-message" id="signupSuccess"></div>
+        </form>
+    </div>
+
+    <!-- Main Content (shown when logged in) -->
+    <div id="mainContent" style="display: none;">
+        <!-- User Header -->
+        <div class="user-header">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">G</div>
+                <div>
+                    <p id="userGreeting">Welcome! Start recording to get real-time feedback</p>
+                </div>
+            </div>
+            <div class="user-actions">
+                <a href="/dashboard" class="btn btn-secondary">Dashboard</a>
+                <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+            </div>
         </div>
-        <div class="metric-box" id="pitch-box">
-            <span class="metric-label" id="pitch-label">Pitch Variance (Hz)</span>
-            <span class="metric-value" id="pitch-value">0</span>
+
+        <!-- Controls Section -->
+        <div class="controls-section">
+            <div class="controls-header">
+                <h2>Recording Controls</h2>
+                <button class="controls-toggle" id="controlsToggle">−</button>
+            </div>
+            <div class="controls-content" id="controlsContent">
+                <div class="button-row">
+                    <button id="startBtn" class="action-btn">Start Recording</button>
+                    <button id="pauseResumeBtn" class="action-btn" disabled>Pause</button>
+                    <button id="resetBtn" class="action-btn" disabled>Reset</button>
+                    <button id="stopBtn" class="action-btn" disabled>Stop Recording</button>
+                </div>
+                <div class="session-info">
+                    <div class="info-item">
+                        <span class="info-label">Session Duration:</span>
+                        <span class="info-value" id="sessionDuration">00:00</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Words Spoken:</span>
+                        <span class="info-value" id="wordsSpoken">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value" id="sessionStatus">Ready</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="main-content">
+            <!-- Transcript Section -->
+            <div class="transcript-section">
+                <div class="transcript-header">
+                    <h2>Live Transcript</h2>
+                    <button class="transcript-toggle" id="transcriptToggle">−</button>
+                </div>
+                <div class="transcript-content" id="transcriptContent">
+                    <div id="transcript-box">Live transcript will appear here...</div>
+                </div>
+            </div>
+
+            <!-- Metrics Section -->
+            <div class="metrics-section">
+                <div class="metrics-header">
+                    <h2>Live Metrics</h2>
+                    <button class="metrics-toggle" id="metricsToggle">−</button>
+                </div>
+                <div class="metrics-content" id="metricsContent">
+                    <div class="metrics-container">
+                        <div class="metric-box" id="wpm-box">
+                            <span class="metric-label" id="wpm-label">Words per Minute</span>
+                            <span class="metric-value" id="wpm-value">0</span>
+                        </div>
+                        <div class="metric-box" id="volume-box">
+                            <span class="metric-label" id="volume-label">Volume (dBFS)</span>
+                            <span class="metric-value" id="volume-value">0</span>
+                        </div>
+                        <div class="metric-box" id="pitch-box">
+                            <span class="metric-label" id="pitch-label">Pitch Variance (Hz)</span>
+                            <span class="metric-value" id="pitch-value">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphs Section -->
+            <div class="graphs-section">
+                <div class="graphs-header">
+                    <h2>Performance Graphs</h2>
+                    <button class="graphs-toggle" id="graphsToggle">−</button>
+                </div>
+                <div class="graphs-content" id="graphsContent">
+                    <div class="graphs-container">
+                        <div class="graph-box">
+                            <div class="graph-title">WPM / Time</div>
+                            <canvas id="wpmChart"></canvas>
+                        </div>
+                        <div class="graph-box">
+                            <div class="graph-title">Volume / Time</div>
+                            <canvas id="volumeChart"></canvas>
+                        </div>
+                        <div class="graph-box">
+                            <div class="graph-title">Pitch Variance / Time</div>
+                            <canvas id="pitchChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="graphs-container">
-        <div class="graph-box">
-            <div class="graph-title">WPM / Time</div>
-            <canvas id="wpmChart"></canvas>
-        </div>
-        <div class="graph-box">
-            <div class="graph-title">Volume / Time</div>
-            <canvas id="volumeChart"></canvas>
-        </div>
-        <div class="graph-box">
-            <div class="graph-title">Pitch Variance / Time</div>
-            <canvas id="pitchChart"></canvas>
-        </div>
-    </div>
+</div>
 {% endblock %}
 
 {% block footer %}
@@ -55,4 +182,6 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- JavaScript Files -->
+<script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
 {% endblock %}
