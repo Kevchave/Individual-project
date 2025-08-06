@@ -1,5 +1,5 @@
 import { initialiseCharts, resetCharts } from './charts.js';
-import { pollTranscript, pollMetrics } from './polling.js';
+import { pollTranscript, pollMetrics, resetMetricColors } from './polling.js';
 import { 
     startTime, setStartTime, 
     metricsMode, setMetricsMode, 
@@ -7,6 +7,34 @@ import {
     metricsInterval, setMetricsInterval, 
     isPaused, setIsPaused 
 } from './state.js';
+
+// Button state management functions
+function updateButtonStates(isRecording, isPaused) {
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const pauseResumeBtn = document.getElementById('pauseResumeBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    if (isRecording) {
+        // Recording is active
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        pauseResumeBtn.disabled = false;
+        resetBtn.disabled = true;
+        
+        // Update pause/resume button text
+        pauseResumeBtn.textContent = isPaused ? "Resume" : "Pause";
+    } else {
+        // Not recording
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        pauseResumeBtn.disabled = true;
+        resetBtn.disabled = false;
+        
+        // Reset pause/resume button text
+        pauseResumeBtn.textContent = "Pause";
+    }
+}
 
 function updateMetricsDisplay(metricsMode) {
     if (metricsMode === "live") {
@@ -26,6 +54,9 @@ function updateMetricsDisplay(metricsMode) {
 function initialiseControls({
     startBtn, stopBtn, pauseResumeBtn, resetBtn,
     transcriptBox, wpmValue, volumeValue, pitchValue }) {
+    
+    // Initialize button states (not recording)
+    updateButtonStates(false, false);
     
         // Start Recording
     startBtn.addEventListener('click', function() {
@@ -48,6 +79,8 @@ function initialiseControls({
             .then(data => {
                 transcriptBox.textContent = data.status;
                 updateMetricsDisplay(metricsMode);
+                updateButtonStates(true, false); // Enable recording buttons
+                resetMetricColors(); // Reset colors for new recording session
                 // This is only used if we want to poll on intervals 
                 if (!transcriptInterval && !metricsInterval) {
                     setTranscriptInterval(setInterval(() => pollTranscript(transcriptBox), 2000));
@@ -73,6 +106,7 @@ function initialiseControls({
             .then(data => {
                 transcriptBox.textContent = data.status;
                 updateMetricsDisplay(metricsMode);
+                updateButtonStates(false, false); // Disable recording buttons
 
                 if (transcriptInterval) {
                     clearInterval(transcriptInterval); // JavaScript function 
@@ -127,7 +161,7 @@ function initialiseControls({
                 .then(response => {
                     if (response.ok) {
                         setIsPaused(true);
-                        pauseResumeBtn.textContent = "Resume";
+                        updateButtonStates(true, true); // Update button states for paused state
                     } else {
                         alert("Failed to pause recording.");
                     }
@@ -140,7 +174,7 @@ function initialiseControls({
                 .then(response => {
                     if (response.ok) {
                         setIsPaused(false);
-                        pauseResumeBtn.textContent = "Pause";
+                        updateButtonStates(true, false); // Update button states for resumed state
                     } else {
                         alert("Failed to resume recording.");
                     }
@@ -164,6 +198,9 @@ function initialiseControls({
         // Reset the charts
         resetCharts();
         
+        // Reset metric box colors
+        resetMetricColors();
+        
         // Reset metrics display to live mode labels
         document.getElementById('wpm-label').textContent = 'Words per Minute';
         document.getElementById('volume-label').textContent = 'Volume (dBFS)';
@@ -172,7 +209,7 @@ function initialiseControls({
         document.getElementById('volume-value').textContent = '0';
         document.getElementById('pitch-value').textContent = '0';
         
-        console.log("Reset completed - graphs and transcript cleared");
+        console.log("Reset completed - graphs, transcript, and metric colors cleared");
     });
 }
 

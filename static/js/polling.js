@@ -61,4 +61,16 @@ function pollMetrics(wpmValue, volumeValue, pitchValue) {
         });
 }
 
-export { pollTranscript, pollMetrics};
+// Function to reset metric box colors
+function resetMetricColors() {
+    const wpmBox = document.getElementById('wpm-box');
+    const volumeBox = document.getElementById('volume-box');
+    const pitchBox = document.getElementById('pitch-box');
+
+    // Remove out-of-bounds class from all metric boxes
+    wpmBox.classList.remove('out-of-bounds');
+    volumeBox.classList.remove('out-of-bounds');
+    pitchBox.classList.remove('out-of-bounds');
+}
+
+export { pollTranscript, pollMetrics, resetMetricColors};

@@ -3,9 +3,13 @@ import { initialiseCharts } from './charts.js';
 // import { pollTranscript, pollMetrics } from './polling.js';
 import { initialiseControls } from './controls.js';
 
-// Main entry point: orchestrate initialization and wiring
+// Global variable to track if recording functionality is initialized
+let recordingInitialized = false;
 
-document.addEventListener('DOMContentLoaded', () => {
+// Function to initialize recording functionality
+export function initializeRecordingFunctionality() {
+    if (recordingInitialized) return; // Prevent double initialization
+    
     // Query all needed DOM elements
     const startBtn = document.getElementById('startBtn');
     const stopBtn = document.getElementById('stopBtn');
@@ -15,6 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const wpmValue = document.getElementById('wpm-value');
     const volumeValue = document.getElementById('volume-value');
     const pitchValue = document.getElementById('pitch-value');
+
+    // Check if all elements exist (recording interface is visible)
+    if (!startBtn || !stopBtn || !transcriptBox) {
+        console.log('Recording interface not ready yet');
+        return;
+    }
 
     // Initialize theme and charts
     initialiseTheme();
@@ -31,4 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
         volumeValue,
         pitchValue,
     });
+
+    recordingInitialized = true;
+    console.log('Recording functionality initialized');
+}
+
+// Initialize theme immediately (this can be done right away)
+document.addEventListener('DOMContentLoaded', () => {
+    initialiseTheme();
 });

@@ -1,5 +1,6 @@
 // Recording Interface Module
 import { signOut, getUserPreferences } from './supabase-cllient.js';
+import { initializeRecordingFunctionality } from './main.js';
 
 export class RecordingManager {
     constructor() {
@@ -12,6 +13,11 @@ export class RecordingManager {
         this.updateUserInfo();
         await this.loadUserPreferences();
         this.initializeUI();
+        
+        // Initialize recording functionality after UI is ready
+        setTimeout(() => {
+            initializeRecordingFunctionality();
+        }, 100);
     }
 
     updateUserInfo() {
