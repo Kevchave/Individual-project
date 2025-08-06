@@ -7,23 +7,7 @@
     padding: 2rem;
 }
 
-/* App Title */
-.app-title {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding: 2rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.app-title h1 {
-    font-size: 3rem;
-    font-weight: bold;
-    color: white;
-    margin: 0;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
+/* App Title - now in header */
 
 /* Common Button Styles */
 .btn {

@@ -21,11 +21,8 @@ export class RecordingManager {
     }
 
     updateUserInfo() {
-        const userName = this.currentUser.user_metadata?.full_name || this.currentUser.email?.split('@')[0] || 'User';
-        const userInitial = userName.charAt(0).toUpperCase();
-        
-        document.getElementById('userAvatar').textContent = userInitial;
-        document.getElementById('userGreeting').textContent = `Welcome back, ${userName}!`;
+        // User info is now displayed in the header, no need to update specific elements
+        console.log('User logged in:', this.currentUser.email);
     }
 
     async loadUserPreferences() {
@@ -59,11 +56,14 @@ export class RecordingManager {
         this.setupCollapsible('metricsToggle', 'metricsContent');
         this.setupCollapsible('graphsToggle', 'graphsContent');
 
-        // Logout button
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            await signOut();
-            window.location.reload();
-        });
+        // Logout button (now in header)
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                await signOut();
+                window.location.reload();
+            });
+        }
     }
 
     setupCollapsible(toggleId, contentId) {

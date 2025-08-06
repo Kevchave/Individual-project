@@ -16,13 +16,8 @@
 {% block content %}
 <!-- Page Structure -->
 <div class="main-container">
-    <!-- App Title -->
-    <div class="app-title">
-        <h1>Live Lecture Feedback</h1>
-    </div>
-
     <!-- Authentication Section (shown when not logged in) -->
-    <div id="authSection" class="auth-section">
+    <div id="authSection" class="auth-section" style="display: none;">
         <div class="auth-tabs">
             <button class="auth-tab active" data-tab="login">Login</button>
             <button class="auth-tab" data-tab="signup">Sign Up</button>
@@ -68,20 +63,6 @@
 
     <!-- Main Content (shown when logged in) -->
     <div id="mainContent" style="display: none;">
-        <!-- User Header -->
-        <div class="user-header">
-            <div class="user-info">
-                <div class="user-avatar" id="userAvatar">G</div>
-                <div>
-                    <p id="userGreeting">Welcome! Start recording to get real-time feedback</p>
-                </div>
-            </div>
-            <div class="user-actions">
-                <a href="/dashboard" class="btn btn-secondary">Dashboard</a>
-                <button class="btn btn-secondary" id="logoutBtn">Logout</button>
-            </div>
-        </div>
-
         <!-- Controls Section -->
         <div class="controls-section">
             <div class="controls-header">

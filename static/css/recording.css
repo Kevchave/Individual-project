@@ -37,9 +37,9 @@
 /* Controls Section */
 .controls-section {
     background: var(--surface-color);
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: 12px;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -47,7 +47,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.controls-header h2 {
+    font-size: 1.1rem;
+    margin: 0;
+    color: var(--text-primary);
 }
 
 .controls-toggle {
@@ -134,13 +140,13 @@
 .main-content {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1rem;
 }
 
 /* Transcript Section */
 .transcript-section {
     background: var(--surface-color);
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -149,7 +155,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.transcript-header h2 {
+    font-size: 1.1rem;
+    margin: 0;
+    color: var(--text-primary);
 }
 
 .transcript-toggle {
@@ -184,7 +196,7 @@
 /* Metrics Section */
 .metrics-section {
     background: var(--surface-color);
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -193,7 +205,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.metrics-header h2 {
+    font-size: 1.1rem;
+    margin: 0;
+    color: var(--text-primary);
 }
 
 .metrics-toggle {
@@ -246,7 +264,7 @@
 /* Graphs Section */
 .graphs-section {
     background: var(--surface-color);
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -255,7 +273,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.graphs-header h2 {
+    font-size: 1.1rem;
+    margin: 0;
+    color: var(--text-primary);
 }
 
 .graphs-toggle {

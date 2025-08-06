@@ -51,14 +51,34 @@ body {
     align-items: center;
     padding: 20px 40px;
     box-sizing: border-box;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header h1 {
+    margin: 0;
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .theme-toggle {
-    background: var(--button-bg);
-    color: var(--button-text);
-    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 50px;
-    padding: 10px 20px;
+    padding: 8px 16px;
     cursor: pointer;
     font-size: 14px;
     transition: all 0.3s ease;
@@ -68,7 +88,8 @@ body {
 }
 
 .theme-toggle:hover {
-    opacity: 0.8;
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* Descendant selector 
@@ -78,9 +99,28 @@ body {
     font-size: 16px;
 }
 
-h1 {
-    margin: 0;
-    color: var(--text-primary);
+/* Header buttons styling */
+.header .btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 16px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.header .btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+}
+
+/* Active state for navigation buttons */
+.header .btn.active {
+    background: rgba(255, 255, 255, 0.4);
+    border-color: rgba(255, 255, 255, 0.6);
+    color: white;
+    font-weight: 500;
 }
 
 .button-row {
