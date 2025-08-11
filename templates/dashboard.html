@@ -3,282 +3,7 @@
 {% block title %}Dashboard - Live Lecture Feedback{% endblock %}
 
 {% block head %}
-<style>
-    .dashboard-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem;
-        margin-top: 1rem;
-    }
-
-    .dashboard-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid var(--border-color);
-    }
-
-    .user-welcome {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .user-avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: var(--primary-color);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 1.2rem;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .stat-card {
-        background: var(--surface-color);
-        padding: 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        border-left: 4px solid var(--primary-color);
-    }
-
-    .stat-title {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-        margin-bottom: 0.5rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .stat-value {
-        font-size: 2rem;
-        font-weight: bold;
-        color: var(--text-primary);
-        margin-bottom: 0.25rem;
-    }
-
-    .stat-change {
-        font-size: 0.875rem;
-        color: #28a745;
-    }
-
-    .stat-change.negative {
-        color: #dc3545;
-    }
-
-    .dashboard-tabs {
-        display: flex;
-        margin-bottom: 2rem;
-        border-bottom: 2px solid var(--border-color);
-    }
-
-    .dashboard-tab {
-        padding: 1rem 2rem;
-        cursor: pointer;
-        border: none;
-        background: none;
-        color: var(--text-secondary);
-        font-weight: 500;
-        transition: all 0.3s ease;
-        border-bottom: 2px solid transparent;
-    }
-
-    .dashboard-tab.active {
-        color: var(--primary-color);
-        border-bottom-color: var(--primary-color);
-    }
-
-    .dashboard-content {
-        display: none;
-    }
-
-    .dashboard-content.active {
-        display: block;
-    }
-
-    .sessions-list {
-        display: grid;
-        gap: 1rem;
-    }
-
-    .session-card {
-        background: var(--surface-color);
-        padding: 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        border: 1px solid var(--border-color);
-        transition: transform 0.2s ease;
-    }
-
-    .session-card:hover {
-        transform: translateY(-2px);
-    }
-
-    .session-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1rem;
-    }
-
-    .session-title {
-        font-weight: 600;
-        color: var(--text-primary);
-        margin-bottom: 0.25rem;
-    }
-
-    .session-date {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-    }
-
-    .session-metrics {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .session-metric {
-        text-align: center;
-    }
-
-    .session-metric-label {
-        font-size: 0.75rem;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .session-metric-value {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--text-primary);
-    }
-
-    .session-actions {
-        display: flex;
-        gap: 0.5rem;
-    }
-
-    .btn {
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-    .btn-primary {
-        background: var(--primary-color);
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: var(--primary-dark);
-    }
-
-    .btn-secondary {
-        background: var(--border-color);
-        color: var(--text-primary);
-    }
-
-    .btn-secondary:hover {
-        background: var(--text-secondary);
-        color: white;
-    }
-
-    .settings-form {
-        max-width: 600px;
-    }
-
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-
-    .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: var(--text-primary);
-    }
-
-    .form-group input,
-    .form-group select {
-        width: 100%;
-        padding: 0.75rem;
-        border: 2px solid var(--border-color);
-        border-radius: 8px;
-        font-size: 1rem;
-        transition: border-color 0.3s ease;
-        box-sizing: border-box;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus {
-        outline: none;
-        border-color: var(--primary-color);
-    }
-
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-    }
-
-    .save-btn {
-        background: var(--primary-color);
-        color: white;
-        padding: 0.75rem 2rem;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .save-btn:hover {
-        background: var(--primary-dark);
-    }
-
-    .save-btn:disabled {
-        background: var(--text-secondary);
-        cursor: not-allowed;
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 3rem;
-        color: var(--text-secondary);
-    }
-
-    .empty-state h3 {
-        margin-bottom: 1rem;
-        color: var(--text-primary);
-    }
-
-    .loading {
-        text-align: center;
-        padding: 2rem;
-        color: var(--text-secondary);
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 {% endblock %}
 
 {% block header %}
@@ -297,7 +22,6 @@
         </div>
         <div class="session-actions">
             <a href="/" class="btn btn-primary">Start New Session</a>
-            <button class="btn btn-secondary" id="logoutBtn">Logout</button>
         </div>
     </div>
 
@@ -394,9 +118,10 @@
 
 {% block scripts %}
 <script type="module">
-    import { getCurrentUser, signOut, getUserSessions, getUserPreferences, saveUserPreferences } from '/static/js/supabase-cllient.js';
+    import { getCurrentUser, signOut, getUserSessions, getUserPreferences, saveUserPreferences, getUserProfile } from '/static/js/supabase-cllient.js';
 
     let currentUser = null;
+    let userProfile = null;
     let userSessions = [];
     let userPreferences = {};
 
@@ -408,21 +133,31 @@
             return;
         }
 
-        // Update user info
-        updateUserInfo();
-        
         // Load data
         await Promise.all([
+            loadUserProfile(),
             loadUserSessions(),
             loadUserPreferences()
         ]);
+
+        // Update user info (after loading profile)
+        updateUserInfo();
 
         // Update statistics
         updateStatistics();
     }
 
+    async function loadUserProfile() {
+        const { data, error } = await getUserProfile();
+        if (!error && data) {
+            userProfile = data;
+        }
+    }
+
     function updateUserInfo() {
-        const userName = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User';
+        // Use profile data from database, fallback to auth user data
+        const fullName = userProfile?.full_name || currentUser.user_metadata?.full_name || '';
+        const userName = fullName || currentUser.email?.split('@')[0] || 'User';
         const userInitial = userName.charAt(0).toUpperCase();
         
         document.getElementById('userName').textContent = userName;
@@ -563,11 +298,7 @@
         }
     });
 
-    // Logout
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-        await signOut();
-        window.location.href = '/login';
-    });
+
 
     // Initialize
     initDashboard();

@@ -73,11 +73,13 @@ export async function saveUserPreferences(preferences) {
         if (!user) throw new Error('Not authenticated')
         
         const { data, error } = await supabase
-            .from('user_preferences') // Table name
-            .upsert({                 // Insert or update
+            .from('user_preferences')
+            .upsert({
                 user_id: user.id,
                 ...preferences,
                 updated_at: new Date().toISOString()
+            }, {
+                onConflict: 'user_id'  // Specify the conflict resolution column
             })
         
         return { data, error }
@@ -97,6 +99,66 @@ export async function getUserPreferences() {
             .eq('user_id', user.id)   // Filter by user_id
             .single()                 // Get a single row
         
+        return { data, error }
+    } catch (err) {
+        return { data: null, error: err }
+    }
+}
+
+export async function getUserProfile() {
+    try {
+        const user = await getCurrentUser()
+        if (!user) return { data: null, error: 'Not authenticated' }
+        
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single()
+        
+        return { data, error }
+    } catch (err) {
+        return { data: null, error: err }
+    }
+}
+
+export async function updateUserProfile(profileData) {
+    try {
+        const user = await getCurrentUser()
+        if (!user) throw new Error('Not authenticated')
+        
+        const { data, error } = await supabase
+            .from('profiles')
+            .upsert({
+                id: user.id,
+                ...profileData,
+                updated_at: new Date().toISOString()
+            }, {
+                onConflict: 'id'
+            })
+        
+        return { data, error }
+    } catch (err) {
+        return { data: null, error: err }
+    }
+}
+
+export async function updateUserEmail(newEmail) {
+    try {
+        const { data, error } = await supabase.auth.updateUser({
+            email: newEmail
+        })
+        return { data, error }
+    } catch (err) {
+        return { data: null, error: err }
+    }
+}
+
+export async function updateUserPassword(newPassword) {
+    try {
+        const { data, error } = await supabase.auth.updateUser({
+            password: newPassword
+        })
         return { data, error }
     } catch (err) {
         return { data: null, error: err }

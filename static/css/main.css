@@ -14,6 +14,15 @@
     --shadow: rgba(0,0,0,0.07);
     --button-bg: #0077cc;
     --button-text: #fff;
+    
+    /* Primary colors */
+    --primary-color: #667eea;
+    --primary-dark: #5a6fd8;
+    --primary-darker: #4a5fc8;
+    
+    /* Surface and border colors */
+    --surface-color: #fff;
+    --border-color: #ddd;
 }
 
 [data-theme="dark"] {
@@ -28,6 +37,15 @@
     --shadow: rgba(0,0,0,0.3);
     --button-bg: #4a9eff;
     --button-text: #1a1a1a;
+    
+    /* Primary colors for dark theme */
+    --primary-color: #4a9eff;
+    --primary-dark: #3a8eef;
+    --primary-darker: #2a7edf;
+    
+    /* Surface and border colors for dark theme */
+    --surface-color: #2d2d2d;
+    --border-color: #4a4a4a;
 }
 
 body {

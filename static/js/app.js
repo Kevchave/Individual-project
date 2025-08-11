@@ -1,5 +1,5 @@
 // Main Application Controller
-import { getCurrentUser } from './supabase-cllient.js';
+import { getCurrentUser, getUserPreferences } from './supabase-cllient.js';
 import { AuthManager } from './auth.js';
 import { RecordingManager } from './recording.js';
 
@@ -58,6 +58,9 @@ class NavigationManager {
         } else if (this.currentPage === 'dashboard') {
             const dashboardBtn = document.getElementById('dashboardBtn');
             if (dashboardBtn) dashboardBtn.classList.add('active');
+        } else if (this.currentPage === 'settings') {
+            const settingsBtn = document.getElementById('settingsBtn');
+            if (settingsBtn) settingsBtn.classList.add('active');
         }
     }
 }
@@ -75,9 +78,12 @@ export class AppController {
         // Initialize navigation manager
         this.navigationManager.init();
         
-        // Check if we're on the dashboard page
+        // Check if we're on the dashboard or settings page
         if (window.location.pathname === '/dashboard') {
             this.navigationManager.currentPage = 'dashboard';
+            this.navigationManager.updateActiveState();
+        } else if (window.location.pathname === '/settings') {
+            this.navigationManager.currentPage = 'settings';
             this.navigationManager.updateActiveState();
         }
         
@@ -118,6 +124,9 @@ export class AppController {
         // Set navigation to home page
         this.navigationManager.navigateTo('home');
         
+        // Load and apply user preferences
+        await this.applyUserPreferences();
+        
         // Initialize recording manager
         await this.recordingManager.init(this.currentUser);
     }
@@ -132,6 +141,59 @@ export class AppController {
     handleSignup() {
         // Handle signup success (could show success message or auto-login)
         console.log('Signup successful');
+    }
+
+    async applyUserPreferences() {
+        try {
+            // Get user preferences from database
+            const { data: preferences, error } = await getUserPreferences();
+            
+            if (error) {
+                console.error('Error loading user preferences:', error);
+                return;
+            }
+
+            if (!preferences) {
+                console.log('No user preferences found, using defaults');
+                return;
+            }
+
+            console.log('Applying user preferences:', preferences);
+
+            // Apply layout preferences
+            const transcriptSection = document.getElementById('transcriptSection');
+            const metricsSection = document.getElementById('metricsSection');
+            const graphsSection = document.getElementById('graphsSection');
+
+            // Show/hide sections based on preferences
+            if (transcriptSection) {
+                if (preferences.display_transcript === false) {
+                    transcriptSection.classList.add('section-hidden');
+                } else {
+                    transcriptSection.classList.remove('section-hidden');
+                }
+            }
+
+            if (metricsSection) {
+                if (preferences.display_metrics === false) {
+                    metricsSection.classList.add('section-hidden');
+                } else {
+                    metricsSection.classList.remove('section-hidden');
+                }
+            }
+
+            if (graphsSection) {
+                if (preferences.display_graphs === false) {
+                    graphsSection.classList.add('section-hidden');
+                } else {
+                    graphsSection.classList.remove('section-hidden');
+                }
+            }
+
+            console.log('User preferences applied successfully');
+        } catch (err) {
+            console.error('Error applying user preferences:', err);
+        }
     }
 }
 

@@ -29,6 +29,31 @@
     <!-- Chart.js for live graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Main JS file -->
-    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>    {% block scripts %}{% endblock %}
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <!-- Header functionality -->
+    <script type="module">
+        import { signOut } from '/static/js/supabase-cllient.js';
+        
+        // Handle logout button
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async () => {
+                    try {
+                        await signOut();
+                        // Redirect to home page (which will show login if not authenticated)
+                        window.location.href = '/';
+                    } catch (error) {
+                        console.error('Logout error:', error);
+                        // Still redirect even if logout fails
+                        window.location.href = '/';
+                    }
+                });
+            }
+        });
+    </script>
+    
+    {% block scripts %}{% endblock %}
 </body>
 </html>

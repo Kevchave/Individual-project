@@ -64,7 +64,7 @@
     <!-- Main Content (shown when logged in) -->
     <div id="mainContent" style="display: none;">
         <!-- Controls Section -->
-        <div class="controls-section">
+        <div class="controls-section" id="controlsSection">
             <div class="controls-header">
                 <h2>Recording Controls</h2>
                 <button class="controls-toggle" id="controlsToggle">−</button>
@@ -76,27 +76,14 @@
                     <button id="resetBtn" class="action-btn" disabled>Reset</button>
                     <button id="stopBtn" class="action-btn" disabled>Stop Recording</button>
                 </div>
-                <div class="session-info">
-                    <div class="info-item">
-                        <span class="info-label">Session Duration:</span>
-                        <span class="info-value" id="sessionDuration">00:00</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Words Spoken:</span>
-                        <span class="info-value" id="wordsSpoken">0</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Status:</span>
-                        <span class="info-value" id="sessionStatus">Ready</span>
-                    </div>
-                </div>
+
             </div>
         </div>
 
         <!-- Main Content Grid -->
         <div class="main-content">
             <!-- Transcript Section -->
-            <div class="transcript-section">
+            <div class="transcript-section" id="transcriptSection">
                 <div class="transcript-header">
                     <h2>Live Transcript</h2>
                     <button class="transcript-toggle" id="transcriptToggle">−</button>
@@ -107,7 +94,7 @@
             </div>
 
             <!-- Metrics Section -->
-            <div class="metrics-section">
+            <div class="metrics-section" id="metricsSection">
                 <div class="metrics-header">
                     <h2>Live Metrics</h2>
                     <button class="metrics-toggle" id="metricsToggle">−</button>
@@ -131,7 +118,7 @@
             </div>
 
             <!-- Graphs Section -->
-            <div class="graphs-section">
+            <div class="graphs-section" id="graphsSection">
                 <div class="graphs-header">
                     <h2>Performance Graphs</h2>
                     <button class="graphs-toggle" id="graphsToggle">−</button>

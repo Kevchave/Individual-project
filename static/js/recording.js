@@ -50,7 +50,7 @@ export class RecordingManager {
     }
 
     initializeUI() {
-        // Collapsible sections
+        // Collapsible sections - toggle content divs, keep headers visible
         this.setupCollapsible('controlsToggle', 'controlsContent');
         this.setupCollapsible('transcriptToggle', 'transcriptContent');
         this.setupCollapsible('metricsToggle', 'metricsContent');

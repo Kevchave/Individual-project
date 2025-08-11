@@ -38,7 +38,11 @@ def home():
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template("dashboard.html") 
+    return render_template("dashboard.html")
+
+@app.route('/settings')
+def settings():
+    return render_template("settings.html") 
 
 # Start Recording
 @app.route("/start_recording", methods=['POST'])

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Live Lecture Feedback{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+{% endblock %}
+
+{% block header %}
+    {% include "header.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <!-- User Account Section -->
+    <div class="settings-section">
+        <h2>User Account</h2>
+        <div class="user-info">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <div>
+                <h3 id="userName">User Name</h3>
+                <p id="userEmail">user@example.com</p>
+            </div>
+        </div>
+        <form id="accountForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" value="">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="newPassword">New Password (leave blank to keep current)</label>
+                <input type="password" id="newPassword" minlength="6">
+            </div>
+        </form>
+    </div>
+
+    <!-- Layout Preferences Section -->
+    <div class="settings-section">
+        <h2>Layout Preferences</h2>
+        <div class="form-group">
+            <label>Display Options</label>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="displayTranscript" checked>
+                    <label for="displayTranscript">Live Transcript</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="displayMetrics" checked>
+                    <label for="displayMetrics">Live Metrics</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="displayGraphs" checked>
+                    <label for="displayGraphs">Performance Graphs</label>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Speaking Style Section -->
+    <div class="settings-section">
+        <h2>Speaking Style</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="speakingSpeed">Speaking Speed</label>
+                <select id="speakingSpeed">
+                    <option value="slow">Slow (80-120 WPM)</option>
+                    <option value="medium" selected>Medium (120-180 WPM)</option>
+                    <option value="fast">Fast (180-240 WPM)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="pauseFrequency">Pause Frequency</label>
+                <select id="pauseFrequency">
+                    <option value="rare">Rare</option>
+                    <option value="occasional" selected>Occasional</option>
+                    <option value="frequent">Frequent</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="volumeLevel">Volume Level</label>
+                <select id="volumeLevel">
+                    <option value="quiet">Quiet</option>
+                    <option value="normal" selected>Normal</option>
+                    <option value="loud">Loud</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="presentationStyle">Presentation Style</label>
+                <select id="presentationStyle">
+                    <option value="formal">Formal</option>
+                    <option value="casual" selected>Casual</option>
+                    <option value="interactive">Interactive</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="settings-actions">
+        <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveBtn">Save Settings</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/settings.js') }}"></script>
+{% endblock %} 
