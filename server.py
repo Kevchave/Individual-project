@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify 
+from flask import Flask, render_template, jsonify
 from transcriber_app.main import (
     start_transcription_pipeline,
     stop_transcription_pipeline,
@@ -7,7 +7,8 @@ from transcriber_app.main import (
     get_current_transcript,
     get_final_transcript,
     get_current_metrics,
-    get_average_metrics
+    get_average_metrics,
+    get_session_data_for_saving
 )
 
 # The Flask App 
@@ -97,6 +98,18 @@ def get_final_transcript_route():
 def get_average_metrics_route():
     average_metrics = get_average_metrics()
     return jsonify(average_metrics)
+
+# Get Session Data for Saving (NEW - Clean Architecture)
+@app.route("/get_session_data")
+def get_session_data_route():
+    # print("[DEBUG] /get_session_data endpoint called")
+    session_data = get_session_data_for_saving()
+    if session_data:
+        # print(f"[DEBUG] Returning session data with {len(session_data)} fields")
+        return jsonify(session_data)
+    else:
+        # print("[DEBUG] No session data available")
+        return jsonify({'error': 'No session data available'}), 404
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001) # Starts the Flask application in debug mode

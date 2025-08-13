@@ -183,6 +183,58 @@ export async function getUserSessions(limit = 50) {
     }
 }
 
+// Save session data to database
+export async function saveSessionData(sessionData) {
+    try {
+        const user = await getCurrentUser()
+        if (!user) throw new Error('Not authenticated')
+        
+        // Simplified data structure - only essential fields
+        const insertData = {
+            user_id: user.id,
+            title: 'Lecture Session', // Default title
+            duration_seconds: Math.round(sessionData.total_duration), // Convert to integer
+            total_words: sessionData.total_words,
+            average_wpm: sessionData.average_metrics.wpm,
+            average_volume: sessionData.average_metrics.volume,
+            average_pitch: sessionData.average_metrics.pitch,
+            transcript: sessionData.final_transcript,
+            start_time: new Date(sessionData.session_start_time * 1000).toISOString(),
+            end_time: new Date(sessionData.session_end_time * 1000).toISOString()
+        };
+        
+        // console.log('[DEBUG] Inserting data:', JSON.stringify(insertData, null, 2));
+        
+        const { data, error } = await supabase
+            .from('lecture_sessions')
+            .insert(insertData)
+        
+        return { data, error }
+    } catch (err) {
+        return { data: null, error: err }
+    }
+}
+
+// Get most recent session for dashboard
+export async function getMostRecentSession() {
+    try {
+        const user = await getCurrentUser()
+        if (!user) return { data: null, error: 'Not authenticated' }
+        
+        const { data, error } = await supabase
+            .from('lecture_sessions')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single()
+        
+        return { data, error }
+    } catch (err) {
+        return { data: null, error: err }
+    }
+}
+
 // Calback function - only called when auth state changes
 export function onAuthStateChange(callback) {
     return supabase.auth.onAuthStateChange(callback)

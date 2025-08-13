@@ -69,6 +69,10 @@ def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=Tru
     def run_transcription():
         if audio_stream is not None:
             audio_stream.start()
+            # Start session tracking when transcription begins
+            # print("[DEBUG] Starting session tracking...")
+            start_session_tracking()
+            
             if transcriber is not None:
                 # Get current parameters from adaptive controller (or use defaults)
                 if adaptive_controller is not None:
@@ -211,6 +215,14 @@ def start_transcription_pipeline_with_virtual_audio(audio_file_path, enable_insi
 # Stop the pipeline (implement as needed)
 def stop_transcription_pipeline():
     global audio_stream, transcriber, metrics, track_insider_metrics, adaptive_controller, transcription_thread
+    
+    # End session tracking when pipeline stops
+    end_session_tracking()
+    
+    # Session data is now available for JavaScript to save
+    if metrics is not None and hasattr(metrics, 'accumulated') and metrics.accumulated:
+        print("[SESSION] Session data ready for saving")
+    
     # You may need to add stop/cleanup logic to your classes
     if audio_stream is not None:
         audio_stream.stop()
@@ -301,6 +313,33 @@ def get_adaptive_controller_status():
     if adaptive_controller is None:
         return None
     return adaptive_controller.get_status()
+
+def start_session_tracking():
+    """Start tracking session timing"""
+    global metrics
+    if metrics is not None:
+        metrics.start_session()
+
+def end_session_tracking():
+    """End tracking session timing"""
+    global metrics
+    if metrics is not None:
+        metrics.end_session()
+
+    def get_session_data_for_saving():
+        """Get session data ready for saving (called by JavaScript)"""
+        global metrics
+        if metrics is not None:
+            session_data = metrics.get_session_summary()
+            # print(f"[DEBUG] Session data generated: {session_data is not None}")
+            # if session_data:
+            #     print(f"[DEBUG] Session duration: {session_data.get('total_duration', 0)}")
+            #     print(f"[DEBUG] Total words: {session_data.get('total_words', 0)}")
+            #     print(f"[DEBUG] Has transcript: {bool(session_data.get('final_transcript', ''))}")
+            return session_data
+        else:
+            # print("[DEBUG] No metrics object available")
+            return None
 
 def main():
     # For manual testing: start the pipeline, print status, etc.

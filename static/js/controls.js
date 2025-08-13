@@ -1,5 +1,6 @@
 import { initialiseCharts, resetCharts } from './charts.js';
 import { pollTranscript, pollMetrics, resetMetricColors } from './polling.js';
+import { saveSessionData } from './supabase-cllient.js';
 import { 
     startTime, setStartTime, 
     metricsMode, setMetricsMode, 
@@ -119,6 +120,10 @@ function initialiseControls({
                 }
                 updateMetricsDisplay(metricsMode);
 
+                // Save session data to database
+                // console.log('[DEBUG] About to call saveSessionDataToDatabase()');
+                saveSessionDataToDatabase();
+
                  // Fetch the final transcript and metrics 
                 fetch('/get_final_transcript')
                     .then(response => response.json())
@@ -211,6 +216,39 @@ function initialiseControls({
         
         console.log("Reset completed - graphs, transcript, and metric colors cleared");
     });
+}
+
+// Save session data to database
+async function saveSessionDataToDatabase() {
+    // console.log('[DEBUG] saveSessionDataToDatabase function called');
+    try {
+        // console.log('[DEBUG] Starting to save session data to database...');
+        
+        // Get session data from Python via Flask endpoint
+        const response = await fetch('/get_session_data');
+        // console.log('[DEBUG] Response status:', response.status);
+        
+        if (!response.ok) {
+            console.log('No session data available to save');
+            return;
+        }
+        
+        const sessionData = await response.json();
+        // console.log('[DEBUG] Session data received:', JSON.stringify(sessionData, null, 2));
+        
+        // Save to database using Supabase
+        // console.log('[DEBUG] About to call saveSessionData with data:', sessionData);
+        const { data, error } = await saveSessionData(sessionData);
+        
+        if (error) {
+            console.error('Failed to save session data:', error);
+            // console.error('Error details:', JSON.stringify(error, null, 2));
+        } else {
+            console.log('Session data saved successfully to database');
+        }
+    } catch (err) {
+        console.error('Error saving session data:', err);
+    }
 }
 
 export { initialiseControls, updateMetricsDisplay };

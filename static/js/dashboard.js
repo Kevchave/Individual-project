@@ -1,4 +1,4 @@
-import { getCurrentUser, signOut, getUserSessions, getUserPreferences, saveUserPreferences, getUserProfile } from './supabase-cllient.js';
+import { getCurrentUser, signOut, getUserSessions, getUserPreferences, saveUserPreferences, getUserProfile, getMostRecentSession } from './supabase-cllient.js';
 
 let currentUser = null;
 let userProfile = null;
@@ -13,12 +13,13 @@ async function initDashboard() {
         return;
     }
 
-    // Load data
-    await Promise.all([
-        loadUserProfile(),
-        loadUserSessions(),
-        loadUserPreferences()
-    ]);
+            // Load data
+        await Promise.all([
+            loadUserProfile(),
+            loadUserSessions(),
+            loadUserPreferences(),
+            loadMostRecentSession()
+        ]);
 
     // Update user info (after loading profile)
     updateUserInfo();
@@ -44,13 +45,22 @@ function updateUserInfo() {
     document.getElementById('userAvatar').textContent = userInitial;
 }
 
-async function loadUserSessions() {
-    const { data, error } = await getUserSessions(10);
-    if (!error && data) {
-        userSessions = data;
-        displaySessions();
+    async function loadUserSessions() {
+        const { data, error } = await getUserSessions(10);
+        if (!error && data) {
+            userSessions = data;
+            displaySessions();
+        }
     }
-}
+
+    async function loadMostRecentSession() {
+        const { data, error } = await getMostRecentSession();
+        if (!error && data) {
+            displayRecentSession(data);
+        } else {
+            console.log('No recent session found or error:', error);
+        }
+    }
 
 async function loadUserPreferences() {
     const { data, error } = await getUserPreferences();
@@ -86,7 +96,7 @@ function displaySessions() {
             <div class="session-metrics">
                 <div class="session-metric">
                     <div class="session-metric-label">Duration</div>
-                    <div class="session-metric-value">${formatDuration(session.duration || 0)}</div>
+                    <div class="session-metric-value">${formatDuration(session.session_duration || 0)}</div>
                 </div>
                 <div class="session-metric">
                     <div class="session-metric-label">Avg WPM</div>
@@ -102,6 +112,45 @@ function displaySessions() {
             </div>
         </div>
     `).join('');
+}
+
+function displayRecentSession(sessionData) {
+    // Update session title and date
+    const sessionTitle = document.querySelector('.session-title h3');
+    const sessionDate = document.querySelector('.session-date');
+    
+    if (sessionTitle) {
+        sessionTitle.textContent = 'Recent Lecture Session';
+    }
+    
+    if (sessionDate) {
+        const date = new Date(sessionData.created_at);
+        sessionDate.textContent = date.toLocaleDateString() + ' • ' + date.toLocaleTimeString();
+    }
+
+    // Update duration
+    const durationValue = document.querySelector('.duration-value');
+    if (durationValue) {
+        durationValue.textContent = formatDuration(sessionData.session_duration || 0);
+    }
+
+    // Update metrics
+    const metricValues = document.querySelectorAll('.metric-value');
+    if (metricValues.length >= 4) {
+        metricValues[0].textContent = Math.round(sessionData.avg_wpm || 0);
+        metricValues[1].textContent = Math.round(sessionData.avg_volume || 0) + ' dB';
+        metricValues[2].textContent = (sessionData.avg_pitch || 0).toFixed(2);
+        metricValues[3].textContent = Math.round((sessionData.session_duration / 60) || 0) + '%';
+    }
+
+    // Update percentages (placeholder for now - could calculate from historical data)
+    const percentages = document.querySelectorAll('.metric-percentage');
+    if (percentages.length >= 4) {
+        percentages[0].textContent = '+12%';
+        percentages[1].textContent = '+8%';
+        percentages[2].textContent = '+15%';
+        percentages[3].textContent = '+5%';
+    }
 }
 
 function updateStatistics() {

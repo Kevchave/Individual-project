@@ -16,6 +16,10 @@ class MetricsTracker:
         self.audio_chunks_lock = threading.Lock()
         self.sample_rate = sample_rate
 
+        # Session timing
+        self.session_start_time = None
+        self.session_end_time = None
+
         # Live metrics
         self.current_wpm = 0
         self.current_volume = 0
@@ -34,10 +38,35 @@ class MetricsTracker:
         self.pitch_history = deque(maxlen = window_size)
         self.chunk_duration_history = deque(maxlen=window_size)
 
+        # Complete session data for graphs (NEW)
+        self.complete_wpm_history = []
+        self.complete_volume_history = []
+        self.complete_pitch_history = []
+        self.complete_timestamps = []
+        self.complete_data_lock = threading.Lock()
+
     # ------------------- Chunk Duration Tracking -------------------
     def track_chunk_duration(self, duration):
         self.chunk_duration_history.append(duration)
         self.current_chunk_duration = float(np.mean(self.chunk_duration_history))
+
+    # ------------------- Session Timing -------------------
+    def start_session(self):
+        """Mark the start of a recording session"""
+        self.session_start_time = time.time()
+        print(f"[SESSION] Started at {self.session_start_time}")
+
+    def end_session(self):
+        """Mark the end of a recording session"""
+        self.session_end_time = time.time()
+        print(f"[SESSION] Ended at {self.session_end_time}")
+
+    def get_session_duration(self):
+        """Get the total session duration in seconds"""
+        if self.session_start_time is None:
+            return 0
+        end_time = self.session_end_time if self.session_end_time else time.time()
+        return end_time - self.session_start_time
 
     # ------------------- Text Tracking -------------------
     def add_transcription(self, text, duration):
@@ -77,6 +106,11 @@ class MetricsTracker:
         # Add 'wpm' into a deque list, then take the average
         self.wpm_history.append(wpm)
         self.current_wpm = float(np.mean(self.wpm_history))
+        
+        # Store in complete history for graphs
+        with self.complete_data_lock:
+            self.complete_wpm_history.append(wpm)
+            self.complete_timestamps.append(time.time())
 
     def track_wpm_average(self):
         with self.accumulated_lock:
@@ -98,6 +132,10 @@ class MetricsTracker:
         # Add 'volume' into a deque list, then take the average
         self.vol_history.append(db)
         self.current_volume = float(np.mean(self.vol_history))
+        
+        # Store in complete history for graphs
+        with self.complete_data_lock:
+            self.complete_volume_history.append(db)
 
     def track_volume_average(self):
         """ This code is repeated in track_volume, find a way to reduce redundancy 
@@ -138,6 +176,10 @@ class MetricsTracker:
         # Add 'st_dev_pitch' into a deque list, then take the average
         self.pitch_history.append(std_dev_pitch)
         self.current_pitch = float(np.mean(self.pitch_history))
+        
+        # Store in complete history for graphs
+        with self.complete_data_lock:
+            self.complete_pitch_history.append(std_dev_pitch)
 
     def track_overall_pitch(self):
         with self.audio_chunks_lock:
@@ -158,3 +200,49 @@ class MetricsTracker:
     def print_ui_metrics_summary(self):
         """Print UI metrics summary to terminal"""
         print(f"[UI METRICS] WPM: {self.current_wpm:.2f} | Volume: {self.current_volume:.2f} dB | Pitch: {self.current_pitch:.2f} Hz | Chunk Duration: {self.current_chunk_duration:.2f}s")
+
+    # ------------------- Complete Session Data (NEW) -------------------
+    def get_final_graph_data(self):
+        """Return complete session data for dashboard graphs"""
+        with self.complete_data_lock:
+            return {
+                'wpm_data': [float(x) for x in self.complete_wpm_history],
+                'volume_data': [float(x) for x in self.complete_volume_history],
+                'pitch_data': [float(x) for x in self.complete_pitch_history],
+                'timestamps': [float(x) for x in self.complete_timestamps],
+                'session_duration': float(self.get_session_duration()),
+                'total_data_points': int(len(self.complete_wpm_history))
+            }
+
+    def get_session_summary(self):
+        """Return complete session data for database storage"""
+        # Calculate final averages
+        self.track_wpm_average()
+        self.track_volume_average()
+        self.track_overall_pitch()
+        
+        return {
+            'session_start_time': self.session_start_time,
+            'session_end_time': self.session_end_time,
+            'total_duration': float(sum(duration for _, duration in self.accumulated)),
+            'total_words': int(sum(len(text.split()) for text, _ in self.accumulated)),
+            'final_transcript': ' '.join(text for text, _ in self.accumulated),
+            'average_metrics': {
+                'wpm': float(self.average_wpm),
+                'volume': float(self.average_volume),
+                'pitch': float(self.average_pitch)
+            },
+            'graph_data': self.get_final_graph_data()
+        }
+
+    def reset_session_data(self):
+        """Reset all session data (useful for new sessions)"""
+        with self.complete_data_lock:
+            self.complete_wpm_history.clear()
+            self.complete_volume_history.clear()
+            self.complete_pitch_history.clear()
+            self.complete_timestamps.clear()
+        
+        self.session_start_time = None
+        self.session_end_time = None
+        print("[SESSION] Session data reset")
