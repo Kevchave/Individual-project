@@ -20,9 +20,7 @@
                 <p>Track your lecture performance and improve your speaking skills</p>
             </div>
         </div>
-        <div class="session-actions">
-            <a href="/" class="btn btn-primary">Start New Session</a>
-        </div>
+
     </div>
 
     <!-- Statistics Cards -->
@@ -58,12 +56,122 @@
 
     <!-- Sessions Tab -->
     <div id="sessionsContent" class="dashboard-content active">
-        <div class="loading" id="sessionsLoading">Loading sessions...</div>
-        <div class="sessions-list" id="sessionsList" style="display: none;"></div>
-        <div class="empty-state" id="sessionsEmpty" style="display: none;">
-            <h3>No sessions yet</h3>
-            <p>Start your first lecture session to see your data here</p>
-            <a href="/" class="btn btn-primary">Start Recording</a>
+        <!-- Recent Session Section -->
+        <div class="recent-session-section">
+            <div class="section-header">
+                <h2>Recent Session</h2>
+                <div class="session-date">December 15, 2024 • 2:30 PM</div>
+            </div>
+            
+            <!-- Session Overview Card -->
+            <div class="session-overview-card">
+                <div class="overview-header">
+                    <div class="session-title">
+                        <h3>Introduction to Machine Learning</h3>
+                        <span class="session-status completed">Completed</span>
+                    </div>
+                    <div class="session-duration">
+                        <div class="duration-value">45:32</div>
+                        <div class="duration-label">Total Time</div>
+                    </div>
+                </div>
+                
+                <!-- Key Metrics Grid -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-title">WPM</div>
+                        <div class="metric-value">n/a</div>
+                        <div class="metric-percentage">+12%</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">AVG Volume</div>
+                        <div class="metric-value">n/a</div>
+                        <div class="metric-percentage">+8%</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Pitch Variance</div>
+                        <div class="metric-value">n/a</div>
+                        <div class="metric-percentage">+15%</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Speaking Time</div>
+                        <div class="metric-value">n/a</div>
+                        <div class="metric-percentage">+5%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Performance Charts Section -->
+            <div class="charts-section">
+                <div class="section-subheader">
+                    <h3>Performance Over Time</h3>
+                    <div class="chart-controls">
+                        <button class="chart-btn active" data-chart="wpm">WPM</button>
+                        <button class="chart-btn" data-chart="volume">Volume</button>
+                        <button class="chart-btn" data-chart="pitch">Pitch</button>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        <div class="chart-icon">📈</div>
+                        <h4>Performance Charts</h4>
+                        <p>Real-time graphs showing your speaking patterns will appear here</p>
+                        <div class="chart-mock">
+                            <div class="mock-line"></div>
+                            <div class="mock-line"></div>
+                            <div class="mock-line"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Trends & Feedback Section -->
+            <div class="trends-section">
+                <div class="section-subheader">
+                    <h3>Session Insights</h3>
+                </div>
+                
+                <div class="insights-grid">
+                    <div class="insight-card positive">
+                        <div class="insight-icon">✅</div>
+                        <div class="insight-content">
+                            <h4>Excellent Pace Control</h4>
+                            <p>Your speaking pace was consistent throughout the session, staying within the optimal range of 140-160 WPM.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-card neutral">
+                        <div class="insight-icon">📝</div>
+                        <div class="insight-content">
+                            <h4>Good Volume Management</h4>
+                            <p>Volume levels were well-maintained, with only minor fluctuations. Consider varying volume more for emphasis.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-card suggestion">
+                        <div class="insight-icon">💡</div>
+                        <div class="insight-content">
+                            <h4>Improvement Opportunity</h4>
+                            <p>Try incorporating more pitch variation in your next session to increase engagement and clarity.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Session Actions -->
+            <div class="session-actions-section">
+                <button class="btn btn-primary">Download Transcript</button>
+            </div>
+        </div>
+        
+        <!-- Placeholder for History Section (LATER) -->
+        <div class="history-section" style="display: none;">
+            <h2>Session History</h2>
+            <p>This section will show your session backlog and historical trends.</p>
         </div>
     </div>
 
@@ -117,195 +225,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="module">
-    import { getCurrentUser, signOut, getUserSessions, getUserPreferences, saveUserPreferences, getUserProfile } from '/static/js/supabase-cllient.js';
-
-    let currentUser = null;
-    let userProfile = null;
-    let userSessions = [];
-    let userPreferences = {};
-
-    // Initialize dashboard
-    async function initDashboard() {
-        currentUser = await getCurrentUser();
-        if (!currentUser) {
-            window.location.href = '/login';
-            return;
-        }
-
-        // Load data
-        await Promise.all([
-            loadUserProfile(),
-            loadUserSessions(),
-            loadUserPreferences()
-        ]);
-
-        // Update user info (after loading profile)
-        updateUserInfo();
-
-        // Update statistics
-        updateStatistics();
-    }
-
-    async function loadUserProfile() {
-        const { data, error } = await getUserProfile();
-        if (!error && data) {
-            userProfile = data;
-        }
-    }
-
-    function updateUserInfo() {
-        // Use profile data from database, fallback to auth user data
-        const fullName = userProfile?.full_name || currentUser.user_metadata?.full_name || '';
-        const userName = fullName || currentUser.email?.split('@')[0] || 'User';
-        const userInitial = userName.charAt(0).toUpperCase();
-        
-        document.getElementById('userName').textContent = userName;
-        document.getElementById('userAvatar').textContent = userInitial;
-    }
-
-    async function loadUserSessions() {
-        const { data, error } = await getUserSessions(10);
-        if (!error && data) {
-            userSessions = data;
-            displaySessions();
-        }
-    }
-
-    async function loadUserPreferences() {
-        const { data, error } = await getUserPreferences();
-        if (!error && data) {
-            userPreferences = data;
-            populateSettingsForm();
-        }
-    }
-
-    function displaySessions() {
-        const sessionsList = document.getElementById('sessionsList');
-        const sessionsLoading = document.getElementById('sessionsLoading');
-        const sessionsEmpty = document.getElementById('sessionsEmpty');
-
-        sessionsLoading.style.display = 'none';
-
-        if (userSessions.length === 0) {
-            sessionsEmpty.style.display = 'block';
-            return;
-        }
-
-        sessionsList.style.display = 'grid';
-        sessionsList.innerHTML = userSessions.map(session => `
-            <div class="session-card">
-                <div class="session-header">
-                    <div>
-                        <div class="session-title">Lecture Session</div>
-                        <div class="session-date">${new Date(session.created_at).toLocaleDateString()}</div>
-                    </div>
-                </div>
-                <div class="session-metrics">
-                    <div class="session-metric">
-                        <div class="session-metric-label">Duration</div>
-                        <div class="session-metric-value">${formatDuration(session.duration || 0)}</div>
-                    </div>
-                    <div class="session-metric">
-                        <div class="session-metric-label">Avg WPM</div>
-                        <div class="session-metric-value">${session.avg_wpm || 0}</div>
-                    </div>
-                    <div class="session-metric">
-                        <div class="session-metric-label">Avg Volume</div>
-                        <div class="session-metric-value">${session.avg_volume || 0} dB</div>
-                    </div>
-                </div>
-                <div class="session-actions">
-                    <button class="btn btn-secondary" onclick="viewSessionDetails('${session.id}')">View Details</button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function updateStatistics() {
-        if (userSessions.length === 0) return;
-
-        const totalSessions = userSessions.length;
-        const avgWPM = Math.round(userSessions.reduce((sum, s) => sum + (s.avg_wpm || 0), 0) / totalSessions);
-        const totalTime = userSessions.reduce((sum, s) => sum + (s.duration || 0), 0);
-        const bestSession = userSessions.reduce((best, current) => 
-            (current.avg_wpm || 0) > (best.avg_wpm || 0) ? current : best
-        );
-
-        document.getElementById('totalSessions').textContent = totalSessions;
-        document.getElementById('avgWPM').textContent = avgWPM;
-        document.getElementById('totalTime').textContent = formatDuration(totalTime);
-        document.getElementById('bestSession').textContent = bestSession.avg_wpm || 0;
-    }
-
-    function formatDuration(seconds) {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        
-        if (hours > 0) {
-            return `${hours}h ${minutes}m`;
-        }
-        return `${minutes}m`;
-    }
-
-    function populateSettingsForm() {
-        document.getElementById('targetWPM').value = userPreferences.target_wpm || 150;
-        document.getElementById('targetVolume').value = userPreferences.target_volume || -20;
-        document.getElementById('preferredLayout').value = userPreferences.preferred_layout || 'default';
-        document.getElementById('showMetrics').value = userPreferences.show_metrics || 'all';
-    }
-
-    // Tab switching
-    document.querySelectorAll('.dashboard-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.dashboard-content').forEach(c => c.classList.remove('active'));
-            
-            tab.classList.add('active');
-            const contentId = tab.dataset.tab + 'Content';
-            document.getElementById(contentId).classList.add('active');
-        });
-    });
-
-    // Settings form
-    document.getElementById('settingsForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const saveBtn = document.getElementById('saveSettings');
-        
-        saveBtn.disabled = true;
-        saveBtn.textContent = 'Saving...';
-
-        const preferences = {
-            target_wpm: parseInt(document.getElementById('targetWPM').value),
-            target_volume: parseInt(document.getElementById('targetVolume').value),
-            preferred_layout: document.getElementById('preferredLayout').value,
-            show_metrics: document.getElementById('showMetrics').value
-        };
-
-        try {
-            const { error } = await saveUserPreferences(preferences);
-            if (!error) {
-                userPreferences = preferences;
-                alert('Settings saved successfully!');
-            } else {
-                alert('Failed to save settings: ' + error.message);
-            }
-        } catch (err) {
-            alert('An error occurred while saving settings');
-        } finally {
-            saveBtn.disabled = false;
-            saveBtn.textContent = 'Save Settings';
-        }
-    });
-
-
-
-    // Initialize
-    initDashboard();
-
-    // Global function for session details (placeholder)
-    window.viewSessionDetails = function(sessionId) {
-        alert('Session details feature coming soon!');
-    };
-</script>
+<script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %} 
