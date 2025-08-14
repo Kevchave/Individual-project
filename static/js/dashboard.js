@@ -5,7 +5,7 @@
 // - handles user interactions 
 
 // Import functions from supabase-client.js
-import { getCurrentUser, signOut, getUserSessions, getUserProfile, getMostRecentSession } from './supabase-cllient.js';
+import { getCurrentUser, getUserSessions, getUserProfile } from './supabase-cllient.js';
 import { initialiseCharts } from './charts.js';
 import { currentTheme } from './theme.js';
 import { wpmChart, volumeChart, pitchChart } from './state.js';
@@ -30,8 +30,7 @@ async function initDashboard() {
         // Load data from Supabase (name, email, past sessions)
         await Promise.all([
             loadUserProfile(),
-            loadUserSessions(),
-            loadMostRecentSession()
+            loadUserSessions()
         ]);
 
     // Update UI with loaded data (username and stats)
@@ -97,7 +96,7 @@ function applyFilter() {
 function displayMostRecentView() {
     if (filteredSessions.length > 0) {
         displayRecentSession(filteredSessions[0]);
-        loadRecentSessionGraphData();
+        // Charts will be updated by updateCharts() called from applyFilter()
     }
 }
 
@@ -108,6 +107,13 @@ function displayMultipleSessionsView() {
     if (sectionHeader) {
         const sessionCount = filteredSessions.length;
         sectionHeader.textContent = `Last ${sessionCount} Sessions`;
+    }
+    
+    // Update chart title
+    const chartTitle = document.querySelector('.section-subheader h3');
+    if (chartTitle) {
+        const sessionCount = filteredSessions.length;
+        chartTitle.textContent = `Performance Over ${sessionCount} Sessions`;
     }
     
     // Update session date to show range
@@ -185,12 +191,20 @@ function displayAggregatedCharts() {
     // Prepare data for charts
     const sessionLabels = filteredSessions.map((session, index) => {
         const date = new Date(session.created_at);
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const sessionNumber = filteredSessions.length - index; // S1, S2, S3, etc.
+        return `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} (S${sessionNumber})`;
     }).reverse(); // Show oldest to newest
     
     const wpmData = filteredSessions.map(session => session.average_wpm || 0).reverse();
     const volumeData = filteredSessions.map(session => session.average_volume || 0).reverse();
     const pitchData = filteredSessions.map(session => session.average_pitch || 0).reverse();
+    
+    // Update x-axis title for multiple sessions
+    [wpmChart, volumeChart, pitchChart].forEach(chart => {
+        if (chart && chart.options?.scales?.x?.title) {
+            chart.options.scales.x.title.text = 'Date';
+        }
+    });
     
     // Update WPM chart
     if (wpmChart) {
@@ -214,15 +228,7 @@ function displayAggregatedCharts() {
     }
 }
 
-// Fetch the most recent session from the database and display it in the UI
-async function loadMostRecentSession() {
-    const { data, error } = await getMostRecentSession();
-    if (!error && data) {
-        displayRecentSession(data);
-    } else {
-        console.log('No recent session found or error:', error);
-    }
-}
+
 
 // Fetch graph data for the most recent session
 async function loadRecentSessionGraphData() {
@@ -232,12 +238,18 @@ async function loadRecentSessionGraphData() {
             const sessionData = await response.json();
             if (sessionData && sessionData.graph_data) {
                 displaySessionGraphs(sessionData.graph_data);
+            } else {
+                console.log('No detailed graph data available');
             }
+        } else {
+            console.log('Failed to fetch session data');
         }
     } catch (error) {
         console.log('No recent session graph data available:', error);
     }
 }
+
+
 
 // Display session graph data in charts
 function displaySessionGraphs(graphData) {
@@ -270,49 +282,6 @@ function displaySessionGraphs(graphData) {
 
 
 
-function displaySessions() {
-    const sessionsList = document.getElementById('sessionsList');
-    const sessionsLoading = document.getElementById('sessionsLoading');
-    const sessionsEmpty = document.getElementById('sessionsEmpty');
-
-    if (!sessionsList || !sessionsLoading || !sessionsEmpty) return;
-
-    sessionsLoading.style.display = 'none';
-
-    if (userSessions.length === 0) {
-        sessionsEmpty.style.display = 'block';
-        return;
-    }
-
-    sessionsList.style.display = 'grid';
-    sessionsList.innerHTML = userSessions.map(session => `
-        <div class="session-card">
-            <div class="session-header">
-                <div>
-                    <div class="session-title">Lecture Session</div>
-                    <div class="session-date">${new Date(session.created_at).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-                </div>
-            </div>
-            <div class="session-metrics">
-                <div class="session-metric">
-                    <div class="session-metric-label">Duration</div>
-                    <div class="session-metric-value">${formatDuration(session.duration_seconds || 0)}</div>
-                </div>
-                <div class="session-metric">
-                    <div class="session-metric-label">Avg WPM</div>
-                    <div class="session-metric-value">${session.average_wpm || 0}</div>
-                </div>
-                <div class="session-metric">
-                    <div class="session-metric-label">Avg Volume</div>
-                    <div class="session-metric-value">${session.average_volume || 0} dB</div>
-                </div>
-            </div>
-            <div class="session-actions">
-                <button class="btn btn-secondary" onclick="viewSessionDetails('${session.id}')">View Details</button>
-            </div>
-        </div>
-    `).join('');
-}
 
 // Displays the most recent session in the UI
 function displayRecentSession(sessionData) {
@@ -329,9 +298,9 @@ function displayRecentSession(sessionData) {
         const options = { 
             weekday: 'long', 
             year: 'numeric', 
-            month: 'long', 
-            day: 'numeric',
-            hour: '2-digit',
+            month: 'long',   
+            day: 'numeric',  
+            hour: '2-digit', 
             minute: '2-digit'
         };
         sessionDate.textContent = date.toLocaleDateString('en-US', options);
@@ -462,10 +431,7 @@ function setupEventListeners() {
     }
 }
 
-// Global function for session details (placeholder)
-window.viewSessionDetails = function(sessionId) {
-    alert('Session details feature coming soon!');
-};
+
 
 // Runs when page loads 
 // - sets up event listeners, then starts dashboard.

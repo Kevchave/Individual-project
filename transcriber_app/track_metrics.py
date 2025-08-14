@@ -38,12 +38,12 @@ class MetricsTracker:
         self.pitch_history = deque(maxlen = window_size)
         self.chunk_duration_history = deque(maxlen=window_size)
 
-        # Complete session data for graphs (NEW)
-        self.complete_wpm_history = []
-        self.complete_volume_history = []
-        self.complete_pitch_history = []
-        self.complete_timestamps = []
-        self.complete_data_lock = threading.Lock()
+        # Polled metrics for dashboard graphs (matches live experience)
+        self.polled_wpm_history = []
+        self.polled_volume_history = []
+        self.polled_pitch_history = []
+        self.polled_timestamps = []
+        self.polled_data_lock = threading.Lock()
 
     # ------------------- Chunk Duration Tracking -------------------
     def track_chunk_duration(self, duration):
@@ -106,11 +106,6 @@ class MetricsTracker:
         # Add 'wpm' into a deque list, then take the average
         self.wpm_history.append(wpm)
         self.current_wpm = float(np.mean(self.wpm_history))
-        
-        # Store in complete history for graphs
-        with self.complete_data_lock:
-            self.complete_wpm_history.append(wpm)
-            self.complete_timestamps.append(time.time())
 
     def track_wpm_average(self):
         with self.accumulated_lock:
@@ -132,10 +127,6 @@ class MetricsTracker:
         # Add 'volume' into a deque list, then take the average
         self.vol_history.append(db)
         self.current_volume = float(np.mean(self.vol_history))
-        
-        # Store in complete history for graphs
-        with self.complete_data_lock:
-            self.complete_volume_history.append(db)
 
     def track_volume_average(self):
         """ This code is repeated in track_volume, find a way to reduce redundancy 
@@ -176,10 +167,6 @@ class MetricsTracker:
         # Add 'st_dev_pitch' into a deque list, then take the average
         self.pitch_history.append(std_dev_pitch)
         self.current_pitch = float(np.mean(self.pitch_history))
-        
-        # Store in complete history for graphs
-        with self.complete_data_lock:
-            self.complete_pitch_history.append(std_dev_pitch)
 
     def track_overall_pitch(self):
         with self.audio_chunks_lock:
@@ -201,17 +188,42 @@ class MetricsTracker:
         """Print UI metrics summary to terminal"""
         print(f"[UI METRICS] WPM: {self.current_wpm:.2f} | Volume: {self.current_volume:.2f} dB | Pitch: {self.current_pitch:.2f} Hz | Chunk Duration: {self.current_chunk_duration:.2f}s")
 
-    # ------------------- Complete Session Data (NEW) -------------------
-    def get_final_graph_data(self):
-        """Return complete session data for dashboard graphs"""
-        with self.complete_data_lock:
+    # ------------------- Polled Metrics Storage -------------------
+    def store_polled_metrics(self):
+        """Store current smoothed metrics for dashboard graphs (called during polling)"""
+        with self.polled_data_lock:
+            self.polled_wpm_history.append(float(self.current_wpm))
+            self.polled_volume_history.append(float(self.current_volume))
+            self.polled_pitch_history.append(float(self.current_pitch))
+            self.polled_timestamps.append(time.time())
+            print(f"[POLLED] Stored metrics: WPM={self.current_wpm:.2f}, Volume={self.current_volume:.2f}, Pitch={self.current_pitch:.2f}")
+
+
+
+    def get_polled_graph_data(self):
+        """Return polled metrics data for dashboard graphs (matches live experience exactly)"""
+        with self.polled_data_lock:
+            if not self.polled_timestamps:
+                return {
+                    'wpm_data': [],
+                    'volume_data': [],
+                    'pitch_data': [],
+                    'timestamps': [],
+                    'session_duration': float(self.get_session_duration()),
+                    'total_data_points': 0
+                }
+            
+            # Convert timestamps to relative seconds from session start
+            start_time = self.polled_timestamps[0] if self.polled_timestamps else 0
+            relative_timestamps = [float(t - start_time) for t in self.polled_timestamps]
+            
             return {
-                'wpm_data': [float(x) for x in self.complete_wpm_history],
-                'volume_data': [float(x) for x in self.complete_volume_history],
-                'pitch_data': [float(x) for x in self.complete_pitch_history],
-                'timestamps': [float(x) for x in self.complete_timestamps],
+                'wpm_data': [float(x) for x in self.polled_wpm_history],
+                'volume_data': [float(x) for x in self.polled_volume_history],
+                'pitch_data': [float(x) for x in self.polled_pitch_history],
+                'timestamps': relative_timestamps,
                 'session_duration': float(self.get_session_duration()),
-                'total_data_points': int(len(self.complete_wpm_history))
+                'total_data_points': len(self.polled_wpm_history)
             }
 
     def get_session_summary(self):
@@ -232,16 +244,16 @@ class MetricsTracker:
                 'volume': float(self.average_volume),
                 'pitch': float(self.average_pitch)
             },
-            'graph_data': self.get_final_graph_data()
+            'graph_data': self.get_polled_graph_data()
         }
 
     def reset_session_data(self):
         """Reset all session data (useful for new sessions)"""
-        with self.complete_data_lock:
-            self.complete_wpm_history.clear()
-            self.complete_volume_history.clear()
-            self.complete_pitch_history.clear()
-            self.complete_timestamps.clear()
+        with self.polled_data_lock:
+            self.polled_wpm_history.clear()
+            self.polled_volume_history.clear()
+            self.polled_pitch_history.clear()
+            self.polled_timestamps.clear()
         
         self.session_start_time = None
         self.session_end_time = None

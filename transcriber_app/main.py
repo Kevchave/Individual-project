@@ -273,6 +273,11 @@ def get_current_metrics():
     global metrics
     if metrics is None:
         return {'wpm': 0, 'volume': 0, 'pitch': 0}
+    
+    # Store the current metrics for dashboard graphs (matches live experience)
+    if metrics is not None:
+        metrics.store_polled_metrics()
+    
     return {
         'wpm': float(metrics.current_wpm),
         'volume': float(metrics.current_volume),
@@ -332,8 +337,8 @@ def get_session_data_for_saving():
     if metrics is not None:
         session_data = metrics.get_session_summary()
         
-        # Add graph data for dashboard charts
-        graph_data = metrics.get_final_graph_data()
+        # Add polled graph data for dashboard charts (matches live experience exactly)
+        graph_data = metrics.get_polled_graph_data()
         session_data['graph_data'] = graph_data
         
         # print(f"[DEBUG] Session data generated: {session_data is not None}")
