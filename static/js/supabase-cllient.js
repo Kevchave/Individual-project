@@ -190,10 +190,17 @@ export async function saveSessionData(sessionData) {
         if (!user) throw new Error('Not authenticated')
         
         // Simplified data structure - only essential fields
+        const wallClockSeconds = Math.round(
+            (sessionData?.graph_data?.session_duration) ??
+            ((sessionData?.session_end_time && sessionData?.session_start_time)
+                ? (sessionData.session_end_time - sessionData.session_start_time)
+                : sessionData.total_duration)
+        );
+
         const insertData = {
             user_id: user.id,
             title: 'Lecture Session', // Default title
-            duration_seconds: Math.round(sessionData.total_duration), // Convert to integer
+            duration_seconds: wallClockSeconds, // use full session elapsed time (includes silence)
             total_words: sessionData.total_words,
             average_wpm: sessionData.average_metrics.wpm,
             average_volume: sessionData.average_metrics.volume,

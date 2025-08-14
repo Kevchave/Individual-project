@@ -326,20 +326,26 @@ def end_session_tracking():
     if metrics is not None:
         metrics.end_session()
 
-    def get_session_data_for_saving():
-        """Get session data ready for saving (called by JavaScript)"""
-        global metrics
-        if metrics is not None:
-            session_data = metrics.get_session_summary()
-            # print(f"[DEBUG] Session data generated: {session_data is not None}")
-            # if session_data:
-            #     print(f"[DEBUG] Session duration: {session_data.get('total_duration', 0)}")
-            #     print(f"[DEBUG] Total words: {session_data.get('total_words', 0)}")
-            #     print(f"[DEBUG] Has transcript: {bool(session_data.get('final_transcript', ''))}")
-            return session_data
-        else:
-            # print("[DEBUG] No metrics object available")
-            return None
+def get_session_data_for_saving():
+    """Get session data ready for saving (called by JavaScript)"""
+    global metrics
+    if metrics is not None:
+        session_data = metrics.get_session_summary()
+        
+        # Add graph data for dashboard charts
+        graph_data = metrics.get_final_graph_data()
+        session_data['graph_data'] = graph_data
+        
+        # print(f"[DEBUG] Session data generated: {session_data is not None}")
+        # if session_data:
+        #     print(f"[DEBUG] Session duration: {session_data.get('total_duration', 0)}")
+        #     print(f"[DEBUG] Total words: {session_data.get('total_words', 0)}")
+        #     print(f"[DEBUG] Has transcript: {bool(session_data.get('final_transcript', ''))}")
+        #     print(f"[DEBUG] Graph data points: {len(graph_data.get('wpm_data', []))}")
+        return session_data
+    else:
+        # print("[DEBUG] No metrics object available")
+        return None
 
 def main():
     # For manual testing: start the pipeline, print status, etc.
