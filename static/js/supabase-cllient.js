@@ -242,7 +242,52 @@ export async function getMostRecentSession() {
     }
 }
 
-// Calback function - only called when auth state changes
+// Goals functions
+export async function getUserGoals() {
+    try {
+        const user = await getCurrentUser();
+        if (!user) return { data: null, error: 'Not authenticated' };
+
+        const { data, error } = await supabase
+            .from('user_goals')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+
+        return { data, error };
+    } catch (err) {
+        return { data: null, error: err };
+    }
+}
+
+export async function saveUserGoals(goals) {
+    try {
+        const user = await getCurrentUser();
+        if (!user) throw new Error('Not authenticated');
+
+        const payload = {
+            user_id: user.id,
+            target_wpm: goals.target_wpm ?? null,
+            target_volume: goals.target_volume ?? null,
+            target_pitch: goals.target_pitch ?? null,
+            average_wpm: goals.average_wpm ?? null,
+            average_volume: goals.average_volume ?? null,
+            average_pitch: goals.average_pitch ?? null
+        };
+
+        const { data, error } = await supabase
+            .from('user_goals')
+            .upsert(payload, { onConflict: 'user_id' })
+            .select()
+            .single();
+
+        return { data, error };
+    } catch (err) {
+        return { data: null, error: err };
+    }
+}
+
+// Callback function - only called when auth state changes
 export function onAuthStateChange(callback) {
     return supabase.auth.onAuthStateChange(callback)
 }

@@ -137,6 +137,14 @@
     cursor: pointer;
 }
 
+/* Goals Section Styles */
+.section-description {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .settings-container {

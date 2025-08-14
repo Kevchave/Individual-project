@@ -5,7 +5,7 @@
 // - handles user interactions 
 
 // Import functions from supabase-client.js
-import { getCurrentUser, getUserSessions, getUserProfile } from './supabase-cllient.js';
+import { getCurrentUser, getUserSessions, getUserProfile, getUserGoals } from './supabase-cllient.js';
 import { initialiseCharts } from './charts.js';
 import { currentTheme } from './theme.js';
 import { wpmChart, volumeChart, pitchChart } from './state.js';
@@ -15,7 +15,8 @@ let currentUser = null;     // Current logged in user
 let userProfile = null;     // User profile data 
 let userSessions = [];      // Array of user's sessions
 let currentFilter = 'most_recent';  // Current session filter
-let filteredSessions = [];  // Sessions based on current filter 
+let filteredSessions = [];  // Sessions based on current filter
+let userGoals = null;       // User goals data 
 
 // Initialize dashboard
 async function initDashboard() {
@@ -27,10 +28,11 @@ async function initDashboard() {
         return;
     }
 
-        // Load data from Supabase (name, email, past sessions)
+        // Load data from Supabase (name, email, past sessions, goals)
         await Promise.all([
             loadUserProfile(),
-            loadUserSessions()
+            loadUserSessions(),
+            loadUserGoals()
         ]);
 
     // Update UI with loaded data (username and stats)
@@ -71,6 +73,15 @@ async function loadUserSessions() {
     }
 }
 
+// Load user goals from the database
+async function loadUserGoals() {
+    const { data, error } = await getUserGoals();
+    if (!error && data) {
+        userGoals = data;
+        updateGoalsDisplay();
+    }
+}
+
 // Apply the current filter and update the display
 function applyFilter() {
     const filterValue = document.getElementById('sessionFilter').value;
@@ -87,9 +98,10 @@ function applyFilter() {
         displayMultipleSessionsView();
     }
     
-    // Update statistics and charts
+    // Update statistics, charts, and goals
     updateStatistics();
     updateCharts();
+    updateGoalsDisplay();
 }
 
 // Display view for most recent session
@@ -280,9 +292,6 @@ function displaySessionGraphs(graphData) {
     }
 }
 
-
-
-
 // Displays the most recent session in the UI
 function displayRecentSession(sessionData) {
     // Update session title and date
@@ -385,6 +394,109 @@ function calculatePercentage(current, historical) {
     return `${sign}${rounded}%`;
 }
 
+// Apply color coding to percentage text based on progress
+function applyPercentageColor(element, progress) {
+    // Remove any existing color classes
+    element.classList.remove('progress-excellent', 'progress-good', 'progress-warning', 'progress-poor');
+    
+    // Determine color based on percentage
+    let colorClass;
+    if (progress >= 90) { // 0-10% away from target
+        colorClass = 'progress-excellent'; // Dark green
+    } else if (progress >= 75) { // 11-25% away from target
+        colorClass = 'progress-good'; // Light green
+    } else if (progress >= 60) { // 26-40% away from target
+        colorClass = 'progress-warning'; // Orange
+    } else { // More than 40% away from target
+        colorClass = 'progress-poor'; // Red
+    }
+    
+    element.classList.add(colorClass);
+}
+
+// Update goals display based on current filter and session data
+function updateGoalsDisplay() {
+    if (!userGoals) return;
+
+    // Get current metrics based on filter
+    let currentWPM, currentVolume, currentPitch;
+    
+    if (currentFilter === 'most_recent' && filteredSessions.length > 0) {
+        // Use most recent session metrics
+        const recentSession = filteredSessions[0];
+        currentWPM = recentSession.average_wpm || 0;
+        currentVolume = recentSession.average_volume || 0;
+        currentPitch = recentSession.average_pitch || 0;
+    } else {
+        // Use average of filtered sessions
+        const avgWPM = filteredSessions.reduce((sum, s) => sum + (s.average_wpm || 0), 0) / filteredSessions.length;
+        const avgVolume = filteredSessions.reduce((sum, s) => sum + (s.average_volume || 0), 0) / filteredSessions.length;
+        const avgPitch = filteredSessions.reduce((sum, s) => sum + (s.average_pitch || 0), 0) / filteredSessions.length;
+        
+        currentWPM = avgWPM || 0;
+        currentVolume = avgVolume || 0;
+        currentPitch = avgPitch || 0;
+    }
+
+    // Update WPM goal
+    if (userGoals.target_wpm) {
+        const wpmProgress = (currentWPM / userGoals.target_wpm) * 100;
+        const wpmTargetEl = document.querySelector('.goal-card:nth-child(1) .goal-target');
+        const wpmProgressEl = document.querySelector('.goal-card:nth-child(1) .progress-fill');
+        const wpmStatusEl = document.querySelector('.goal-card:nth-child(1) .goal-status');
+        
+        if (wpmTargetEl) wpmTargetEl.textContent = `${userGoals.target_wpm} WPM`;
+        if (wpmProgressEl) wpmProgressEl.style.width = `${Math.min(wpmProgress, 100)}%`;
+        if (wpmStatusEl) {
+            const currentText = `Current: ${Math.round(currentWPM)} WPM`;
+            const percentageText = wpmProgress >= 100 
+                ? `${Math.round(wpmProgress - 100)}% over your target`
+                : `${Math.round(100 - wpmProgress)}% to your target`;
+            wpmStatusEl.innerHTML = `${currentText}<br><br><span class="percentage-text">${percentageText}</span>`;
+            applyPercentageColor(wpmStatusEl.querySelector('.percentage-text'), wpmProgress);
+        }
+    }
+
+    // Update Volume goal
+    if (userGoals.target_volume) {
+        // Volume calculation with absolute values: (|current| - |target|) / |current|
+        const volumeProgress = ((Math.abs(currentVolume) - Math.abs(userGoals.target_volume)) / Math.abs(currentVolume)) * 100;
+        const volumeTargetEl = document.querySelector('.goal-card:nth-child(2) .goal-target');
+        const volumeProgressEl = document.querySelector('.goal-card:nth-child(2) .progress-fill');
+        const volumeStatusEl = document.querySelector('.goal-card:nth-child(2) .goal-status');
+        
+        if (volumeTargetEl) volumeTargetEl.textContent = `${userGoals.target_volume} dB`;
+        if (volumeProgressEl) volumeProgressEl.style.width = `${Math.min(Math.max(volumeProgress, 0), 100)}%`;
+        if (volumeStatusEl) {
+            const currentText = `Current: ${Math.round(currentVolume)} dB`;
+            const percentageText = volumeProgress >= 100 
+                ? `${Math.round(volumeProgress - 100)}% over your target`
+                : `${Math.round(100 - volumeProgress)}% to your target`;
+            volumeStatusEl.innerHTML = `${currentText}<br><br><span class="percentage-text">${percentageText}</span>`;
+            applyPercentageColor(volumeStatusEl.querySelector('.percentage-text'), volumeProgress);
+        }
+    }
+
+    // Update Pitch goal
+    if (userGoals.target_pitch) {
+        const pitchProgress = (currentPitch / userGoals.target_pitch) * 100;
+        const pitchTargetEl = document.querySelector('.goal-card:nth-child(3) .goal-target');
+        const pitchProgressEl = document.querySelector('.goal-card:nth-child(3) .progress-fill');
+        const pitchStatusEl = document.querySelector('.goal-card:nth-child(3) .goal-status');
+        
+        if (pitchTargetEl) pitchTargetEl.textContent = `${userGoals.target_pitch} Hz`;
+        if (pitchProgressEl) pitchProgressEl.style.width = `${Math.min(pitchProgress, 100)}%`;
+        if (pitchStatusEl) {
+            const currentText = `Current: ${Math.round(currentPitch)} Hz`;
+            const percentageText = pitchProgress >= 100 
+                ? `${Math.round(pitchProgress - 100)}% over your target`
+                : `${Math.round(100 - pitchProgress)}% to your target`;
+            pitchStatusEl.innerHTML = `${currentText}<br><br><span class="percentage-text">${percentageText}</span>`;
+            applyPercentageColor(pitchStatusEl.querySelector('.percentage-text'), pitchProgress);
+        }
+    }
+}
+
 
 
 // Event Listeners - sets up all interactive features - chart switching.
@@ -430,8 +542,6 @@ function setupEventListeners() {
         });
     }
 }
-
-
 
 // Runs when page loads 
 // - sets up event listeners, then starts dashboard.
