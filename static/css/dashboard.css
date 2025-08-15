@@ -537,6 +537,59 @@
     font-weight: bold;
 }
 
+/* Feedback Section Styles */
+.feedback-section {
+    margin-bottom: 2rem;
+}
+
+.feedback-overview-card {
+    background: var(--surface-color);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+}
+
+.feedback-grid {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.feedback-card {
+    flex: 1;
+    min-width: 300px;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    position: relative;
+}
+
+.feedback-card.positive {
+    background: rgba(40, 167, 69, 0.1);
+    border-left: 4px solid #28a745;
+}
+
+.feedback-card.constructive {
+    background: rgba(255, 193, 7, 0.1);
+    border-left: 4px solid #ffc107;
+}
+
+.feedback-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.feedback-content p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -588,6 +641,14 @@
     }
     
     .goal-card {
+        min-width: auto;
+    }
+    
+    .feedback-grid {
+        flex-direction: column;
+    }
+    
+    .feedback-card {
         min-width: auto;
     }
 } 
