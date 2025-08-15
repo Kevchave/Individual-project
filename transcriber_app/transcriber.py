@@ -53,9 +53,20 @@ class Transcriber:
             pass  # No updates to apply
 
     def transcribe_stream(self, audio_queue, on_transcription, on_audio_chunk, track_insider_metrics=None, 
-                         aggressiveness=3, frame_duration_ms=20, max_silence_frames=10, metrics_collector=None):
+                         aggressiveness=3, frame_duration_ms=20, max_silence_frames=10, metrics_collector=None, metrics=None):
         """
         Transcribe audio stream with optional insider metrics tracking for adaptive chunking.
+        
+        Args:
+            audio_queue: Queue containing audio data
+            on_transcription: Callback function for transcription results
+            on_audio_chunk: Callback function for audio chunks
+            track_insider_metrics: TrackInsiderMetrics object for adaptive control
+            aggressiveness: VAD aggressiveness level (0-3)
+            frame_duration_ms: Frame duration in milliseconds
+            max_silence_frames: Maximum silence frames before ending chunk
+            metrics_collector: MetricsCollector for testing
+            metrics: MetricsTracker object for database storage
         """
 
         # Initialize current parameters
@@ -134,13 +145,21 @@ class Transcriber:
 
                             # Calculate chunk-level metrics for insider tracking
                             if track_insider_metrics is not None:
-                                # Calculate silence ratio for this chunk
+                                # This is the ratio of silence frames to total frames in the chunk
                                 chunk_silence_ratio = chunk_silence_frames / chunk_total_frames if chunk_total_frames > 0 else 0.0
-                                track_insider_metrics.add_chunk_silence_ratio(chunk_silence_ratio)
                                 
-                                # Calculate confidence for this chunk
+                                # This extracts the confidence score from the Whisper transcription result
                                 confidence = self._extract_confidence(result)
+                                
+                                # Store in TrackInsiderMetrics for adaptive control
+                                # This maintains the rolling averages used for parameter adjustment
+                                track_insider_metrics.add_chunk_silence_ratio(chunk_silence_ratio)
                                 track_insider_metrics.add_confidence(confidence)
+                                
+                                # Also store in MetricsTracker for database storage
+                                # This stores the raw values for each chunk (not rolling averages)
+                                if metrics is not None and hasattr(metrics, 'add_chunk_insider_metrics'):
+                                    metrics.add_chunk_insider_metrics(chunk_silence_ratio, confidence)
                                 
                                 # Reset frame counters for next chunk
                                 chunk_silence_frames = 0

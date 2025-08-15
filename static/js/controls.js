@@ -220,13 +220,13 @@ function initialiseControls({
 
 // Save session data to database
 async function saveSessionDataToDatabase() {
-    // console.log('[DEBUG] saveSessionDataToDatabase function called');
+    console.log('[DEBUG] saveSessionDataToDatabase function called');
     try {
-        // console.log('[DEBUG] Starting to save session data to database...');
+        console.log('[DEBUG] Starting to save session data to database...');
         
         // Get session data from Python via Flask endpoint
         const response = await fetch('/get_session_data');
-        // console.log('[DEBUG] Response status:', response.status);
+        console.log('[DEBUG] Response status:', response.status);
         
         if (!response.ok) {
             console.log('No session data available to save');
@@ -234,17 +234,28 @@ async function saveSessionDataToDatabase() {
         }
         
         const sessionData = await response.json();
-        // console.log('[DEBUG] Session data received:', JSON.stringify(sessionData, null, 2));
+        console.log('[DEBUG] Session data received:', JSON.stringify(sessionData, null, 2));
+        
+        // Check if metrics_data exists
+        if (sessionData.metrics_data) {
+            console.log(`[DEBUG] metrics_data found with ${sessionData.metrics_data.length} chunks`);
+            if (sessionData.metrics_data.length > 0) {
+                console.log('[DEBUG] Sample chunk:', sessionData.metrics_data[0]);
+            }
+        } else {
+            console.log('[DEBUG] WARNING: metrics_data is missing from sessionData!');
+        }
         
         // Save to database using Supabase
-        // console.log('[DEBUG] About to call saveSessionData with data:', sessionData);
+        console.log('[DEBUG] About to call saveSessionData with data:', sessionData);
         const { data, error } = await saveSessionData(sessionData);
         
         if (error) {
             console.error('Failed to save session data:', error);
-            // console.error('Error details:', JSON.stringify(error, null, 2));
+            console.error('Error details:', JSON.stringify(error, null, 2));
         } else {
             console.log('Session data saved successfully to database');
+            console.log('Saved session data:', data);
         }
     } catch (err) {
         console.error('Error saving session data:', err);

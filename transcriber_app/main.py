@@ -88,7 +88,8 @@ def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=Tru
                     aggressiveness=aggressiveness,
                     frame_duration_ms=frame_duration_ms,
                     max_silence_frames=max_silence_frames,
-                    metrics_collector=metrics_collector
+                    metrics_collector=metrics_collector,
+                    metrics=metrics  # Pass metrics object for insider metrics storage
                 )
 
     # Safeguard to ensure exactly one background thread is active 
@@ -276,7 +277,9 @@ def get_current_metrics():
     
     # Store the current metrics for dashboard graphs (matches live experience)
     if metrics is not None:
+        print(f"[DEBUG] Storing polled metrics - current count: {len(metrics.polled_wpm_history)}")
         metrics.store_polled_metrics()
+        print(f"[DEBUG] After storing - polled count: {len(metrics.polled_wpm_history)}")
     
     return {
         'wpm': float(metrics.current_wpm),
@@ -334,22 +337,29 @@ def end_session_tracking():
 def get_session_data_for_saving():
     """Get session data ready for saving (called by JavaScript)"""
     global metrics
+    print("[DEBUG] get_session_data_for_saving() called")
+    
     if metrics is not None:
+        print("[DEBUG] Metrics object exists, getting session summary...")
         session_data = metrics.get_session_summary()
         
-        # Add polled graph data for dashboard charts (matches live experience exactly)
-        graph_data = metrics.get_polled_graph_data()
-        session_data['graph_data'] = graph_data
+        print(f"[DEBUG] Session summary keys: {list(session_data.keys())}")
+        print(f"[DEBUG] Has metrics_data: {'metrics_data' in session_data}")
         
-        # print(f"[DEBUG] Session data generated: {session_data is not None}")
-        # if session_data:
-        #     print(f"[DEBUG] Session duration: {session_data.get('total_duration', 0)}")
-        #     print(f"[DEBUG] Total words: {session_data.get('total_words', 0)}")
-        #     print(f"[DEBUG] Has transcript: {bool(session_data.get('final_transcript', ''))}")
-        #     print(f"[DEBUG] Graph data points: {len(graph_data.get('wpm_data', []))}")
+        if 'metrics_data' in session_data:
+            print(f"[DEBUG] metrics_data length: {len(session_data['metrics_data'])}")
+            if len(session_data['metrics_data']) > 0:
+                print(f"[DEBUG] First chunk sample: {session_data['metrics_data'][0]}")
+        else:
+            print("[DEBUG] WARNING: metrics_data is missing from session_data!")
+        
+        print(f"[DEBUG] Has graph_data: {'graph_data' in session_data}")
+        print(f"[DEBUG] Session duration: {session_data.get('total_duration', 'N/A')}")
+        print(f"[DEBUG] Total words: {session_data.get('total_words', 'N/A')}")
+        
         return session_data
     else:
-        # print("[DEBUG] No metrics object available")
+        print("[DEBUG] ERROR: No metrics object available")
         return None
 
 def main():

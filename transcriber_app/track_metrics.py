@@ -45,6 +45,13 @@ class MetricsTracker:
         self.polled_timestamps = []
         self.polled_data_lock = threading.Lock()
 
+        # Insider metrics for database storage (chunk-level data)
+        # These store the confidence and silence ratio for each individual chunk
+        # This is separate from the rolling averages used for adaptive control
+        self.chunk_confidence_scores = []  # List of confidence scores (one per chunk)
+        self.chunk_silence_ratios = []     # List of silence ratios (one per chunk)
+        self.insider_metrics_lock = threading.Lock()  # Thread safety for insider metrics
+
     # ------------------- Chunk Duration Tracking -------------------
     def track_chunk_duration(self, duration):
         self.chunk_duration_history.append(duration)
@@ -84,6 +91,28 @@ class MetricsTracker:
 
             # Return the audio_float of the last chunk
             return self.all_audio_chunks[-1][0] if self.all_audio_chunks else None
+
+    # ------------------- Insider Metrics Storage -------------------
+    def add_chunk_insider_metrics(self, silence_ratio, confidence):
+        """
+        Store insider metrics for database storage.
+        This method is called from the transcriber for each chunk.
+        
+        Args:
+            silence_ratio (float): Ratio of silence in the chunk (0-1)
+            confidence (float): Transcription confidence score (0-1)
+        """
+        with self.insider_metrics_lock:
+            # Store the silence ratio for this chunk
+            # This will be saved to the database at session end
+            self.chunk_silence_ratios.append(float(silence_ratio))
+            
+            # Store the confidence score for this chunk
+            # This will be saved to the database at session end
+            self.chunk_confidence_scores.append(float(confidence))
+            
+            print(f"[INSIDER STORAGE] Stored chunk metrics: silence_ratio={silence_ratio:.3f}, confidence={confidence:.3f}")
+            print(f"[INSIDER STORAGE] Total stored: {len(self.chunk_silence_ratios)} silence ratios, {len(self.chunk_confidence_scores)} confidence scores")
 
     # ------------------------------------------------------------------------------------------------
     # Helper Functions 
@@ -192,11 +221,13 @@ class MetricsTracker:
     def store_polled_metrics(self):
         """Store current smoothed metrics for dashboard graphs (called during polling)"""
         with self.polled_data_lock:
+            print(f"[DEBUG] Storing polled metrics - WPM: {self.current_wpm:.2f}, Volume: {self.current_volume:.2f}, Pitch: {self.current_pitch:.2f}")
             self.polled_wpm_history.append(float(self.current_wpm))
             self.polled_volume_history.append(float(self.current_volume))
             self.polled_pitch_history.append(float(self.current_pitch))
             self.polled_timestamps.append(time.time())
-            print(f"[POLLED] Stored metrics: WPM={self.current_wpm:.2f}, Volume={self.current_volume:.2f}, Pitch={self.current_pitch:.2f}")
+            print(f"[DEBUG] Polled data stored. Total points: {len(self.polled_wpm_history)}")
+            print(f"[DEBUG] Timestamps: {[f'{t:.1f}' for t in self.polled_timestamps]}")
 
 
 
@@ -228,12 +259,18 @@ class MetricsTracker:
 
     def get_session_summary(self):
         """Return complete session data for database storage"""
+        print("[DEBUG] get_session_summary() called")
+        
         # Calculate final averages
         self.track_wpm_average()
         self.track_volume_average()
         self.track_overall_pitch()
         
-        return {
+        # Get metrics data for storage
+        metrics_data = self.get_metrics_data_for_storage()
+        print(f"[DEBUG] get_metrics_data_for_storage returned {len(metrics_data)} chunks")
+        
+        session_summary = {
             'session_start_time': self.session_start_time,
             'session_end_time': self.session_end_time,
             'total_duration': float(sum(duration for _, duration in self.accumulated)),
@@ -244,8 +281,89 @@ class MetricsTracker:
                 'volume': float(self.average_volume),
                 'pitch': float(self.average_pitch)
             },
-            'graph_data': self.get_polled_graph_data()
+            'graph_data': self.get_polled_graph_data(),
+            'metrics_data': metrics_data
         }
+        
+        print(f"[DEBUG] Session summary created with keys: {list(session_summary.keys())}")
+        print(f"[DEBUG] metrics_data in summary: {len(session_summary['metrics_data'])} chunks")
+        
+        return session_summary
+
+    def get_metrics_data_for_storage(self):
+        """Return metrics data formatted for database storage"""
+        print("[DEBUG] get_metrics_data_for_storage() called")
+        
+        metrics_data = []
+        
+        print(f"[DEBUG] polled_wpm_history: {len(self.polled_wpm_history)}")
+        print(f"[DEBUG] polled_volume_history: {len(self.polled_volume_history)}")
+        print(f"[DEBUG] polled_pitch_history: {len(self.polled_pitch_history)}")
+        print(f"[DEBUG] polled_timestamps: {len(self.polled_timestamps)}")
+        print(f"[DEBUG] accumulated chunks: {len(self.accumulated)}")
+        print(f"[DEBUG] chunk_confidence_scores: {len(self.chunk_confidence_scores)}")
+        print(f"[DEBUG] chunk_silence_ratios: {len(self.chunk_silence_ratios)}")
+        
+        # Check if we have enough polled data
+        if len(self.polled_timestamps) < 2:
+            print("[DEBUG] WARNING: Very few polled data points. Session might be too short.")
+            print("[DEBUG] Consider using chunk-level data for short sessions.")
+        
+        # Use chunk-level data if we have insider metrics available
+        # This gives us text, confidence scores, and silence ratios
+        if len(self.accumulated) > 0 and len(self.chunk_confidence_scores) > 0:
+            print("[DEBUG] Using chunk-level data with insider metrics")
+            session_start = self.session_start_time or 0
+            cumulative_time = 0
+            
+            for i, (text, duration) in enumerate(self.accumulated):
+                metric = {
+                    'text': text,
+                    'duration': float(duration),
+                    'timestamp': float(cumulative_time),
+                    'wpm': None,  # Will be filled from polled data if available
+                    'volume': None,  # Will be filled from polled data if available
+                    'pitch': None,  # Will be filled from polled data if available
+                    'confidence': float(self.chunk_confidence_scores[i]) if i < len(self.chunk_confidence_scores) else None,
+                    'silence_ratio': float(self.chunk_silence_ratios[i]) if i < len(self.chunk_silence_ratios) else None
+                }
+                
+                # Try to match with polled metrics data for WPM, volume, pitch
+                if i < len(self.polled_wpm_history):
+                    metric['wpm'] = float(self.polled_wpm_history[i])
+                if i < len(self.polled_volume_history):
+                    metric['volume'] = float(self.polled_volume_history[i])
+                if i < len(self.polled_pitch_history):
+                    metric['pitch'] = float(self.polled_pitch_history[i])
+                
+                metrics_data.append(metric)
+                cumulative_time += duration
+                
+        else:
+            print("[DEBUG] Using polled data (no insider metrics available)")
+            # Use polled data (rolling averages) instead of chunk-level data
+            # This makes metrics_data similar to graph_data but in database table format
+            for i in range(len(self.polled_timestamps)):
+                metric = {
+                    'text': '',  # No text for polled data points
+                    'duration': 0,  # No duration for polled data points
+                    'timestamp': float(self.polled_timestamps[i] - self.polled_timestamps[0]) if self.polled_timestamps else 0,
+                    'wpm': float(self.polled_wpm_history[i]) if i < len(self.polled_wpm_history) else None,
+                    'volume': float(self.polled_volume_history[i]) if i < len(self.polled_volume_history) else None,
+                    'pitch': float(self.polled_pitch_history[i]) if i < len(self.polled_pitch_history) else None,
+                    'confidence': None,  # Not available in polled data
+                    'silence_ratio': None  # Not available in polled data
+                }
+                
+                metrics_data.append(metric)
+        
+        print(f"[DEBUG] Created {len(metrics_data)} metric entries")
+        if len(metrics_data) > 0:
+            print(f"[DEBUG] Sample metric entry: {metrics_data[0]}")
+            if len(metrics_data) > 1:
+                print(f"[DEBUG] Last metric entry: {metrics_data[-1]}")
+        
+        return metrics_data
 
     def reset_session_data(self):
         """Reset all session data (useful for new sessions)"""
@@ -254,6 +372,11 @@ class MetricsTracker:
             self.polled_volume_history.clear()
             self.polled_pitch_history.clear()
             self.polled_timestamps.clear()
+        
+        # Clear insider metrics data for new session
+        with self.insider_metrics_lock:
+            self.chunk_confidence_scores.clear()
+            self.chunk_silence_ratios.clear()
         
         self.session_start_time = None
         self.session_end_time = None

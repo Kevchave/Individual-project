@@ -185,6 +185,7 @@ export async function getUserSessions(limit = 50) {
 
 // Save session data to database
 export async function saveSessionData(sessionData) {
+    console.log('[DEBUG] saveSessionData called with:', sessionData);
     try {
         const user = await getCurrentUser()
         if (!user) throw new Error('Not authenticated')
@@ -208,16 +209,90 @@ export async function saveSessionData(sessionData) {
             transcript: sessionData.final_transcript,
             start_time: new Date(sessionData.session_start_time * 1000).toISOString(),
             end_time: new Date(sessionData.session_end_time * 1000).toISOString()
+            // Removed graph_data - now using metrics_data from session_metrics table
         };
         
-        // console.log('[DEBUG] Inserting data:', JSON.stringify(insertData, null, 2));
+        console.log('[DEBUG] Inserting session data:', JSON.stringify(insertData, null, 2));
         
         const { data, error } = await supabase
             .from('lecture_sessions')
             .insert(insertData)
+            .select()  // Return the inserted data so we can get the session ID
+        
+        if (error) {
+            console.error('[DEBUG] Error inserting session data:', error);
+            return { data: null, error }
+        }
+        
+        console.log('[DEBUG] Session data inserted successfully:', data);
+        
+        // If session was created successfully and we have metrics data, save session metrics
+        if (data && data[0] && sessionData.metrics_data) {
+            console.log(`[DEBUG] Saving ${sessionData.metrics_data.length} chunks to session_metrics`);
+            const metricsResult = await saveSessionMetrics(data[0].id, sessionData.metrics_data)
+            if (metricsResult.error) {
+                console.error('[DEBUG] Failed to save session metrics:', metricsResult.error);
+            } else {
+                console.log('[DEBUG] Session metrics saved successfully');
+            }
+        } else {
+            console.log('[DEBUG] No metrics_data to save or session creation failed');
+            if (!data || !data[0]) {
+                console.log('[DEBUG] Session creation failed - no data returned');
+            }
+            if (!sessionData.metrics_data) {
+                console.log('[DEBUG] No metrics_data in sessionData');
+            }
+        }
         
         return { data, error }
     } catch (err) {
+        console.error('[DEBUG] Exception in saveSessionData:', err);
+        return { data: null, error: err }
+    }
+}
+
+// Save session metrics data to database
+export async function saveSessionMetrics(sessionId, metricsData) {
+    console.log(`[DEBUG] saveSessionMetrics called with sessionId: ${sessionId}, ${metricsData.length} chunks`);
+    try {
+        if (!sessionId || !metricsData || !Array.isArray(metricsData)) {
+            console.error('[DEBUG] Invalid parameters:', { sessionId, metricsDataLength: metricsData?.length, isArray: Array.isArray(metricsData) });
+            throw new Error('Invalid session ID or metrics data')
+        }
+        
+        // Transform metrics data for database insertion
+        // This converts our Python data structure to the database format
+        const metricsToInsert = metricsData.map((metric, index) => ({
+            session_id: sessionId,                    // Link to the session
+            chunk_index: index + 1,                   // Order within session (1, 2, 3, etc.)
+            text: metric.text || '',                  // Transcribed text for this chunk
+            timestamp_seconds: metric.timestamp || 0, // When this chunk occurred (relative to session start)
+            wpm: metric.wpm || null,                  // Words per minute for this chunk
+            volume: metric.volume || null,            // Volume in dB for this chunk
+            pitch: metric.pitch || null,              // Pitch variance for this chunk
+            chunk_duration: metric.duration || 0,     // Duration of this chunk
+            confidence_score: metric.confidence || null,  // Transcription confidence (0-1)
+            silence_ratio: metric.silence_ratio || null   // Ratio of silence in chunk (0-1)
+        }))
+        
+        console.log(`[DEBUG] Transformed ${metricsToInsert.length} chunks for database insertion`);
+        console.log('[DEBUG] Sample transformed chunk:', metricsToInsert[0]);
+        
+        // Insert all metrics data into the database
+        const { data, error } = await supabase
+            .from('session_metrics')
+            .insert(metricsToInsert)
+        
+        if (error) {
+            console.error('[DEBUG] Error inserting metrics data:', error);
+        } else {
+            console.log(`[DEBUG] Successfully inserted ${metricsToInsert.length} chunks to session_metrics`);
+        }
+        
+        return { data, error }
+    } catch (err) {
+        console.error('[DEBUG] Exception in saveSessionMetrics:', err);
         return { data: null, error: err }
     }
 }
@@ -290,4 +365,71 @@ export async function saveUserGoals(goals) {
 // Callback function - only called when auth state changes
 export function onAuthStateChange(callback) {
     return supabase.auth.onAuthStateChange(callback)
+}
+
+// Get session metrics for a specific session
+export async function getSessionMetrics(sessionId) {
+    try {
+        // Retrieve all metrics for the given session, ordered by chunk index
+        const { data, error } = await supabase
+            .from('session_metrics')
+            .select('*')
+            .eq('session_id', sessionId)
+            .order('chunk_index', { ascending: true })
+        
+        return { data: data || [], error }
+    } catch (err) {
+        return { data: [], error: err }
+    }
+}
+
+// Get session metrics statistics using the database function
+export async function getSessionMetricsStats(sessionId) {
+    try {
+        // Call the database function we created to get summary statistics
+        const { data, error } = await supabase
+            .rpc('get_session_metrics_stats', { session_uuid: sessionId })
+        
+        return { data: data || null, error }
+    } catch (err) {
+        return { data: null, error: err }
+    }
+}
+
+// Get session metrics formatted for charts (replaces graph_data)
+export async function getSessionMetricsForCharts(sessionId) {
+    try {
+        // Get all metrics for the session, ordered by timestamp
+        const { data: metrics, error } = await supabase
+            .from('session_metrics')
+            .select('timestamp_seconds, wpm, volume, pitch')
+            .eq('session_id', sessionId)
+            .order('timestamp_seconds', { ascending: true })
+        
+        if (error) {
+            console.error('[DEBUG] Error getting session metrics for charts:', error);
+            return { data: null, error };
+        }
+        
+        if (!metrics || metrics.length === 0) {
+            console.log('[DEBUG] No metrics data found for charts');
+            return { data: null, error: 'No metrics data available' };
+        }
+        
+        // Format data for charts (similar to old graph_data format)
+        const chartData = {
+            wpm_data: metrics.map(m => m.wpm || 0),
+            volume_data: metrics.map(m => m.volume || 0),
+            pitch_data: metrics.map(m => m.pitch || 0),
+            timestamps: metrics.map(m => m.timestamp_seconds || 0),
+            total_data_points: metrics.length
+        };
+        
+        console.log(`[DEBUG] Formatted ${metrics.length} data points for charts`);
+        return { data: chartData, error: null };
+        
+    } catch (err) {
+        console.error('[DEBUG] Exception in getSessionMetricsForCharts:', err);
+        return { data: null, error: err };
+    }
 }

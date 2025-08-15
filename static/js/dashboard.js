@@ -5,7 +5,7 @@
 // - handles user interactions 
 
 // Import functions from supabase-client.js
-import { getCurrentUser, getUserSessions, getUserProfile, getUserGoals } from './supabase-cllient.js';
+import { getCurrentUser, getUserSessions, getUserProfile, getUserGoals, getSessionMetrics, getSessionMetricsStats, getSessionMetricsForCharts } from './supabase-cllient.js';
 import { initialiseCharts } from './charts.js';
 import { currentTheme } from './theme.js';
 import { wpmChart, volumeChart, pitchChart } from './state.js';
@@ -293,7 +293,7 @@ function displaySessionGraphs(graphData) {
 }
 
 // Displays the most recent session in the UI
-function displayRecentSession(sessionData) {
+async function displayRecentSession(sessionData) {
     // Update session title and date
     const sessionTitle = document.querySelector('.session-title h3');
     const sessionDate = document.querySelector('.session-date');
@@ -327,6 +327,23 @@ function displayRecentSession(sessionData) {
         metricValues[0].textContent = Math.round(sessionData.average_wpm || 0);
         metricValues[1].textContent = Math.round(sessionData.average_volume || 0) + ' dB';
         metricValues[2].textContent = (sessionData.average_pitch || 0).toFixed(2);
+    }
+
+    // Load chart data from session_metrics table
+    if (sessionData.id) {
+        console.log('[DEBUG] Loading chart data for session:', sessionData.id);
+        const { data: chartData, error } = await getSessionMetricsForCharts(sessionData.id);
+        
+        if (error) {
+            console.error('[DEBUG] Error loading chart data:', error);
+            displaySessionGraphs({ wpm_data: [], volume_data: [], pitch_data: [], timestamps: [] });
+        } else if (chartData) {
+            console.log('[DEBUG] Chart data loaded successfully:', chartData);
+            displaySessionGraphs(chartData);
+        } else {
+            console.log('[DEBUG] No chart data available');
+            displaySessionGraphs({ wpm_data: [], volume_data: [], pitch_data: [], timestamps: [] });
+        }
     }
 
     // Calculate percentages based on historical averages
