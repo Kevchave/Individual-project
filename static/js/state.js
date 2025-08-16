@@ -3,10 +3,14 @@
 export let wpmChart = null;
 export let volumeChart = null;
 export let pitchChart = null;
+export let confidenceChart = null;
+export let silenceChart = null;
 
 export let wpmData = [];
 export let volumeData = [];
 export let pitchData = [];
+export let confidenceData = [];
+export let silenceData = [];
 export let timeLabels = [];
 
 export let startTime = null;
@@ -19,6 +23,8 @@ export let isPaused = false;
 export function setWpmChart(chart) { wpmChart = chart; }
 export function setVolumeChart(chart) { volumeChart = chart; }
 export function setPitchChart(chart) { pitchChart = chart; }
+export function setConfidenceChart(chart) { confidenceChart = chart; }
+export function setSilenceChart(chart) { silenceChart = chart; }
 export function setStartTime(time) { startTime = time; }
 export function setMetricsMode(mode) { metricsMode = mode; }
 export function setTranscriptInterval(interval) { transcriptInterval = interval; }

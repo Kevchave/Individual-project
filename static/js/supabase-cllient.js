@@ -206,6 +206,8 @@ export async function saveSessionData(sessionData) {
             average_wpm: sessionData.average_metrics.wpm,
             average_volume: sessionData.average_metrics.volume,
             average_pitch: sessionData.average_metrics.pitch,
+            average_confidence: sessionData.average_metrics.confidence,
+            average_silence_ratio: sessionData.average_metrics.silence_ratio,
             transcript: sessionData.final_transcript,
             start_time: new Date(sessionData.session_start_time * 1000).toISOString(),
             end_time: new Date(sessionData.session_end_time * 1000).toISOString()
@@ -213,6 +215,7 @@ export async function saveSessionData(sessionData) {
         };
         
         console.log('[DEBUG] Inserting session data:', JSON.stringify(insertData, null, 2));
+        console.log('[DEBUG] New averages - Confidence:', sessionData.average_metrics.confidence, 'Silence Ratio:', sessionData.average_metrics.silence_ratio);
         
         const { data, error } = await supabase
             .from('lecture_sessions')
@@ -266,12 +269,10 @@ export async function saveSessionMetrics(sessionId, metricsData) {
         const metricsToInsert = metricsData.map((metric, index) => ({
             session_id: sessionId,                    // Link to the session
             chunk_index: index + 1,                   // Order within session (1, 2, 3, etc.)
-            text: metric.text || '',                  // Transcribed text for this chunk
             timestamp_seconds: metric.timestamp || 0, // When this chunk occurred (relative to session start)
             wpm: metric.wpm || null,                  // Words per minute for this chunk
             volume: metric.volume || null,            // Volume in dB for this chunk
             pitch: metric.pitch || null,              // Pitch variance for this chunk
-            chunk_duration: metric.duration || 0,     // Duration of this chunk
             confidence_score: metric.confidence || null,  // Transcription confidence (0-1)
             silence_ratio: metric.silence_ratio || null   // Ratio of silence in chunk (0-1)
         }))
@@ -402,7 +403,7 @@ export async function getSessionMetricsForCharts(sessionId) {
         // Get all metrics for the session, ordered by timestamp
         const { data: metrics, error } = await supabase
             .from('session_metrics')
-            .select('timestamp_seconds, wpm, volume, pitch')
+            .select('timestamp_seconds, wpm, volume, pitch, confidence_score, silence_ratio')
             .eq('session_id', sessionId)
             .order('timestamp_seconds', { ascending: true })
         
@@ -421,6 +422,8 @@ export async function getSessionMetricsForCharts(sessionId) {
             wpm_data: metrics.map(m => m.wpm || 0),
             volume_data: metrics.map(m => m.volume || 0),
             pitch_data: metrics.map(m => m.pitch || 0),
+            confidence_data: metrics.map(m => m.confidence_score || 0),
+            silence_data: metrics.map(m => m.silence_ratio || 0),
             timestamps: metrics.map(m => m.timestamp_seconds || 0),
             total_data_points: metrics.length
         };

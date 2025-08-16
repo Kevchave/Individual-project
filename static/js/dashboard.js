@@ -8,7 +8,7 @@
 import { getCurrentUser, getUserSessions, getUserProfile, getUserGoals, getSessionMetrics, getSessionMetricsStats, getSessionMetricsForCharts } from './supabase-cllient.js';
 import { initialiseCharts } from './charts.js';
 import { currentTheme } from './theme.js';
-import { wpmChart, volumeChart, pitchChart } from './state.js';
+import { wpmChart, volumeChart, pitchChart, confidenceChart, silenceChart } from './state.js';
 
 // Initialise global variables to store data    
 let currentUser = null;     // Current logged in user
@@ -164,24 +164,60 @@ function displayMultipleSessionsView() {
 
 // Update metrics to show averages across multiple sessions
 function updateAverageMetrics() {
+    // Define metric configuration for efficient processing
+    const metricConfig = [
+        { 
+            key: 'average_wpm', 
+            formatter: (value) => Math.round(value),
+            suffix: ''
+        },
+        { 
+            key: 'average_volume', 
+            formatter: (value) => Math.round(value),
+            suffix: ' dB'
+        },
+        { 
+            key: 'average_pitch', 
+            formatter: (value) => value.toFixed(2),
+            suffix: ''
+        },
+        { 
+            key: 'average_confidence', 
+            formatter: (value) => (value * 100).toFixed(1),
+            suffix: '%'
+        },
+        { 
+            key: 'average_silence_ratio', 
+            formatter: (value) => (value * 100).toFixed(1),
+            suffix: '%'
+        }
+    ];
+
     const metricValues = document.querySelectorAll('.metric-value');
-    if (metricValues.length >= 3 && filteredSessions.length > 0) {
-        // Calculate averages
-        const avgWPM = Math.round(filteredSessions.reduce((sum, s) => sum + (s.average_wpm || 0), 0) / filteredSessions.length);
-        const avgVolume = Math.round(filteredSessions.reduce((sum, s) => sum + (s.average_volume || 0), 0) / filteredSessions.length);
-        const avgPitch = (filteredSessions.reduce((sum, s) => sum + (s.average_pitch || 0), 0) / filteredSessions.length).toFixed(2);
-        
-        metricValues[0].textContent = avgWPM;
-        metricValues[1].textContent = avgVolume + ' dB';
-        metricValues[2].textContent = avgPitch;
-    }
-    
-    // Update percentages (placeholder for now)
     const percentages = document.querySelectorAll('.metric-percentage');
-    if (percentages.length >= 3) {
-        percentages[0].textContent = 'Avg';
-        percentages[1].textContent = 'Avg';
-        percentages[2].textContent = 'Avg';
+    
+    if (metricValues.length >= metricConfig.length && filteredSessions.length > 0) {
+        // Calculate averages for all metrics in one pass
+        const averages = metricConfig.map(config => {
+            const sum = filteredSessions.reduce((acc, s) => acc + (s[config.key] || 0), 0);
+            return sum / filteredSessions.length;
+        });
+        
+        // Update metric values
+        metricValues.forEach((element, index) => {
+            if (index < metricConfig.length) {
+                const config = metricConfig[index];
+                const value = averages[index];
+                element.textContent = config.formatter(value) + config.suffix;
+            }
+        });
+        
+        // Update percentages
+        percentages.forEach((element, index) => {
+            if (index < metricConfig.length) {
+                element.textContent = 'Avg';
+            }
+        });
     }
 }
 
@@ -210,9 +246,11 @@ function displayAggregatedCharts() {
     const wpmData = filteredSessions.map(session => session.average_wpm || 0).reverse();
     const volumeData = filteredSessions.map(session => session.average_volume || 0).reverse();
     const pitchData = filteredSessions.map(session => session.average_pitch || 0).reverse();
+    const confidenceData = filteredSessions.map(session => session.average_confidence || 0).reverse();
+    const silenceData = filteredSessions.map(session => session.average_silence_ratio || 0).reverse();
     
     // Update x-axis title for multiple sessions
-    [wpmChart, volumeChart, pitchChart].forEach(chart => {
+    [wpmChart, volumeChart, pitchChart, confidenceChart, silenceChart].forEach(chart => {
         if (chart && chart.options?.scales?.x?.title) {
             chart.options.scales.x.title.text = 'Date';
         }
@@ -237,6 +275,20 @@ function displayAggregatedCharts() {
         pitchChart.data.labels = sessionLabels;
         pitchChart.data.datasets[0].data = pitchData;
         pitchChart.update('none');
+    }
+
+    // Update Confidence chart
+    if (confidenceChart) {
+        confidenceChart.data.labels = sessionLabels;
+        confidenceChart.data.datasets[0].data = confidenceData;
+        confidenceChart.update('none');
+    }
+
+    // Update Silence chart
+    if (silenceChart) {
+        silenceChart.data.labels = sessionLabels;
+        silenceChart.data.datasets[0].data = silenceData;
+        silenceChart.update('none');
     }
 }
 
@@ -265,7 +317,7 @@ async function loadRecentSessionGraphData() {
 
 // Display session graph data in charts
 function displaySessionGraphs(graphData) {
-    const { wpm_data, volume_data, pitch_data, timestamps } = graphData;
+    const { wpm_data, volume_data, pitch_data, confidence_data, silence_data, timestamps } = graphData;
     const relSeconds = Array.isArray(timestamps) && timestamps.length > 0
         ? timestamps.map(t => Math.max(0, Math.round(t - timestamps[0])))
         : [];
@@ -290,10 +342,54 @@ function displaySessionGraphs(graphData) {
         pitchChart.data.datasets[0].data = pitch_data;
         pitchChart.update('none');
     }
+
+    // Update Confidence chart
+    if (confidenceChart && confidence_data && confidence_data.length > 0) {
+        confidenceChart.data.labels = relSeconds.map(s => `${s}s`);
+        confidenceChart.data.datasets[0].data = confidence_data;
+        confidenceChart.update('none');
+    }
+
+    // Update Silence chart
+    if (silenceChart && silence_data && silence_data.length > 0) {
+        silenceChart.data.labels = relSeconds.map(s => `${s}s`);
+        silenceChart.data.datasets[0].data = silence_data;
+        silenceChart.update('none');
+    }
 }
 
 // Displays the most recent session in the UI
 async function displayRecentSession(sessionData) {
+    
+    // Define metric configuration for efficient processing
+    const metricConfig = [
+        { 
+            key: 'average_wpm', 
+            formatter: (value) => Math.round(value || 0),
+            suffix: ''
+        },
+        { 
+            key: 'average_volume', 
+            formatter: (value) => Math.round(value || 0),
+            suffix: ' dB'
+        },
+        { 
+            key: 'average_pitch', 
+            formatter: (value) => (value || 0).toFixed(2),
+            suffix: ''
+        },
+        { 
+            key: 'average_confidence', 
+            formatter: (value) => value ? (value * 100).toFixed(1) + '%' : 'n/a',
+            suffix: ''
+        },
+        { 
+            key: 'average_silence_ratio', 
+            formatter: (value) => value ? (value * 100).toFixed(1) + '%' : 'n/a',
+            suffix: ''
+        }
+    ];
+
     // Update session title and date
     const sessionTitle = document.querySelector('.session-title h3');
     const sessionDate = document.querySelector('.session-date');
@@ -321,53 +417,69 @@ async function displayRecentSession(sessionData) {
         durationValue.textContent = formatDuration(sessionData.duration_seconds || 0);
     }
 
-    // Update metrics
+    // Update metrics efficiently using loops
     const metricValues = document.querySelectorAll('.metric-value');
-    if (metricValues.length >= 3) {
-        metricValues[0].textContent = Math.round(sessionData.average_wpm || 0);
-        metricValues[1].textContent = Math.round(sessionData.average_volume || 0) + ' dB';
-        metricValues[2].textContent = (sessionData.average_pitch || 0).toFixed(2);
-    }
+    metricValues.forEach((element, index) => {
+        if (index < metricConfig.length) {
+            const config = metricConfig[index];
+            const value = sessionData[config.key];
+            element.textContent = config.formatter(value) + config.suffix;
+        }
+    });
 
     // Load chart data from session_metrics table
     if (sessionData.id) {
-        console.log('[DEBUG] Loading chart data for session:', sessionData.id);
         const { data: chartData, error } = await getSessionMetricsForCharts(sessionData.id);
         
         if (error) {
-            console.error('[DEBUG] Error loading chart data:', error);
+            console.error('Error loading chart data:', error);
             displaySessionGraphs({ wpm_data: [], volume_data: [], pitch_data: [], timestamps: [] });
         } else if (chartData) {
-            console.log('[DEBUG] Chart data loaded successfully:', chartData);
             displaySessionGraphs(chartData);
         } else {
-            console.log('[DEBUG] No chart data available');
             displaySessionGraphs({ wpm_data: [], volume_data: [], pitch_data: [], timestamps: [] });
         }
     }
 
     // Calculate percentages based on historical averages
     const percentages = document.querySelectorAll('.metric-percentage');
-    if (percentages.length >= 3 && userSessions.length > 1) {
+    
+    if (percentages.length >= metricConfig.length && userSessions.length > 1) {
         // Calculate historical averages (excluding current session)
-        const historicalSessions = userSessions.slice(1); // Exclude most recent
-        const avgHistoricalWPM = historicalSessions.reduce((sum, s) => sum + (s.average_wpm || 0), 0) / historicalSessions.length;
-        const avgHistoricalVolume = historicalSessions.reduce((sum, s) => sum + (s.average_volume || 0), 0) / historicalSessions.length;
-        const avgHistoricalPitch = historicalSessions.reduce((sum, s) => sum + (s.average_pitch || 0), 0) / historicalSessions.length;
+        const historicalSessions = userSessions.slice(1);
         
-        // Calculate percentage differences
-        const currentWPM = sessionData.average_wpm || 0;
-        const currentVolume = sessionData.average_volume || 0;
-        const currentPitch = sessionData.average_pitch || 0;
-        
-        percentages[0].textContent = calculatePercentage(currentWPM, avgHistoricalWPM);
-        percentages[1].textContent = calculatePercentage(currentVolume, avgHistoricalVolume);
-        percentages[2].textContent = calculatePercentage(currentPitch, avgHistoricalPitch);
+        // Only calculate percentages if we have enough historical data
+        if (historicalSessions.length > 0) {
+            // Calculate historical averages for all metrics in one pass
+            const historicalAverages = metricConfig.map(config => {
+                const sum = historicalSessions.reduce((acc, s) => acc + (s[config.key] || 0), 0);
+                return sum / historicalSessions.length;
+            });
+            
+            // Calculate and set percentages
+            percentages.forEach((element, index) => {
+                if (index < metricConfig.length) {
+                    const currentValue = sessionData[metricConfig[index].key] || 0;
+                    const historicalValue = historicalAverages[index];
+                    const percentageText = calculatePercentage(currentValue, historicalValue);
+                    element.textContent = percentageText;
+                }
+            });
+        } else {
+            // No historical data - set all to 'New'
+            percentages.forEach((element, index) => {
+                if (index < metricConfig.length) {
+                    element.textContent = 'New';
+                }
+            });
+        }
     } else {
-        // No historical data yet
-        if (percentages[0]) percentages[0].textContent = 'New';
-        if (percentages[1]) percentages[1].textContent = 'New';
-        if (percentages[2]) percentages[2].textContent = 'New';
+        // No historical data yet - set all to 'New'
+        percentages.forEach((element, index) => {
+            if (index < metricConfig.length) {
+                element.textContent = 'New';
+            }
+        });
     }
 }
 
@@ -402,7 +514,8 @@ function formatDuration(seconds) {
 }
 
 function calculatePercentage(current, historical) {
-    if (historical === 0) return 'New';
+    if (historical === 0 || historical === null || historical === undefined) return 'New';
+    if (current === null || current === undefined) return 'New';
     
     const percentage = ((current - historical) / historical) * 100;
     const sign = percentage >= 0 ? '+' : '';
@@ -541,11 +654,15 @@ function setupEventListeners() {
             const wpmCanvas = document.getElementById('wpmChart');
             const volumeCanvas = document.getElementById('volumeChart');
             const pitchCanvas = document.getElementById('pitchChart');
+            const confidenceCanvas = document.getElementById('confidenceChart');
+            const silenceCanvas = document.getElementById('silenceChart');
             
-            if (wpmCanvas && volumeCanvas && pitchCanvas) {
+            if (wpmCanvas && volumeCanvas && pitchCanvas && confidenceCanvas && silenceCanvas) {
                 wpmCanvas.style.display = chartType === 'wpm' ? 'block' : 'none';
                 volumeCanvas.style.display = chartType === 'volume' ? 'block' : 'none';
                 pitchCanvas.style.display = chartType === 'pitch' ? 'block' : 'none';
+                confidenceCanvas.style.display = chartType === 'confidence' ? 'block' : 'none';
+                silenceCanvas.style.display = chartType === 'silence' ? 'block' : 'none';
             }
         });
     });

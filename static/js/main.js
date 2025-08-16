@@ -8,7 +8,9 @@ let recordingInitialized = false;
 
 // Function to initialize recording functionality
 export function initializeRecordingFunctionality() {
-    if (recordingInitialized) return; // Prevent double initialization
+    if (recordingInitialized) {
+        return; // Prevent double initialization
+    }
     
     // Query all needed DOM elements
     const startBtn = document.getElementById('startBtn');
@@ -22,7 +24,6 @@ export function initializeRecordingFunctionality() {
 
     // Check if all elements exist (recording interface is visible)
     if (!startBtn || !stopBtn || !transcriptBox) {
-        console.log('Recording interface not ready yet');
         return;
     }
 
@@ -43,7 +44,6 @@ export function initializeRecordingFunctionality() {
     });
 
     recordingInitialized = true;
-    console.log('Recording functionality initialized');
 }
 
 // Initialize theme immediately (this can be done right away)

@@ -43,66 +43,90 @@
         </div>
     </div>
 
-    <!-- Recent Session Section -->
-    <div class="recent-session-section">
-        <div class="section-header">
-            <h2>Recent Session</h2>
-            <div class="session-date">December 15, 2024 • 2:30 PM</div>
-        </div>
-        
-        <!-- Session Overview Card -->
-        <div class="session-overview-card">
-            <div class="overview-header">
-                <div class="session-title">
-                    <h3>Introduction to Machine Learning</h3>
-                    <span class="session-status completed">Completed</span>
+        <!-- Recent Session Section -->
+        <div class="recent-session-section">
+            <div class="section-header">
+                <h2>Recent Session</h2>
+                <div class="session-date">December 15, 2024 • 2:30 PM</div>
+            </div>
+            
+            <!-- Session Overview Card -->
+            <div class="session-overview-card">
+                <div class="overview-header">
+                    <div class="session-title">
+                        <h3>Introduction to Machine Learning</h3>
+                        <span class="session-status completed">Completed</span>
+                    </div>
+                    <div class="session-duration">
+                        <div class="duration-value">45:32</div>
+                        <div class="duration-label">Total Time</div>
+                    </div>
                 </div>
-                <div class="session-duration">
-                    <div class="duration-value">45:32</div>
-                    <div class="duration-label">Total Time</div>
+                
+                <!-- Key Metrics Grid -->
+                <div class="metrics-grid">
+                    <div class="metrics-row">
+                        <div class="metric-card">
+                            <div class="metric-title">WPM</div>
+                            <div class="metric-value">n/a</div>
+                            <div class="metric-percentage">+12%</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-title">AVG Volume</div>
+                            <div class="metric-value">n/a</div>
+                            <div class="metric-percentage">+8%</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-title">Pitch Variance</div>
+                            <div class="metric-value">n/a</div>
+                            <div class="metric-percentage">+15%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="metrics-row">
+                        <div class="metric-card">
+                            <div class="metric-title">Word Confidence</div>
+                            <div class="metric-value">n/a</div>
+                            <div class="metric-percentage">+5%</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-title">Silence Ratio</div>
+                            <div class="metric-value">n/a</div>
+                            <div class="metric-percentage">-3%</div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <!-- Key Metrics Grid -->
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-title">WPM</div>
-                    <div class="metric-value">n/a</div>
-                    <div class="metric-percentage">+12%</div>
+            <!-- Performance Charts Section -->
+            <div class="charts-section">
+                <div class="section-subheader">
+                    <h3>Performance Over Time</h3>
+                    <div class="chart-controls">
+                        <div class="chart-controls-row">
+                            <button class="chart-btn active" data-chart="wpm">WPM</button>
+                            <button class="chart-btn" data-chart="volume">Volume</button>
+                            <button class="chart-btn" data-chart="pitch">Pitch</button>
+                        </div>
+                        <div class="chart-controls-row">
+                            <button class="chart-btn" data-chart="confidence">Confidence</button>
+                            <button class="chart-btn" data-chart="silence">Silence</button>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="metric-card">
-                    <div class="metric-title">AVG Volume</div>
-                    <div class="metric-value">n/a</div>
-                    <div class="metric-percentage">+8%</div>
-                </div>
-                
-                <div class="metric-card">
-                    <div class="metric-title">Pitch Variance</div>
-                    <div class="metric-value">n/a</div>
-                    <div class="metric-percentage">+15%</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Performance Charts Section -->
-        <div class="charts-section">
-            <div class="section-subheader">
-                <h3>Performance Over Time</h3>
-                <div class="chart-controls">
-                    <button class="chart-btn active" data-chart="wpm">WPM</button>
-                    <button class="chart-btn" data-chart="volume">Volume</button>
-                    <button class="chart-btn" data-chart="pitch">Pitch</button>
-                </div>
+                <div class="chart-container">
+	<canvas id="wpmChart" style="width: 100%; height: 300px;"></canvas>
+	<canvas id="volumeChart" style="width: 100%; height: 300px; display: none;"></canvas>
+	<canvas id="pitchChart" style="width: 100%; height: 300px; display: none;"></canvas>
+	<canvas id="confidenceChart" style="width: 100%; height: 300px; display: none;"></canvas>
+	<canvas id="silenceChart" style="width: 100%; height: 300px; display: none;"></canvas>
+</div>
             </div>
             
-            <div class="chart-container">
-                <canvas id="wpmChart" style="width: 100%; height: 300px;"></canvas>
-                <canvas id="volumeChart" style="width: 100%; height: 300px; display: none;"></canvas>
-                <canvas id="pitchChart" style="width: 100%; height: 300px; display: none;"></canvas>
-            </div>
-        </div>
-
 
         <!-- Goals Section -->
         <div class="goals-section">
@@ -152,29 +176,29 @@
         <!-- Feedback & Insights Section -->
         <div class="feedback-section">
             <div class="feedback-overview-card">
-                <div class="section-subheader">
+            <div class="section-subheader">
                     <h3>Feedback & Insights</h3>
                     <p>Get personalized feedback on your speaking performance</p>
-                </div>
-                
+            </div>
+            
                 <div class="feedback-grid">
                     <div class="feedback-card positive">
                         <div class="feedback-title">What's Working Well</div>
                         <div class="feedback-content">
                             <p>You are doing really well with your pacing, keep it up!</p>
-                        </div>
                     </div>
-                    
+                </div>
+                
                     <div class="feedback-card constructive">
                         <div class="feedback-title">Areas to Improve</div>
                         <div class="feedback-content">
                             <p>Try to maintain more consistent volume levels throughout your presentation.</p>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        
+    </div>
+
         <!-- Session Actions -->
         <div class="session-actions-section">
             <button class="btn btn-primary">Download Transcript</button>

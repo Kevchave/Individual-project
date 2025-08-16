@@ -273,7 +273,7 @@ def get_current_transcript():
 def get_current_metrics():
     global metrics
     if metrics is None:
-        return {'wpm': 0, 'volume': 0, 'pitch': 0}
+        return {'wpm': 0, 'volume': 0, 'pitch': 0, 'confidence': 0, 'silence': 0}
     
     # Store the current metrics for dashboard graphs (matches live experience)
     if metrics is not None:
@@ -281,10 +281,16 @@ def get_current_metrics():
         metrics.store_polled_metrics()
         print(f"[DEBUG] After storing - polled count: {len(metrics.polled_wpm_history)}")
     
+    # Get current confidence and silence from the latest polled data
+    current_confidence = metrics.polled_confidence_history[-1] if metrics.polled_confidence_history else 0
+    current_silence = metrics.polled_silence_ratio_history[-1] if metrics.polled_silence_ratio_history else 0
+    
     return {
         'wpm': float(metrics.current_wpm),
         'volume': float(metrics.current_volume),
-        'pitch': float(metrics.current_pitch)
+        'pitch': float(metrics.current_pitch),
+        'confidence': float(current_confidence),
+        'silence': float(current_silence)
     }
 
 def get_final_transcript():
@@ -301,18 +307,24 @@ def get_average_metrics():
         return {
             'average_wpm':     0.0,
             'average_volume':  0.0,
-            'average_pitch':   0.0
+            'average_pitch':   0.0,
+            'average_confidence': 0.0,
+            'average_silence_ratio': 0.0
         }
 
     # Recompute the averages
     metrics.track_wpm_average()
     metrics.track_volume_average()
     metrics.track_overall_pitch()
+    metrics.track_average_confidence()
+    metrics.track_average_silence_ratio()
 
     return {
         'average_wpm':     float(metrics.average_wpm),
         'average_volume':  float(metrics.average_volume),
-        'average_pitch':   float(metrics.average_pitch)
+        'average_pitch':   float(metrics.average_pitch),
+        'average_confidence': float(metrics.average_confidence or 0),
+        'average_silence_ratio': float(metrics.average_silence_ratio or 0)
     }
 
 def get_adaptive_controller_status():
