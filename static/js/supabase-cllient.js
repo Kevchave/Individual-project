@@ -384,14 +384,30 @@ export async function getSessionMetrics(sessionId) {
     }
 }
 
-// Get session metrics statistics using the database function
+// Get session metrics statistics using direct queries
 export async function getSessionMetricsStats(sessionId) {
     try {
-        // Call the database function we created to get summary statistics
         const { data, error } = await supabase
-            .rpc('get_session_metrics_stats', { session_uuid: sessionId })
+            .from('session_metrics')
+            .select('wpm, volume, pitch, confidence_score, silence_ratio')
+            .eq('session_id', sessionId)
         
-        return { data: data || null, error }
+        if (error) return { data: null, error }
+        
+        if (!data || data.length === 0) {
+            return { data: null, error: 'No metrics found' }
+        }
+        
+        // Calculate averages manually
+        const stats = {
+            avg_wpm: data.reduce((sum, row) => sum + (row.wpm || 0), 0) / data.length,
+            avg_volume: data.reduce((sum, row) => sum + (row.volume || 0), 0) / data.length,
+            avg_pitch: data.reduce((sum, row) => sum + (row.pitch || 0), 0) / data.length,
+            avg_confidence: data.reduce((sum, row) => sum + (row.confidence_score || 0), 0) / data.length,
+            avg_silence_ratio: data.reduce((sum, row) => sum + (row.silence_ratio || 0), 0) / data.length
+        }
+        
+        return { data: stats, error: null }
     } catch (err) {
         return { data: null, error: err }
     }

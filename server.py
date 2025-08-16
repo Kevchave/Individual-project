@@ -1,4 +1,9 @@
+import os
 from flask import Flask, render_template, jsonify
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 from transcriber_app.main import (
     start_transcription_pipeline,
     stop_transcription_pipeline,
@@ -24,6 +29,10 @@ from transcriber_app.main import (
 
 # Creates an instance of the Flask class (aka application)
 app = Flask(__name__)
+
+# Load environment variables
+app.config['GEMINI_API_KEY'] = os.getenv('GEMINI_API_KEY')
+print(f"GEMINI_API_KEY loaded: {app.config['GEMINI_API_KEY'][:10]}..." if app.config['GEMINI_API_KEY'] else "GEMINI_API_KEY not found")
 
 # Defines a route for the route URL "/"
 # - when a user visits the "/" URL, call the home() function 

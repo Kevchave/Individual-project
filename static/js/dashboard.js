@@ -9,6 +9,7 @@ import { getCurrentUser, getUserSessions, getUserProfile, getUserGoals, getSessi
 import { initialiseCharts } from './charts.js';
 import { currentTheme } from './theme.js';
 import { wpmChart, volumeChart, pitchChart, confidenceChart, silenceChart } from './state.js';
+import { initAIFeedback, updateAIFeedback, updateSessionsData } from './ai/dashboard-integration.js';
 
 // Initialise global variables to store data    
 let currentUser = null;     // Current logged in user
@@ -40,6 +41,9 @@ async function initDashboard() {
     
     // Initialize charts
     initialiseCharts(currentTheme);
+    
+    // Initialize AI feedback
+    initAIFeedback(currentUser, userGoals);
     
     // Apply initial filter (most recent session by default)
     applyFilter();
@@ -98,10 +102,12 @@ function applyFilter() {
         displayMultipleSessionsView();
     }
     
-    // Update statistics, charts, and goals
+    // Update statistics, charts, goals, and AI feedback
     updateStatistics();
     updateCharts();
     updateGoalsDisplay();
+    updateSessionsData(filteredSessions);
+    updateAIFeedback();
 }
 
 // Display view for most recent session
@@ -224,8 +230,8 @@ function updateAverageMetrics() {
 // Update charts based on current filter
 function updateCharts() {
     if (currentFilter === 'most_recent') {
-        // Load detailed graph data for most recent session
-        loadRecentSessionGraphData();
+        // Charts are already loaded via displayRecentSession() -> getSessionMetricsForCharts()
+        console.log('Recent session charts loaded from database');
     } else {
         // Display aggregated data for multiple sessions
         displayAggregatedCharts();
@@ -291,29 +297,6 @@ function displayAggregatedCharts() {
         silenceChart.update('none');
     }
 }
-
-
-
-// Fetch graph data for the most recent session
-async function loadRecentSessionGraphData() {
-    try {
-        const response = await fetch('/get_session_data');
-        if (response.ok) {
-            const sessionData = await response.json();
-            if (sessionData && sessionData.graph_data) {
-                displaySessionGraphs(sessionData.graph_data);
-            } else {
-                console.log('No detailed graph data available');
-            }
-        } else {
-            console.log('Failed to fetch session data');
-        }
-    } catch (error) {
-        console.log('No recent session graph data available:', error);
-    }
-}
-
-
 
 // Display session graph data in charts
 function displaySessionGraphs(graphData) {
@@ -452,8 +435,17 @@ async function displayRecentSession(sessionData) {
         if (historicalSessions.length > 0) {
             // Calculate historical averages for all metrics in one pass
             const historicalAverages = metricConfig.map(config => {
-                const sum = historicalSessions.reduce((acc, s) => acc + (s[config.key] || 0), 0);
-                return sum / historicalSessions.length;
+                // Filter out null/undefined values for more accurate averages
+                const validValues = historicalSessions
+                    .map(s => s[config.key])
+                    .filter(val => val !== null && val !== undefined && val !== 0);
+                
+                if (validValues.length === 0) {
+                    return null; // No valid historical data
+                }
+                
+                const sum = validValues.reduce((acc, val) => acc + val, 0);
+                return sum / validValues.length;
             });
             
             // Calculate and set percentages
