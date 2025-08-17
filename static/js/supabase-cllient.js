@@ -398,13 +398,13 @@ export async function getSessionMetricsStats(sessionId) {
             return { data: null, error: 'No metrics found' }
         }
         
-        // Calculate averages manually
+        // Calculate averages manually - handle string to number conversion
         const stats = {
-            avg_wpm: data.reduce((sum, row) => sum + (row.wpm || 0), 0) / data.length,
-            avg_volume: data.reduce((sum, row) => sum + (row.volume || 0), 0) / data.length,
-            avg_pitch: data.reduce((sum, row) => sum + (row.pitch || 0), 0) / data.length,
-            avg_confidence: data.reduce((sum, row) => sum + (row.confidence_score || 0), 0) / data.length,
-            avg_silence_ratio: data.reduce((sum, row) => sum + (row.silence_ratio || 0), 0) / data.length
+            avg_wpm: data.reduce((sum, row) => sum + (parseFloat(row.wpm) || 0), 0) / data.length,
+            avg_volume: data.reduce((sum, row) => sum + (parseFloat(row.volume) || 0), 0) / data.length,
+            avg_pitch: data.reduce((sum, row) => sum + (parseFloat(row.pitch) || 0), 0) / data.length,
+            avg_confidence: data.reduce((sum, row) => sum + (parseFloat(row.confidence_score) || 0), 0) / data.length,
+            avg_silence_ratio: data.reduce((sum, row) => sum + (parseFloat(row.silence_ratio) || 0), 0) / data.length
         }
         
         return { data: stats, error: null }

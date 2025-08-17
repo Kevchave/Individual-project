@@ -27,11 +27,11 @@ class SimpleAIFeedback {
 
         Session Data:
         - Duration: ${sessionData.duration_seconds || 0} seconds
-        - Average WPM: ${stats.avg_wpm || 0}
-        - Average Volume: ${stats.avg_volume || 0} dB
-        - Average Pitch: ${stats.avg_pitch || 0} Hz
-        - Average Confidence: ${stats.avg_confidence || 0}
-        - Average Silence Ratio: ${stats.avg_silence_ratio || 0}
+        - Average WPM: ${stats.avg_wpm || 0} (words per minute - speaking speed)
+        - Average Volume: ${stats.avg_volume || 0} dB (audio loudness - higher is louder)
+        - Average Pitch: ${stats.avg_pitch || 0} Hz (voice frequency - typically 85-255 Hz for adults)
+        - Average Confidence: ${stats.avg_confidence || 0} (transcription accuracy 0-1, NOT speaker confidence - higher means clearer speech/audio)
+        - Average Silence Ratio: ${stats.avg_silence_ratio || 0} (proportion of silence vs speech, 0-1 scale)
 
         User Goals:
         - WPM Target: ${userGoals?.target_wpm || 'Not set'}
@@ -47,7 +47,12 @@ class SimpleAIFeedback {
 
         prompt += `
 
-        IMPORTANT: Respond ONLY with valid JSON in this exact format. Do not include any other text, explanations, or markdown formatting:
+        IMPORTANT CONTEXT:
+        - "Confidence" refers to how well the speech recognition system understood the audio (audio quality, speech clarity), NOT the speaker's self-confidence
+        - "Silence Ratio" measures pauses and gaps in speech (lower is more continuous speaking)
+        - Focus on actionable, specific feedback based on the metrics provided
+
+        Respond ONLY with valid JSON in this exact format. Do not include any other text, explanations, or markdown formatting:
 
         {
             "positive_note": "One specific thing they're doing well",
@@ -74,11 +79,13 @@ class SimpleAIFeedback {
             });
         });
 
-        return `Session Metrics:
-${sessions.map(s => `Session ${s.session}: WPM=${s.wpm}, Volume=${s.volume}dB, Pitch=${s.pitch}Hz, Confidence=${s.confidence}, Silence=${s.silence_ratio}`).join('\n')}
+        return `Historical Session Metrics (Confidence = transcription accuracy, not speaker confidence):
+${sessions.map(s => `Session ${s.session}: WPM=${s.wpm}, Volume=${s.volume}dB, Pitch=${s.pitch}Hz, Transcription_Accuracy=${s.confidence}, Silence_Ratio=${s.silence_ratio}`).join('\n')}
 
 Analyze the trends across these sessions and provide insights on progress.`;
     }
+
+
 
     async callAI(prompt) {
         if (!this.apiKey) {
@@ -86,7 +93,6 @@ Analyze the trends across these sessions and provide insights on progress.`;
         }
     
         console.log('Making Gemini API call with model:', this.model);
-        console.log('API key starts with:', this.apiKey.substring(0, 10) + '...');
     
         const response = await fetch(`${this.apiEndpoint}?key=${this.apiKey}`, {
             method: 'POST',
