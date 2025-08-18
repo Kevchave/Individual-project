@@ -1,0 +1,101 @@
+[
+  {
+    "audio_file": "10sec_medium_pace_audio.mp3",
+    "model_type": "adaptive",
+    "config": "ADAPTIVE VAD (1/20ms/10 frames)",
+    "word_count": 9,
+    "processing_latency": 2.0106191635131836,
+    "end_to_end_latency": 2.0106191635131836,
+    "wer_score": 0.5,
+    "recorded_transcript": " The human voice. It's the instrument we all play.",
+    "correct_transcript": "The human voice:\nIt's the instrument we all play.\nIt's the most powerful sound in the world, probably."
+  },
+  {
+    "audio_file": "10sec_medium_pace_audio.mp3",
+    "model_type": "adaptive",
+    "config": "ADAPTIVE VAD (1/20ms/10 frames)",
+    "word_count": 9,
+    "processing_latency": 1.197835922241211,
+    "end_to_end_latency": 1.197835922241211,
+    "wer_score": 0.5,
+    "recorded_transcript": " The human voice. It's the instrument we all play.",
+    "correct_transcript": "The human voice:\nIt's the instrument we all play.\nIt's the most powerful sound in the world, probably."
+  },
+  {
+    "audio_file": "10sec_medium_pace_audio.mp3",
+    "model_type": "adaptive",
+    "config": "ADAPTIVE VAD (1/20ms/10 frames)",
+    "word_count": 9,
+    "processing_latency": 1.179319143295288,
+    "end_to_end_latency": 1.179319143295288,
+    "wer_score": 0.5,
+    "recorded_transcript": " The human voice. It's the instrument we all play.",
+    "correct_transcript": "The human voice:\nIt's the instrument we all play.\nIt's the most powerful sound in the world, probably."
+  },
+  {
+    "audio_file": "10sec_medium_pace_audio.mp3",
+    "model_type": "adaptive",
+    "config": "ADAPTIVE VAD (2/20ms/10 frames)",
+    "word_count": 9,
+    "processing_latency": 1.0972659587860107,
+    "end_to_end_latency": 1.0972659587860107,
+    "wer_score": 0.5,
+    "recorded_transcript": " The human voice. It's the instrument we all play.",
+    "correct_transcript": "The human voice:\nIt's the instrument we all play.\nIt's the most powerful sound in the world, probably."
+  },
+  {
+    "audio_file": "10sec_medium_pace_audio.mp3",
+    "model_type": "adaptive",
+    "config": "ADAPTIVE VAD (2/20ms/10 frames)",
+    "word_count": 9,
+    "processing_latency": 1.3440730571746826,
+    "end_to_end_latency": 1.3440730571746826,
+    "wer_score": 0.5,
+    "recorded_transcript": " The human voice. It's the instrument we all play.",
+    "correct_transcript": "The human voice:\nIt's the instrument we all play.\nIt's the most powerful sound in the world, probably."
+  },
+  {
+    "audio_file": "10sec_medium_pace_audio.mp3",
+    "model_type": "adaptive",
+    "config": "ADAPTIVE VAD (2/20ms/10 frames)",
+    "word_count": 9,
+    "processing_latency": 1.1781058311462402,
+    "end_to_end_latency": 1.1781058311462402,
+    "wer_score": 0.5,
+    "recorded_transcript": " The human voice. It's the instrument we all play.",
+    "correct_transcript": "The human voice:\nIt's the instrument we all play.\nIt's the most powerful sound in the world, probably."
+  },
+  {
+    "audio_file": "10sec_medium_pace_audio.mp3",
+    "model_type": "adaptive",
+    "config": "ADAPTIVE VAD (3/20ms/10 frames)",
+    "word_count": 9,
+    "processing_latency": 0.8653205633163452,
+    "end_to_end_latency": 0.8653205633163452,
+    "wer_score": 0.5,
+    "recorded_transcript": " The human voice.  It's the instrument we all play.",
+    "correct_transcript": "The human voice:\nIt's the instrument we all play.\nIt's the most powerful sound in the world, probably."
+  },
+  {
+    "audio_file": "10sec_medium_pace_audio.mp3",
+    "model_type": "adaptive",
+    "config": "ADAPTIVE VAD (3/20ms/10 frames)",
+    "word_count": 9,
+    "processing_latency": 0.886401891708374,
+    "end_to_end_latency": 0.886401891708374,
+    "wer_score": 0.5,
+    "recorded_transcript": " The human voice.  It's the instrument we all play.",
+    "correct_transcript": "The human voice:\nIt's the instrument we all play.\nIt's the most powerful sound in the world, probably."
+  },
+  {
+    "audio_file": "10sec_medium_pace_audio.mp3",
+    "model_type": "adaptive",
+    "config": "ADAPTIVE VAD (3/20ms/10 frames)",
+    "word_count": 9,
+    "processing_latency": 0.8656275272369385,
+    "end_to_end_latency": 0.8656275272369385,
+    "wer_score": 0.5,
+    "recorded_transcript": " The human voice.  It's the instrument we all play.",
+    "correct_transcript": "The human voice:\nIt's the instrument we all play.\nIt's the most powerful sound in the world, probably."
+  }
+]

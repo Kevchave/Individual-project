@@ -1,0 +1,184 @@
+====================================================================================================
+TRANSCRIPTION TEST RESULTS REPORT
+====================================================================================================
+
+SUMMARY TABLE
+----------------------------------------------------------------------------------------------------
+config/params                   | audio_file                  | avg processing  | avg WER   
+----------------------------------------------------------------------------------------------------
+FIXED (1.0s chunks)            | 10sec_medium_pace_audio.mp3 | 0.000s          | 1.000     
+----------------------------------------------------------------------------------------------------
+FIXED (1.5s chunks)            | 10sec_medium_pace_audio.mp3 | 0.000s          | 1.000     
+----------------------------------------------------------------------------------------------------
+FIXED (2.5s chunks)            | 10sec_medium_pace_audio.mp3 | 0.000s          | 1.000     
+----------------------------------------------------------------------------------------------------
+FIXED (3.0s chunks)            | 10sec_medium_pace_audio.mp3 | 0.000s          | 1.000     
+----------------------------------------------------------------------------------------------------
+
+
+DETAILED RESULTS
+====================================================================================================
+
+Test: FIXED (1.0s chunks) - 10sec_medium_pace_audio.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 0.000s
+End-to-End Latency: 0.000s
+Word Count: 0
+WER Score: 1.000
+
+Reference Transcript:
+The human voice:
+It's the instrument we all play.
+It's the most powerful sound in the world, probably.
+
+Iteration #2
+------------------------------
+Processing Latency: 0.000s
+End-to-End Latency: 0.000s
+Word Count: 0
+WER Score: 1.000
+
+Reference Transcript:
+The human voice:
+It's the instrument we all play.
+It's the most powerful sound in the world, probably.
+
+Iteration #3
+------------------------------
+Processing Latency: 0.000s
+End-to-End Latency: 0.000s
+Word Count: 0
+WER Score: 1.000
+
+Reference Transcript:
+The human voice:
+It's the instrument we all play.
+It's the most powerful sound in the world, probably.
+
+================================================================================
+
+Test: FIXED (1.5s chunks) - 10sec_medium_pace_audio.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 0.000s
+End-to-End Latency: 0.000s
+Word Count: 0
+WER Score: 1.000
+
+Reference Transcript:
+The human voice:
+It's the instrument we all play.
+It's the most powerful sound in the world, probably.
+
+Iteration #2
+------------------------------
+Processing Latency: 0.000s
+End-to-End Latency: 0.000s
+Word Count: 0
+WER Score: 1.000
+
+Reference Transcript:
+The human voice:
+It's the instrument we all play.
+It's the most powerful sound in the world, probably.
+
+Iteration #3
+------------------------------
+Processing Latency: 0.000s
+End-to-End Latency: 0.000s
+Word Count: 0
+WER Score: 1.000
+
+Reference Transcript:
+The human voice:
+It's the instrument we all play.
+It's the most powerful sound in the world, probably.
+
+================================================================================
+
+Test: FIXED (2.5s chunks) - 10sec_medium_pace_audio.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 0.000s
+End-to-End Latency: 0.000s
+Word Count: 0
+WER Score: 1.000
+
+Reference Transcript:
+The human voice:
+It's the instrument we all play.
+It's the most powerful sound in the world, probably.
+
+Iteration #2
+------------------------------
+Processing Latency: 0.000s
+End-to-End Latency: 0.000s
+Word Count: 0
+WER Score: 1.000
+
+Reference Transcript:
+The human voice:
+It's the instrument we all play.
+It's the most powerful sound in the world, probably.
+
+Iteration #3
+------------------------------
+Processing Latency: 0.000s
+End-to-End Latency: 0.000s
+Word Count: 0
+WER Score: 1.000
+
+Reference Transcript:
+The human voice:
+It's the instrument we all play.
+It's the most powerful sound in the world, probably.
+
+================================================================================
+
+Test: FIXED (3.0s chunks) - 10sec_medium_pace_audio.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 0.000s
+End-to-End Latency: 0.000s
+Word Count: 0
+WER Score: 1.000
+
+Reference Transcript:
+The human voice:
+It's the instrument we all play.
+It's the most powerful sound in the world, probably.
+
+Iteration #2
+------------------------------
+Processing Latency: 0.000s
+End-to-End Latency: 0.000s
+Word Count: 0
+WER Score: 1.000
+
+Reference Transcript:
+The human voice:
+It's the instrument we all play.
+It's the most powerful sound in the world, probably.
+
+Iteration #3
+------------------------------
+Processing Latency: 0.000s
+End-to-End Latency: 0.000s
+Word Count: 0
+WER Score: 1.000
+
+Reference Transcript:
+The human voice:
+It's the instrument we all play.
+It's the most powerful sound in the world, probably.
+
+================================================================================

@@ -27,7 +27,7 @@ numba==0.61.2
 numpy==2.2.6
 openai-whisper==20250625
 packaging==25.0
-pandas==2.3.1
+# pandas==2.3.1  # Removed - not used in simplified version
 pillow==11.3.0
 pip-tools==7.4.1
 platformdirs==4.3.8
