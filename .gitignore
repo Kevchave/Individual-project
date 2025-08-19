@@ -10,3 +10,5 @@ __pycache__/
 .env
 test_framework/audio_files/uncropped/
 test_framework/audio_files/uncropped/
+# Large test audio files - keep locally but don't track in Git
+test_framework/audio_files/5min_versions/*.mp3
