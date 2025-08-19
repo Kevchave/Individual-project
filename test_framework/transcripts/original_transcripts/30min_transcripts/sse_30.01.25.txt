@@ -1,0 +1,619 @@
+So, uh, I wanted to talk today a little bit about some more aspects of scaling up our application.
+3:08
+I think there's a few kind of dimensions that we might be scaling.
+3:16
+Like it might be scaling to have more capacity to have more users.
+3:19
+So if you're building a business, obviously you want to try and grow that business.
+3:23
+Typically you want more users to use your product. You want to support that.
+3:26
+How can we do that? There's also an aspect of reliability as well.
+3:30
+So in the same case where we're starting to grow, we start to have more people using our system.
+3:35
+We want it to be more reliable, so we don't want it to go down, especially when lots of people are using it.
+3:40
+Maybe lots of people are spending money through it. There's also aspects which we've been thinking about a little bit this time about cost.
+3:45
+So you could scale up everything just by spending loads of money on everything.
+3:53
+But maybe there's an optimisation to be made that right. Maybe you don't want to spend too much money on things that you don't need to.
+3:57
+Maybe there's a way for us to architect the system so we pay in money, but we need to pay money.
+4:04
+But we don't pay money for things that would be a waste.
+4:08
+And then the last thing I think that we would start to think about, which we talked a bit about yesterday when we talked about designing the system,
+4:12
+in breaking it up into small services that could be looked after, perhaps by different developers in different teams.
+4:18
+Working independently is like, if you're growing a company, you're growing an engineering team.
+4:24
+You can't have everyone work together in one team on one thing all the time.
+4:29
+So how are we actually going to like, organise that, break that up,
+4:35
+organise the system so that it allows people to work more independently so that you can be more productive.
+4:39
+And so kind of when we were designing this course, something that I was thinking about was like, where would I like to get to?
+4:45
+Why did I like all of you to get to like by the end of this course, I thought about this book.
+4:53
+I wrote this book almost to have a look.
+4:58
+So this book came out a couple of years ago, and it's really like sort of targeted at people who are interviewing at tech companies.
+5:01
+And what has become popular in recent years is to do coding interviews and algorithmic things,
+5:08
+but also this system design interview where they talk about, okay, how would we design a system that would do this?
+5:13
+And they're not talking about how would we write the code to do this within a particular function or anything they're thinking about,
+5:20
+you know, what are the components that we would have? How would you deploy them?
+5:26
+How would you put them together? What kind of choices would you make that would solve a particular problem?
+5:29
+And so because these courses were like in parallel to the principles and practice of programming, I thought, okay,
+5:35
+well, I don't want this course to be all about learning to program things because we're kind of doing the math.
+5:41
+But what are all the other things that we need to know in order to design a system effectively?
+5:45
+And so I'll talk to you a little bit today about some of the, some aspects of like some of the things that come out in this book,
+5:51
+but you can have a look it's worth it's not a what do I mean?
+5:58
+It's a good book. It's useful to look at. It's not quite as polished as maybe some other books are,
+6:03
+but it's definitely written by someone who's been through a lot of these interviews and also sat on the other side.
+6:10
+They were particularly popular. I Amazon started to do that first, I think, and then Facebook did a lot of these type of interviews.
+6:15
+And now across lots of different tech companies, these are quite popular.
+6:21
+And so the sort of questions they have is like, how would you design a newsfeed system like,
+6:25
+you know, it would be serving hundreds of thousands of people or, uh, designing a URL shortener.
+6:30
+So you offer a service where people can shorten their URL and then, you know, you are serving those out and then fulfilling the longer URLs.
+6:36
+What else have we got here? Uh, designing a rate limiting system.
+6:45
+What was that? The chat system. It's kind of interesting. Uh, search autocomplete is kind of interesting.
+6:54
+So when you type in, like the front search box of Google and you start to type a couple of letters, but it's actually auto completing that.
+7:02
+How is it doing that? Like what's the pattern that you do when you do that?
+7:10
+And how do you do that at scale that Google operates at? So and you can see in the book there's lots of these like diagrams of different pieces that
+7:13
+would fit together kind of in the style that we've been looking at in the past week or two.
+7:21
+And so as you start to go through the project, we're going to do in the rest of the time, like,
+7:26
+this is the sort of level that we want to start thinking about the system design, not so much.
+7:30
+How would I code up a particular function,
+7:35
+but more how are we going to design the system so it has suitable qualities in terms of what kind of capacity we could have,
+7:37
+what kind of reliability we could have, what kind of cost we would need to incur,
+7:44
+or where we might be able to make some efficiencies and how it would support our development team
+7:48
+growing and our organisation being able to keep maintaining that system and grow over time.
+7:53
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+8:00
+Uh, I think it's kind of quite instructive about thinking about this iteratively taking a system that, you know,
+8:09
+is quite small to start with, but functional, and gradually applying more and more technical things to try to scale it up.
+8:15
+And you wouldn't go to the end state immediately, because that would be it would be a lot of engineering work,
+8:22
+and it would probably be quite expensive, and it would take a long time to build, and you don't need it in order to support 100 users.
+8:28
+But if you have a million users, then you might need to have this so you can see how we might grow it over time.
+8:34
+And so the system that I start off with is a pretty simple web app, and it's kind of in the same style that we've been writing in this course so far.
+8:42
+So you've got someone using the system through a browser,
+8:51
+and then we've got a backend server that we've written with some code that we've written in a language like Python or Java or JavaScript.
+8:55
+Uh, it's got a database. And in this example we've got a cache.
+9:04
+So if you've computed some data by doing a big select on the database, and that's going to be done quite often.
+9:09
+And people ask for the same things often you don't need to do that. Select again necessarily if you've pre-calculated it.
+9:15
+So we can just store it in a big dictionary basically in memory, and use that as a cache to say before we check the database for this,
+9:21
+which might be a little bit slow, let's see if we've already computed that and just return it.
+9:29
+Or maybe we could say maybe we've already generated this web page and we could return that because we've done that recently.
+9:33
+But in the first iteration of the system, it's all running on one machine.
+9:40
+So like think back to well, the week before last we made VMs in Azure and you installed flask applications on that.
+9:44
+You could have installed Postgres databases on there. You could have installed Redis caches on that.
+9:52
+Last week in this session even was doing that on his laptop.
+9:59
+So he basically had Docker containers for all these things, but everything was running on his laptop.
+10:01
+And so that's like a perfectly functional system architecture that we could have.
+10:06
+And if you think back to like how the flow of the request goes,
+10:12
+think back to like right at the beginning when Sergio was talking about how the network works,
+10:17
+we see that someone types into their browser the address of our system.
+10:23
+They type in a domain name and URL that is, first of all, the browser looks up in DNS.
+10:28
+Okay, what's the IP address that this domain name corresponds to?
+10:33
+Gets back an IP address. The browser then sends traffic to this IP address.
+10:38
+Sends the request back. Comes through to our server here.
+10:43
+Outside of a process set in the way that we have programmed it to.
+10:47
+And then the response goes back to the browser. And that works pretty well right.
+10:51
+But as we start to have more and more users what using our system, we might find that there's a little bit of a limitation in capacity here.
+10:56
+And also if this is this server happens to go down for any time, um, then all of our system is offline, right?
+11:06
+Because this machine is running everything. So we'd like to be able to try to combat both of those problems, uh,
+11:12
+which are sort of nice problems to have if we have demands that we need to do that.
+11:19
+So the first thing we could do, right is not really a system design.
+11:23
+Think it's a hope, but this is like application of money is like just buy a better computer.
+11:27
+So if you were running this on a server that you had bought and installed in a co-location facility somewhere,
+11:32
+and you found that, you know, you would actually doing quite well with your business, you're having quite a lot of traffic.
+11:39
+Um, so your server was struggling, you could buy a more powerful one, and then you could plug it in and you could install the software on it.
+11:44
+That would be fine, right? That would give you a bit more. If you're running in the clouds,
+11:51
+then you don't have to go through there buying the server and going and installing it in the co-location facility parts.
+11:56
+You just go on to Azure Console or AWS console, and when you selected provision a virtual machine, you chose what type of machine it was.
+12:02
+And you said, uh, you know, this was used quite simple once, but you could have chosen a more expensive one that was more powerful.
+12:11
+And so you want to do that, just choose those options.
+12:18
+You get a more powerful machine, you install all the same stuff on it, and now we have more capacity.
+12:21
+So that's like one of the nice things about using the cloud in that way is that it's easy to provision these things,
+12:25
+and we can provision just enough that we need, and we can keep doing that and keep adding capacity.
+12:31
+That way. When we talk about buying a bigger computer model, this is what I call, um, a vertical scaling.
+12:37
+So basically we just make this box bigger and everything has more computation applied to it in the same sort of ratio.
+12:44
+So it's what we do is like we get a bit more capacity for the web app.
+12:53
+We get a bit more capacity for the database.
+12:56
+We get a bit more capacity for the cache because we put more CPU, Ram and disk into the machine that's running that.
+12:58
+So we haven't really changed it, particularly according to like which bit really needs a bit more capacity.
+13:05
+We just said like just put everything on a bigger computer and there will be space for it to expand.
+13:11
+The next step beyond that is probably to pull some things off our one computer.
+13:20
+So in this case, we've got one computer that runs everything. And often the most logical thing to pull off first is the database.
+13:25
+And this might be because we want to have a specialised machine that runs the database that's configured and optimised for running a database.
+13:34
+And typically that might be something maybe with a bit more memory, maybe with a bit more disk that we don't need.
+13:42
+You'll have noticed that your, you know, your Python web applications,
+13:49
+they don't really write any data to disk, so they don't need very much disk space.
+13:52
+Uh, they don't keep a lot of stuff in memory, but that's very sort of transactional.
+13:56
+So your request comes in, it gets processed, comes out again, gets thrown away.
+14:01
+So it's helpful for these to be quite fast, but they don't really need lots of Ram and lots of disk.
+14:06
+Whereas the database works much better when it's got lots of Ram. And if you have a lot of data than a lot of disk as well.
+14:12
+So you might have quite a different sort of resource profile that's useful.
+14:18
+So you might want to spend spend your money here but not really spend your money here up.
+14:23
+So that separation allows us to specialise a little bit.
+14:29
+What's going on on the two different machines. And as soon as we move this off, like we get a bit more space on this one anyway,
+14:33
+so this one can expand and this one's got its own dedicated machine that's just going to run the database.
+14:40
+And in that case,
+14:46
+we didn't do very much to the architecture apart from when you had the connection string in your code that says where is my database,
+14:47
+how to connect to it? Instead of it being on the same machine, we just connected it over the network on another machine.
+14:53
+And as long as that machine is nearby, then that shouldn't that should be equally as fast.
+15:00
+Pretty much. I think we talked last week, maybe about some of the statistics about how how quickly it was to go over the
+15:06
+wire as long as you were within the data centre and reading data from the map.
+15:13
+So you've got lots of memory in your database, and you want to read a chunk of data across the wire,
+15:18
+and you don't need never hit the disk like it's going to be really fast. That's going to be faster than reading off the disk of this machine.
+15:22
+So moving it onto another machine, as long as it's physically relatively close by, it's going to be pretty fast.
+15:29
+What we didn't do in the last case was we didn't have any increased reliability.
+15:41
+So we've only got one of each thing. We've got one machine that runs this.
+15:47
+We've got one machine that runs this. And if either of those goes down. Then, you know, we've got some part of our system that doesn't work.
+15:50
+And and pretty much the whole system wouldn't work in that case.
+16:00
+We also, increasingly, as we put more and more money in, will say we need a bigger and bigger machine.
+16:05
+It tends to be sort of exponentially more expensive. And so I talked to last week about the Google case, where in fact,
+16:11
+they solved this problem by having lots and lots of cheap machines rather than buying very expensive machines.
+16:17
+And so the model that we sort of work towards in this case, is that let's just try and replicate some of these and have some more of them.
+16:23
+So rather than having big machines but not many, let's have smaller machines and more of them.
+16:31
+And this has a side effect benefit of if one of these happens to go down and crash, then you've still got some more that can keep your service up.
+16:38
+And so having a group of these things that all have the same software installed on them gives you an easy way to add capacity,
+16:48
+because just add more cheap machines just with the same software installed on them.
+16:56
+And it gives us this redundancy that if any of them happens to break, then we still got a whole bunch of other ones that are doing that job.
+17:00
+And so traffic to them should be okay. The user should not notice unless you know 90% of your servers go down.
+17:08
+And so in order to achieve this, we add in this concept of the load balancer,
+17:16
+which I think I also talked a little bit when we talked about cloud deployment.
+17:22
+So this is something that goes in front of your group of servers that have your web application.
+17:26
+So in an older configuration, if we weren't using something like Amazon or Azure, but we were just using our own servers,
+17:33
+and this would be a piece of software that you would download and install on a machine.
+17:40
+And its job is just basically to forward requests on.
+17:47
+So the requests still start from the browser in the same way.
+17:50
+DNS works in the same way, but when you get an IP address back for where is our application,
+17:53
+it's not going to point to this server or this server or this server.
+17:59
+It's going to point at a load balancer. And so you say send all the requests to this load balancer.
+18:03
+And then the load balancers job is to pick one of the servers that actually has the application code on it, and to forward it to one of those.
+18:10
+And you can have various policies for how to do that. So the simplest one is round robin.
+18:20
+So round robin says if I send a first request to this one, send the second request to this one, the third request this one, and so on.
+18:25
+Then there are other policies that say how busy is it?
+18:33
+If this one seems to be busy, let's send it some of the other ones and wait a little bit for this one to recover.
+18:37
+So it's sort of sharing the load out.
+18:44
+And there's more sophisticated, um, algorithms depending on how much the load balancer knows about these machines.
+18:46
+But something you can do is like you could say, oh, last time I sent a request to that one, I didn't get anything back.
+18:56
+Um. I'm not I'm going to leave that one for a while and I'm going to concentrate on the others.
+19:01
+So if this one crashes, the load balancer should just go and send its traffic to the other machines in the pool.
+19:04
+And not too many of our users should notice the fact that actually, no one's going over here.
+19:13
+And one of the nice things about that is if you do that in Amazon or Azure,
+19:20
+then you don't have to download a piece of software and run it on a machine. As a load balancer, you just take a box.
+19:24
+Somewhere in Amazon, you have a, uh, what's that called, an auto scaling group.
+19:29
+And in Azure you have a virtual machine scale set.
+19:35
+And you have a thing that when you check the box for the load balancer, and you can even set these to be dynamically elastic groups.
+19:39
+So you say if the average load on one of these on these machines goes up above 60%,
+19:46
+then grow the size of this group and it will start up some more machines.
+19:55
+We talked about that in the cloud deployment lecture last week.
+19:58
+And then it keeps growing. You know growing the thing. As long as that load is above 60% and that it will stop when it gets big enough.
+20:02
+And then when it drops below another threshold, you can say shrink it down again,
+20:08
+and the load balancer is just going to send requests equally between all of the available machines.
+20:13
+And so that's a nice way it's being able to elastically respond to the changes in in demand that you have.
+20:19
+So you only pay for what you need, but also not to have to pay too much extra and not to have to do extra configuration of this.
+20:27
+I tell you? Yeah, I worked on the system quite a long time ago.
+20:38
+Um, which was the system that does, uh, national rallies. You want to question before we did sort.
+20:42
+Of one of that. So that one is. So there's, uh, two benefits to having two.
+20:48
+One is, uh, you can do twice as many customers because you've got like, twice as many machines so that you can have twice as much capacity.
+20:55
+But also if one of them breaks, the other one is still there.
+21:03
+Whereas if you only have one, if you only have one, it breaks then like your size down.
+21:08
+But if you've got two one of the breaks, then a few of your customers might get an error, but for most of them, it's still going to be okay.
+21:14
+So it's not the same. The classified system is double the capacity.
+21:22
+That's it. Yeah. Yes. It's not divided in two.
+21:26
+Yes. It's not sort of subdividing the same capacity as adding capacity by adding another one.
+21:31
+So I think one of the things that's tempting these days is because it's so easy to set up these things and go,
+21:39
+oh yeah, I'll probably need some more of those machines and like, set these things to quite high numbers.
+21:45
+Uh, you can spend quite a lot of money when maybe you don't need to.
+21:50
+And so the story I was going to tell you was that a few years ago now, I worked with a company that does the National Rail dot.
+21:54
+Co.Uk website, where you go to look up your trains when you need to go somewhere,
+22:01
+or find out whether your station's under water or whatever is happening.
+22:05
+Uh, and so that's quite a high traffic site in the UK.
+22:09
+And with the architecture that we had, it was, uh, pretty similar to this.
+22:15
+That was um, it was a web application. Had a load balancer in the front.
+22:19
+It wasn't running in the cloud. So we ran it in co-located data centres.
+22:23
+So we installed something on this. We had these ones that we ran. And for most of the traffic from the UK population looking up trains, uh,
+22:27
+we managed to run pretty much all of that stuff apart from the journey planning, uh, on one machine.
+22:37
+And so temperature warning doesn't sound good.
+22:45
+It's like that on the other one. I spent a few minutes. Okay.
+22:49
+Let's say um, and so we had two we had two machines because of the reason of the redundancy.
+22:54
+So if the one machine that we were running on water break, we had another one just in case.
+23:03
+But the way that our load balancer worked was it said basically when a request comes in, send it to this machine.
+23:09
+And because most of the information that we were serving was like, uh, what train stop at this station?
+23:16
+Or does this station, uh, have, uh, accessible access to the platform,
+23:21
+or does this station, uh, what are the taxi firms that are nearest to this station?
+23:26
+That is all static data. We don't have to calculate that each time.
+23:30
+There's not a lot of dynamic things. So it's very easy to sort of pre-compute a lot of that and just save it out.
+23:34
+And so one machine with some caching, I was actually fine to serve.
+23:41
+What do we do? Hundreds of thousands of requests a day from people around the UK.
+23:47
+The the thing that we didn't manage to do with one machine is calculating like,
+23:52
+okay, I want to go to this other place, I want to go to Manchester on Tuesday.
+23:58
+What trains are available, what routes are available. This is a much more difficult computational problem.
+24:01
+And so the number of servers that we had that would just work on that part was more like 50.
+24:06
+So the architecture was actually quite imbalanced between the number of servers that we had to just it's basic information,
+24:12
+station information, train company information, things that didn't change very much,
+24:20
+but those things that actually had to be completed every time you did a search had to be updated ways,
+24:25
+you know, whether the trains were cancelled, all these things that you had to do those every time.
+24:30
+And that's actually quite it's quite computationally difficult to find the best routes and the best prices and all those kind of things.
+24:34
+So there were 50 machines that would do that, even though we only have this part.
+24:40
+So separating those out, we didn't need 50 of these.
+24:44
+So we didn't need to duplicate the whole application across all 50, but we needed 50 to do that part.
+24:47
+Well, this part, we don't need to take out those 50 machines that you need.
+24:54
+Is it just trial and error and keep them ready to go? I mean, something more logical there.
+24:59
+I think what you were I mean, to the extent if you're in a company that's growing, you can just keep adding machine.
+25:06
+So you'll be like, oh, okay. Today we had some errors because everything was totally full up.
+25:12
+Let's keep adding. And there's ways that we can design the system where it's easy to just keep adding things.
+25:16
+Um, you can do some predictions.
+25:22
+So you could say, okay, let's do some small scale experiments that say how many, how long does it take to do a journey planning?
+25:24
+And if we run some tests and we try and do 100 journey plans, like how many can we do at the same time on one machine?
+25:32
+And then you could extrapolate a little bit and say, okay, typically how many users going to have on a certain day, um,
+25:39
+that sometimes when this system went wrong was when the weather was bad, because that's when everybody looks up their train.
+25:45
+And particularly, yeah, the there were some times where we would switch into only doing static information and just say,
+25:52
+you know, all the trains are cancelled, everything is bad, not do individual plans for people.
+25:59
+So we could kind of shut off part of the system to make it so that everybody would get some response back, because sometimes you want it to.
+26:04
+It's better to have like we gave you some information, you know, it wasn't a perfectly personalised result,
+26:11
+but at least give us some information rather than saying we have broken because we've got too many requests.
+26:16
+So you can do some capacity planning. Uh, but that and there's also difficulties with, like, sometimes your your traffic's not the same.
+26:22
+So you could do capacity planning for an average Tuesday, but knowing what it's going to be like on a,
+26:31
+you know, uh, freak storm on a Friday when everybody wants to go home from work.
+26:38
+Like, that's a different thing. And you could try and, like, forecast that.
+26:43
+And maybe it depends how important it is that you can meet these peaks.
+26:47
+So sometimes you just say, well it's more important for us to like save a bit of cost and we'll go a little bit lower in the capacity.
+26:51
+And if it breaks then that's unfortunate.
+26:59
+And sometimes it's very important that you can do, like if you're a retailer and your Black Friday is your best sales day of the year,
+27:01
+then running out of capacity on Black Friday is not a good idea because you missed all your possible sales.
+27:08
+So in those cases, a bit of pre-planning is a good idea. There's also some things we can do to be like with the cloud it's easier to be elastic.
+27:13
+So when we were running this in the co-located facility, if we needed some more machines,
+27:21
+we had to go order them from Dell and then go and plug them in. And it took a few weeks.
+27:25
+Whereas if you're in Azure and you can dial up on a slider and then within 15 minutes you've got some more machines running,
+27:29
+but you're much easier able said responsive. What's next?
+27:35
+Oh, yeah. Databases. So on this what we're talking about on this, I was basically scaling this by just duplicating this,
+27:43
+making more machines and copying the same application code onto each one.
+27:52
+And actually, there's a principle of design that we have to keep in order that works pretty well,
+27:58
+and that is that you should not keep any particular like from one request to the next.
+28:02
+So if you're one person using the website and your first request comes in and it hit server one,
+28:08
+and your second request comes in and it happens to hit server two, because our load balancer just picks a machine at random.
+28:14
+If in your application code you've done something like, okay,
+28:20
+look something about this user and remember the option that they saved and put it in a dictionary which is in memory in this machine.
+28:23
+Then if the next request comes to this one it's not going to be all right.
+28:31
+So if you have that your shopping cart is kept in a dictionary in the memory, on the, on the machine when you added your item.
+28:36
+And then your next request goes to the next machine and it looks up what your shopping cart, it's like it's going to be empty.
+28:42
+So that's not very helpful. So one way to fix that is to fix the load balancer policy.
+28:47
+So it says for this particular user send all their requests to this machine.
+28:54
+And then for a different user send all that request to this machine. And you can do that.
+28:59
+But if this machine breaks or becomes overcapacity like then you're stuck kind of it's it's hard to be very even in the load spreading.
+29:03
+So a better design policy is we don't keep anything that belongs to the session of the user in memory, in the machine.
+29:13
+We can compute anything on the way through and we can return anything to the user.
+29:21
+But if there's any temporary states like what's in my shopping basket, I'm going to put it in the database,
+29:26
+or I'm going to send it back to the user for them to send it back to me. I'm not going to keep it in a dictionary in memory in one of these computers.
+29:33
+And so that means that we keep every, all these machines basically the same.
+29:41
+So that's good. But the database is a bit of a different beast.
+29:45
+So we could have the same kind of conversation about the database where we've got one machine that runs our database and it says, hey,
+29:51
+you can tune it and you can optimise it, and you can put more memory in it,
+29:58
+and you can dial up some sliders and you can make it go faster and demo'd up to a certain point.
+30:02
+And then beyond that, you might either need just more computational capacity or more memory, or you might even need more disk.
+30:08
+If you've got loads and loads of data that might not fit on the disk of one machine,
+30:16
+and you might need to have multiple machines with multiple disks in order to have that much data.
+30:23
+You know, if you're getting on terabytes of data in your database could easily be the case.
+30:27
+So the thing we can do is we can also split this into a group of servers if we just want it to go faster.
+30:33
+The easiest thing to do here is to have what we call replicas.
+30:42
+So you have all the databases have the same data in them.
+30:46
+But then we talked about this a little bit in the lab on Tuesday with a few people.
+30:51
+Like we have some problems of consistency. So I said here it was important that we kept all the machines consistent.
+30:55
+So it didn't matter which one that you went to say your data.
+31:03
+It wasn't like all of my data's here. So if I've just done a write in to this database and then I do a read or I do a write into this database,
+31:06
+everything can come inconsistent very easily and it's not a good state.
+31:17
+So the easiest thing to set up here, especially if we're in a system where we do lots of reads and not so many writes.
+31:21
+So it's the most common cases. People come to the web page and they're like, um, yeah.
+31:29
+So it's like Instagram or something.
+31:35
+More people come and look at photos and read comments and scroll through things than upload a photo and post things.
+31:37
+Right.
+31:44
+There's a lot of uploading and posting, but there's sort of order of magnitude more people just browsing, scrolling through things, loading content.
+31:45
+So most of the traffic that we get here is reads.
+31:53
+And so what we can do is we can say if you're doing a read, it does not matter which database server you pick from like any of them will do.
+31:56
+And then we do the same kind of load balancing trick where you just pick one to your queries and get the data back.
+32:04
+But in order to try not to have inconsistent data, if you're going to do a right,
+32:12
+then we pick one of these to be the master, and the master is the one that you can write to.
+32:16
+So if you're going to do a write, you say always write to this one.
+32:22
+And then there's some background process which is managed by the database that
+32:26
+just propagates those changes through the other database service as well.
+32:30
+So reasonably quickly I mean it's pretty fast, but it's not.
+32:34
+Absolutely. It's. And instantaneous. If you write here, then those changes are going to end up in the other servers.
+32:39
+And if you read them again within a few seconds, it's going to be there.
+32:45
+And so this is good. It allows us to spread the load across more machines so we can just add more database service,
+32:50
+which means that we can do more queries, especially for reads.
+32:56
+If you need to do mostly writes then it's a little bit of a different story.

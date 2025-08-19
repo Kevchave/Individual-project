@@ -1,0 +1,560 @@
+So we talked a lot about, uh, what, uh, the.
+3:37
+Operating systems objectives. So we talked about management, uh, CPU management, memory management.
+3:42
+Um, another big part that we kind of skipped so far was the secondary storage.
+3:50
+So we said that memory management is, um, handling information in volatile storage.
+3:56
+That means in for a particular machine, the information is lost.
+4:03
+Right. So any computer system needs a way to kind of persist information permanently.
+4:06
+Right. And for that we use secondary disk.
+4:12
+Um, however, when you write a C program, you don't want, uh, you.
+4:18
+You don't care whether your laptop has this, this storage or a mechanical disk.
+4:22
+Right? You don't care how information has been stored. So you still require some sort of abstraction, right?
+4:26
+So we need a way to obstruct the information that is stored on the disk in a way that will make sense to the upper layers of the system.
+4:33
+And we discussed kind of this plot before.
+4:46
+And just to remind you, uh, what happens is, uh, we had a lot of discussion with can you discuss CPU registers,
+4:48
+which lies on the top left hand side of this plot? And registers are special purpose memories that are very fast, but they are very expensive.
+4:57
+And because of that, you can only have very small circuits that can do that.
+5:07
+Uh, so capacity is very low. Um, and volatility is very high.
+5:12
+It's hard to retain information whereas hard disk lies kind of on the other end.
+5:16
+So um, for very cheap, you can have very large capacities in the order of uh, gigabytes, not terabytes.
+5:20
+And the cost is relatively low. And they're designed to be non-volatile.
+5:29
+So once you persist, something in the secondary storage is not supposed to be lost unless there is some sort of corruption that shouldn't be frequent.
+5:35
+It should be very unlikely that you end up with a corrupted disk.
+5:45
+So the objective of the operating system is to enable sharing of information.
+5:50
+Obviously, as any kind of memory, it needs to be able to deal with concurrent access to share data.
+5:57
+And I have an example of the airline system, even though this applies more like to distributed systems.
+6:03
+So imagine an airline that has a finite set of tickets to sell for one flight.
+6:09
+Um, and then you have several clients across the world like your browser, my browser here, browser.
+6:15
+Everybody's trying to access the airline and make a booking.
+6:20
+So somehow the airline of of the program needs to be able to handle this concurrent access or competing access to buy, let's say the last ticket.
+6:23
+And the the disk obviously that stores the information, uh, it needs to deal with that.
+6:33
+So you make sure that the same ticket is not sold twice. Even though we have this concurrent distributed access.
+6:39
+And obviously, one of the biggest objectives here of the system, and particularly of the file system, is to organise and manage the data.
+6:45
+Um, so from the perspective of the operating system, was you open the secondary storage.
+6:58
+That should be just an arbitrary collection of data of bits and bytes, right.
+7:04
+So it doesn't know what you are storing. If you are storing integers, booleans, uh, information about the flight that you just booked.
+7:09
+Uh, it just it's the, um, the information itself.
+7:16
+And now it becomes kind of the job of the operating system to provide the
+7:20
+abstractions to the higher level programs that they try to create information,
+7:24
+stored information, access information from the perspective of those user space programs.
+7:30
+You can have different types of files or collections of information that you can store.
+7:35
+Uh, you you are probably familiar with most of these, um, in particular like regular files.
+7:41
+So you can create like a text file, you can save a PDF or word document.
+7:50
+You can create directories. Or you can have what we call special files, like blocked special files and Linux, or you can even create links.
+7:54
+So all of these from the perspective of the file system are just different types of files.
+8:06
+So they are going to be stored and managed the same way. Um they just.
+8:12
+He just knows how to read those files. But they're still.
+8:18
+There are still files. Okay. Now thinking about.
+8:24
+The operating system and the file system that is part of it.
+8:35
+We again need to decide what is that interface between the system and its users.
+8:40
+Which could be the programs or the mobile apps that you download from Google Play.
+8:46
+So the operating system needs to provide that abstraction or that interface.
+8:51
+So we need to think what kind of functions should it support.
+8:54
+Right. So obviously, uh, users of the file system will try to, uh, create a file.
+8:58
+Delete a file, maybe open it. Close it. Read the writing to it.
+9:07
+Uh, maybe cut it short, rename it, or find different pieces of information within the same file.
+9:12
+This is with seeking. If you ever use the FC command, for example, you see.
+9:20
+Or you may read or write special attributes.
+9:27
+And we're going to see what are those attributes that can be associated with uh, with files.
+9:31
+Uh, now. A note was mentioned in here.
+9:38
+Is that the functions that we just listed.
+9:43
+They are typically implemented as operating system system calls.
+9:46
+So this is what the OS would do. The applications rarely call system calls directly.
+9:50
+Right. So there is usually if you are writing a C plus program for a desktop machine,
+9:57
+usually the desktop machine will have the runtime environment or the library for that programming
+10:02
+language that will allow you to call a higher level function like f open and under the hood.
+10:08
+And Fopen is going to call the system call of the platform on which it's running.
+10:14
+And what's the benefit of that? Why, uh, why provide that f open abstraction at the programming language level?
+10:20
+And why not let application developers just call the system calls of the platform directly?
+10:28
+What are the benefits of having the C plus plus library?
+10:35
+Imagine not having it.
+10:47
+So if I asked you to write a program that runs on a Unix machine and then runs on a windows machine and then runs on a mobile phone,
+10:49
+then what would you have to do? You have to have different programs for each of those machines for for those different operating systems.
+10:58
+Right. So because you need to know what is the system call that is being available by the platform itself that will allow you to open a file.
+11:09
+Uh, but by having this library you don't need to.
+11:19
+You just call file open, and then you assume that your Mac OS or your, uh, Unix machine, your Linux machine be, uh, below.
+11:22
+Um, under the hood is going to have the C plus plus library already.
+11:31
+That is going to translate this file. Open command into the system called command.
+11:36
+And you can try, for example on a Linux machine to.
+11:42
+To read the description of each of those system calls. So you can call them on command, which is basically manual.
+11:47
+And if you go to page two of the manual, that's where all the system console for Unix.
+11:53
+And there you can write as the third argument the system call that you care about.
+11:58
+And then you're going to get a description of Unix of this manual page of exactly what the open command.
+12:02
+Uh, is doing, and you can try for the other commands as well.
+12:10
+Now the file system offers that support to the users to manipulate files, but it also has its management responsibilities,
+12:19
+and one of its biggest responsibilities is to somehow translate what the user
+12:30
+says or the user visible name or reference to a file to an actual address.
+12:37
+That makes sense for the hardware for the disk that you're using.
+12:44
+And we've seen this kind of translations before in memory, where we try to create a logical name or a logical reference to information,
+12:48
+and then that is being translated to the actual physical address.
+12:57
+So similarly here we want to allow the users to say, uh, I want access file slash home slash that user, slash that file.
+13:00
+Um, and that should be it. And then the system, the file system should be able to translate that to exactly.
+13:09
+If you are using a mechanical disk, hard disk, a rotating disk, it should find exactly which disk you are using and which block on that disk,
+13:15
+uh, you're trying to access by referring to it, uh, with that name.
+13:24
+And then we're going to spend a big part of today's lecture talking about how to allocate space.
+13:29
+So again, you have uh, a finite hardware, uh, that's your hard disk or your SSD disk.
+13:37
+And you have to allocate that to different files that have been created.
+13:44
+And we have to think about, again how to structure the physical hardware and how to make that available to files.
+13:49
+And we're going to see what are the benefits of different design choices in that.
+13:58
+Uh, there's other uh, things that the file system needs to do as well.
+14:03
+Um, it needs to be able to log files to make sure it can guarantee exclusive access when it needs to.
+14:07
+Uh, there is a lot of techniques that are being implemented for performance optimisation, such as caching information in memory.
+14:15
+So you don't have to go in the disk every time and make those expensive, uh, reads to find information.
+14:22
+Um, there some techniques with buffering where you can stream information that is being read, read from the disk into memory.
+14:28
+Um, we do have some backup, uh, techniques for protection and obviously security.
+14:37
+So you need to implement a mechanism such that, um.
+14:43
+Only the authorised users or processes are accessing the pieces of information on your secondary storage.
+14:48
+According to some defined policies and we will see some of that.
+14:55
+Although, uh, mostly we will be talking, um, about how to allocate space.
+15:00
+To files. Now, typically when I say, what's a file?
+15:08
+Um, you would probably think about maybe, uh,
+15:15
+c plus plus source file that you just wrote the code for your coursework or you might think is is a text file.
+15:18
+And it did. To represent that, we do need the file name.
+15:25
+So the operating system needs to know. What is the name?
+15:34
+If you want to refer to that source code that you just wrote, it needs to know how to refer to it.
+15:38
+So it's a logical name. It needs to know what kind of type the file is.
+15:43
+Uh, if it is a text file, if it is a source file, a PDF file or something else, and it stores other information as well,
+15:48
+like who is the creator of the file or as we call the owner of the file,
+15:56
+or if there is an organisation associated, um, uh, or how is information associated in the, in the file.
+16:01
+So if it's try to access it,
+16:08
+will it be able to find all the information about the file one next to each other which is what we call sequential or is supposed to be random access.
+16:10
+Uh, in terms of the address information on where to find, uh, the information for that file, we need to know which volume, uh, is it stored on?
+16:20
+So which disk drive? Which partition? We need to know the stored addresses.
+16:30
+Uh, the the length of the file and how much, uh, space has been allocated.
+16:35
+And you can see some of that, um, if you just type the command list, uh, dash l uh, on Unix.
+16:41
+So the first part here, it just lists everything, all the files and directories.
+16:52
+On the current directory that the shell user is operating on, and what you will get back is something like this.
+16:59
+So you have different columns of information.
+17:06
+This is one example of what can be stored in those columns. So the first part will be uh the permissions that are being associated with the file.
+17:10
+Right. So now we can see how we can force in production.
+17:19
+We can have security policies on access to files. Uh so when we store the file test which is the last parameter there, we also stored, uh,
+17:23
+the permissions or sometimes we refer to that as the access vector, uh associated with that file.
+17:32
+And uh the permissions in Unix are typically separated into three groups.
+17:40
+So we have the first part that is basically the user permissions.
+17:48
+Or the owner permissions. So these are the permissions related to the owner with that that we also store.
+17:54
+So we know who created the file. That's by default the owner.
+18:06
+And then we have the, uh, access permissions for the owner.
+18:09
+But at the same time, you can also set the permissions for.
+18:15
+A group. So you're kind of started grouping users together.
+18:22
+And that makes management of security policies just easier.
+18:25
+Instead of saying that, uh, for me, the permissions to access the slides of, uh, of the class,
+18:29
+um, it's read and then for you, it's read for you, it's read for you, it's read.
+18:36
+I can just input all of us into the same group that is, um, uh, 788.
+18:40
+And then I just say the permissions for that group 788 is read.
+18:45
+And then with only one command I can set the permissions for everybody.
+18:49
+So having groups is a convenient way to manage the policies.
+18:53
+And we have uh a last group of permissions.
+18:58
+And this refers to. Everybody else, or sometimes this is referred to as public.
+19:01
+So basically first, once you try to access a process, try to access the file.
+19:08
+We're going to check we're trying to access it. If it is the owner we're going to check the first try it.
+19:13
+Um, if it is if we fail on that check then we're going to check the group.
+19:18
+If we fail on that day, we're going to check on everybody else. Now, what do those permissions means?
+19:22
+As you. Probably guessed our stars for read.
+19:29
+Used stands for right and X stands for execute.
+19:36
+Okay, so setting the execute the mission is actually particularly dangerous.
+19:41
+So you wouldn't want a shell script, for example, to be executable by the last group by everybody else.
+19:46
+Right. Because by modifying that, uh, you could start writing arbitrary.
+19:54
+You can start executing arbitrary code on the system. So you have to be very careful on how you set these permissions.
+19:58
+And by default, uh, systems like, um, like Linux and everything that is built on top of Linux,
+20:05
+like your Android phones, for example, even your iOS, um, they implement what we call discretionary access control.
+20:11
+And discretionary access control basically just says that access to that file is at the discretion of the user.
+20:18
+So here if I created the file test, then by default the system will assign me as the user.
+20:25
+And now I have the power to change the permissions as the as the owner of the file.
+20:32
+So I can issue command uh command. So we see a model change mod, you can change the permissions of the file.
+20:38
+So as the owner you can issue that permission. And then you can start allowing other people to access it or or do anything they want for that file.
+20:52
+And because of the power being at the discretion of the owner, we call this discretionary access control.
+21:01
+And this is in contrast with some other schemes like mandatory access control where
+21:08
+in mandatory access control the policies are mandated by the operating system.
+21:13
+So the users cannot come in and start changing the policies.
+21:18
+Right. So very security sensitive things like on enterprise or military machines.
+21:22
+Uh, you have mandated policies that are compiled with the operating system that take, uh,
+21:27
+that are being enforced without the user space users being able to do anything about it.
+21:33
+And for those interested, you can look at things like SELinux, for example,
+21:38
+or security enhanced Linux that basically adds some extensions to the file system here to add some SELinux policies as well.
+21:43
+But these Linux policies can not be, uh, changed by the users.
+21:53
+Okay. Uh, this is just a continuation of a different file because we talked about access control information.
+21:56
+So these, uh, in length, these are all the, um, read write execute permissions.
+22:08
+Uh, we also keep usage information like different timings.
+22:14
+Um, for example, uh, at this part.
+22:19
+Why has the date? It can also tell us or the the file system keeps track of when the file was last modified.
+22:26
+So it keeps this information we call metadata alongside the actual information that has been stored on the file in the file.
+22:35
+And obviously the size of the file. Okay. Okay.
+22:46
+So that brings us. That was kind of an introduction of what is a file system.
+22:53
+Um, particularly from the user's perspective, how do you what is a file?
+22:57
+Uh, what are some of the responsibilities of the file system in terms of management, managing all the information on the disk?
+23:02
+One of the biggest tasks is to decide how to allocate space to files.
+23:11
+Okay. We decided that we're going to call this things file, which is going to be our abstraction to collections of information.
+23:17
+And everything is going to be some some type of a file.
+23:25
+Now the next decision is. Once I have my hard disk, how do I allocate this space to files?
+23:29
+Right? And again we have different considerations like similar.
+23:36
+Some of them are similar to the ones we have with um memory management and space allocation there.
+23:41
+And the first question, uh, will be. How do I give space to a file?
+23:47
+Uh, and here I kind of assume that block is the decision.
+23:57
+But even before you decide that files should be broken down into blocks,
+24:01
+and then you have to decide how big the blocks are and how many blocks are you going to assign for each file?
+24:07
+The even the decision before that that has to be taken is whether you even want to have a fixed size block.
+24:12
+Maybe you decide to just, um, have a variable size.
+24:20
+So once a file, uh, comes in, somebody starts to create a file.
+24:25
+Maybe you, you assign some, uh, some portion of your disk, and then you allow it to grow dynamically.
+24:28
+Right. So that would be great because if it if it can grow dynamically,
+24:35
+that will allow us to deal with all these issues of internal and external fragmentation.
+24:41
+But it makes it very hard in terms of management, if every file can grow and shrink arbitrarily.
+24:45
+So to make it more manageable, we kind of use a techniques that is similar to paging.
+24:53
+Instead of pages here we have blocks. So we decided that we're going to have this kind of primitive that we're going to call a block.
+24:59
+We have to decide how big or how small it is. And that decision is really is going to affect the performance of the system.
+25:07
+Uh, but we are going to use that as a primitive to assign space to files.
+25:13
+Okay. And, uh, let's do the exercise a little bit.
+25:19
+Uh, that we have decided that the block size should be, uh, as big as the largest file that you will ever see in your system.
+25:24
+What would that mean? Uh, well, what would that mean?
+25:33
+Is what I show in the picture here that in a lot of the cases, if you have small files coming in, you're going to end up with a lot of empty spaces.
+25:36
+And remember, block is the primitive. So you cannot assign, uh, portions of the disk smaller than a block.
+25:46
+So if you decide on a very big space, then when you have small files, then you end up with a lot of, uh, empty space in blocks.
+25:52
+You also need, uh, more memory, uh, for buffer space.
+26:01
+And this is because if you want to start bringing information from the disk into the memory, you can use some optimisation techniques like buffering.
+26:05
+So you can create a buffer in memory. And you can start filling up the buffer with information from the disk.
+26:15
+Now if your blocks are too large, that means you can bring information in a block at a time.
+26:21
+That means your buffer should be also very large. So you can bring one block.
+26:27
+Or if you want to bring in three blocks at a time, that that will be even larger.
+26:31
+So you're going to need a lot of memory to be able to start streaming information from the disk.
+26:37
+Uh, on the other hand, if you assign the block size to be too small, then you might end up in a situation where you are wasting space for large parts.
+26:43
+So imagine here that we have a very large file that requires just a little bit more than three blocks.
+26:52
+So we fill up three blocks and then maybe just one one byte extra on the extra block.
+26:59
+So in that case a lot of the large files are going to end up in this situation.
+27:06
+Um, where again we might be uh, wasting space.
+27:10
+There is also high overhead in managing it because the more blocks you have, the more pointers to the blocks you need to have.
+27:15
+Maybe if you have mapping tables like we had in, uh, in memory allocation, then you're going to need to have longer tables to keep those pointers.
+27:24
+So management also becomes very expensive. Um, the sick time becomes important.
+27:32
+So sick time here refers, um, to actually finding the information on this storage device.
+27:39
+So typically, um, on a hard disk, if you think about.
+27:45
+Uh. Let's see. So how does a typical hard this look like?
+27:54
+So let's say assuming the mechanical disc, like the cheapest version of hard disk with the largest capacity that you can buy.
+27:58
+So you typically have the disc separated in what I would call a sectors.
+28:05
+And then you have this thing that we call a truck.
+28:12
+And then you have. Something like a pin that if it searches for information or seeks information,
+28:18
+it can start from the top and it can start going left to right trying to find the right block on the disk.
+28:26
+Okay. So when we talk about seat time, it's like,
+28:32
+how much time will it take me to find information that is actually imprinted on the tape on the hard disk in this case.
+28:36
+So the seat time can be very large if we have very small blocks.
+28:46
+And the reason is because we're going to see, according to some of the allocation strategies, that the blocks can be distributed across the disk.
+28:50
+That means you have to make a lot of mechanical movements of that pin back and forth to find all of the blocks that you need to read the entire file.
+28:58
+Okay. So we see that these these decisions, they do affect, uh, performance.
+29:09
+And we're going to see different spatial location techniques. Some work better than others.
+29:16
+And we will start with the simplest one. And it's very similar to the first location strategy we've seen from memory.
+29:21
+Whereas the simplest thing to do is just for the entire file.
+29:30
+Place everything in a contiguous um.
+29:34
+Place on the disk. Now this is very good in terms of locality.
+29:40
+That means my blocks are going to be next to each other.
+29:45
+So reading in once I file the first block, it's very easy to go to the next one and then the next one and the next one.
+29:48
+The problem is the same as the one we have with contiguous memory allocation,
+29:55
+where because you have to put this kind of fixed chunk for the entire file.
+30:00
+Then once that file is been removed, the you end up with these holes might not be big enough to fill whatever comes next.
+30:06
+And that creates the external fragmentation issue. And I'll show an example in the um in the next slide.
+30:14
+This also poor performance if the files grow and shrink over time.
+30:22
+And this is because in a continuous file allocation scheme, the space that you allocate to a file is been predetermined at file creation time.
+30:26
+So once the files grow and shrink over time,
+30:38
+if you grow more than the allocated space that you basically need to create a new file with a new allocation.
+30:40
+And if you grow less, then you're wasting space. And let's see uh, one example here.
+30:48
+So assuming the perfect scenario at the top where everything is being allocated contiguously,
+30:55
+we'll see very good spatial locality between blocks of different files.
+31:00
+Abcdefg. Uh, so the letter characters indicate different files.
+31:05
+And then the little boxes indicate the blocks within a file.
+31:11
+So very good spatial allocation. So once you find the file you are looking for is easy to file everything else.
+31:15
+So in an ideal scenario works quite well in a real scenario.
+31:20
+What's going to happen is that at some point file C and file E are going to be deleted,
+31:24
+and then you're gonna end up with those, uh, portions of the disk that are empty.
+31:30
+Uh, so now let's assume that. Age arrives.
+31:37
+An agent needs six blocks. So we'll take one, two, three, four, five, six.
+31:42
+So this is great. We fit there. No problem. Uh, but then I arrives, and it needs five blocks.
+31:49
+So here we only have two. Here we only have four, and here we only have four.
+31:59
+So that shows basically the problem with. With fixed contiguous file allocations.
+32:06
+So what do you do in that case? What did we do in the case of external fragmentation with contiguous memory in the contiguous memory allocation case?
+32:11
+How did we deal with external fragmentation? There was a technique that was particularly expensive to move things around to make space.
+32:22
+We call that compaction, right? So you might need to do something similar here as well that you might temporarily, uh, save, um, a chunk of.
+32:33
+Let's be conservative and check if maybe you save it somewhere temporarily.
+32:46
+You save this part somewhere temporarily, and then you free this so you can enter a here.
+32:52
+And then you give this space to F, and then you can put the remaining part of F there.
+33:00
+Um, and then the other one is free space.
+33:06
+Okay. We took some part. So G comes here.
+33:10
+But this process like try to deal with external fragmentation that you're gonna end up with, you cannot avoid.
+33:13
+It's very expensive. And now it's even more expensive because we're not moving things around in memory.
+33:20
+We're moving things around in disk that have to be physically written on a tape.
+33:26
+So this process can be very expensive.
+33:32

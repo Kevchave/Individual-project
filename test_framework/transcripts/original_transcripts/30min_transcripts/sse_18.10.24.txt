@@ -1,0 +1,287 @@
+
+* So I guess I'll get started, guys, but, uh, this is for those at home.16:22
+* Unfortunately, there is no recording of these slides. If you can share laptops, you have these lights on.16:27
+* So you anxious or at least, you know, I can say next slide. I had some amazing demos to show you and I'm afraid I can't because those have to be live.16:33
+* But at least we can talk through the slides. Okay. So are there questions about, uh, the material so far?16:44
+* Okay. We covered a range of web technology. We covered our client and server side of applications work.16:53
+* Now, we put it all together, but the first. Topic is Rest APIs.16:58
+* So is is a oh switch on. So that's my result in the console.17:03
+* No, he didn't get that soon. I have to pull that out. So that is.17:11
+* It's like the fingers. Yeah. Yeah. We can't do that.17:14
+* So that's all I did was to, uh. Okay.17:18
+* Okay. Okay. Well, then they're good. Good. So now we can go.17:22
+* So we start with the recipes. Okay.17:26
+* Recipes is a way to organise, you know, your web application so that it can be queried.17:30
+* Not so much by human browsing, but by other programs.17:34
+* So from the command line, from the JavaScript of other web pages or from agents,17:38
+* uh, LMS agents or programs in Java that you've written somewhere on your desktop,17:44
+* you know, all of those clients can connect a website, a web application, get data from it.17:51
+* We structure this interface as a Rest API. Rest uh, stays for representational state transfer.17:57
+* So the key idea is that we use the commands that are available in HDP protocol,18:04
+* which are already seen, get to retrieve a website post to send the form, and a number of other ones.18:09
+* The most common are put and delete.18:16
+* So post is really used to create a new resource in an API, whereas pwd is to update its records and delete is to remove a resource using the API.18:18
+* Okay, so these are the kind of key commands you can retrieve a record, create a record, update a record,18:29
+* delete a record with a with an API, you can do a lot of other things, but those are kind of the key commons.18:34
+* So we the key point is that we're using the HDP protocol itself to describe how to interact with this data that we keep on the server.18:40
+* So is not something so much higher up in the application.18:48
+* We are not saying, let's say I use a Get request that lets me send, uh, a u URL with a querystring with parameters.18:52
+* Then I interpret the parameters to say, oh, you want to add the record, you want to delete.18:59
+* A record is already at that level that we know what we want to do, the path that we put into the URL.19:03
+* So the resource that we denote after the gate or after the post to tell us what data we are trying to access.19:10
+* And then if it's, uh, data to update, it will be in the body of the request.19:19
+* If it's just data to retrieve, you don't need the body, you just obtain it in the response.19:24
+* The benefits of using these APIs is that make it easy to have a performant and scalable web applications.19:29
+* Okay. Every request is by itself. Every every time a request comes to the server, reads the parameters x on it and sends the response.19:36
+* So you can scale it on many different physical instances of servers in the cloud.19:47
+* And and you distributed both the bandwidth and performance issues.19:53
+* Here's an example of code to build a simple basic API in Python.19:59
+* Key things in line two that we include actually an API module.20:03
+* I did, I put my point. We use a flask as the framework that let us do this, uh, implement these APIs.20:11
+* But so now we can say, okay, you created a flask app, which was the way to do a server in general.20:23
+* Now actually create an API for this up. And now we got an object called API in our hands.20:29
+* By telling what to put on this object, we specifying uh, we're going to uh, offer services on this API.20:35
+* Here we are creating two classes to handle.20:42
+* Get of a resource and post of a resource. We call them retrieve and create a reflecting the intuitive meaning of a getting a post on an API.20:47
+* Uh, the geth will expect, uh, an ID, which is a numeric parameter.20:58
+* We just decided that resources IDs and those are, these are numbers.21:03
+* So in the Get request you have to say give me a resource. So you didn't indicated by the number in this case.21:08
+* So we expect this ID parameter.21:14
+* And then these will read the the data store where we store the items in this case is simply a file on disk for simplicity.21:17
+* So we just open the file items dot Json for reading.21:25
+* And then we look for all the items in there. We pass them as Json objects and we look for one that has the corresponding id.21:29
+* If we find that, we can return the Json. Again the serialisation in Json of this object.21:38
+* Otherwise we can see error. We didn't find that item that you were looking for with a specific value.21:44
+* So it's this trivial implementation of a store in retrieve and data store file based.21:49
+* For retrieving a resource. So for posting a new resource similar, we don't need any parameters in the Post request itself.21:55
+* We need the body of the post. That's where we find the data to add.22:04
+* We opened that same file for reading and writing, and then we read the various, uh, items.22:08
+* Now we read the from the. Yeah from the yes from from items.22:16
+* So we read all the entries of this file. So line by line.22:22
+* We set the data to the objective we want.22:28
+* And then we updated the data. Okay. So we have created a new ID with the highest number available in that file.22:32
+* And we put that the data that we received. So the Json of the request inside of the file.22:40
+* And we save it. Okay. Now there is a running API that is accessible for retrieving API items that we didio the item and for updating other API items.22:47
+* So let's go there directly. So I put it on the lab machine.22:58
+* As usual, if you want you can also connect and do the same.23:04
+* Uh. Okay.23:09
+* We need to activate Python. Right. So source. Uh, what was it?23:20
+* Do I have it here somewhere? Yeah.23:39
+* Okay. I start flask telling it to run on zero zero on the public IP of this one,23:44
+* and I use an environment variable to tell it run API dot pi, not my output of pi, which is the default.23:49
+* Okay, the API now is running and we have a day IP address here, so I copied.23:59
+* We have the two endpoints. One to add records and one to.24:07
+* Hmhm retrieve them. So I'm on a different machine now on this laptop.24:11
+* We can try to get item number one, number zero from this API.24:19
+* I know it's there because I put it there before. So we go under API items and then we put zero.24:25
+* Get. Why? Curl. Curl is our common line Http client.24:34
+* Now. The last time we didn't have the front lights, right?24:44
+* Which one was it? Know this one better.24:48
+* Okay, so with River records zero it it zero as expected.24:56
+* And it has some data with some key values. So some Json data.25:00
+* And we can add some data as well with a Post request this time.25:04
+* Uh, I'm looking in these three because I'm to. Lazy to type it.25:11
+* Do I find it? No. So I copied from somewhere else. Yeah.25:17
+* So it's another curl. We say it's a Post request, this time in the header of the post.25:30
+* We need to specify what kind of data we send Json. And then we say here's the data and is a record data value that only has one field.25:35
+* I don't specify the ID, it is something internal for the API to decide what.25:45
+* We send this value to the address of that machine to the endpoint API slash items.25:49
+* Okay, we got the idea of the newly created item and confirmation that its content, it's its contents.25:55
+* So now we can query it again. We asked for item number two and it matches.26:03
+* Right. So this is a way that we can use it from curl.26:07
+* And now we can use it also from the browser using JavaScript instead of.26:12
+* Of, uh, Python or Curl. Right. So we imagine we have a web page where we want to retrieve this sort of data.26:18
+* We'll try to do it now from a web browser. So stop temporarily.26:24
+* Annoying. I didn't update this rapper.26:36
+* All right, I got the code here. Take a look.26:43
+* One is in the browser that is more readable. And also I have the wrong IP address.26:46
+* So. First of all, I need to put the right IP address that we have there.26:55
+* So, um. Yeah. Not.27:03
+* She's got the. Yes.27:11
+* Well. So one client is the common line client. One client is JavaScript.27:27
+* The most common web client, but not for APIs is the browser.27:32
+* So even in the browser we can go there. HTP 172.27:35
+* I think it is. Until. API items one zero.27:41
+* No, I got the wrong address here. Uh, I forgot to restart.27:50
+* Sorry. Here. I need to restart.27:54
+* Relent. Right. So this was just showing.28:00
+* Okay. Even if I put in the browser the same command line, uh, one for, uh,28:04
+* API slash item zero for that server, I get an answer in the browser, I get my my data there.28:10
+* So that's a valid. Client to which you requested is also a valid way to to post.28:17
+* So to so to connect and create items. So we're going to console to do that.28:25
+* So we add the JavaScript dynamically to the page. And now we can read the code a bit better.28:30
+* So how would we issue from the JavaScript of this web page now from a random web page.28:37
+* A request to add an item in the API. Well, as usual, we need to issue a Post request to the right end point saying I'm sending Json.28:42
+* And then here is a Json object to send. Okay.28:51
+* And there is the just the standard way to send this kind of request in JavaScript.28:54
+* Then you can wait for a response. And when the response is there you use the data.28:59
+* You do something with the data. Okay.29:03
+* So I'm issuing this request. That I got a response with ID3.29:06
+* What does it mean? It created a new item in the API showing me okay, the new ID is three for this item.29:11
+* Confirms the data that I said. So that worked fine.29:18
+* Okay, but is this neck? The page we used here was the page.29:21
+* On a server where the API itself was served.29:29
+* Okay, first we ask something to it with a get and then we injected code here.29:32
+* So we are in the same origin, but we've seen last week that the browser doesn't let you do cross origin request for security reasons.29:37
+* So in reality, you don't create an API from the same side that implements the API, but your queries from a different side.29:47
+* So let's try to do that. I'm going now to the usual website.29:54
+* Okay, now on a different domain. I'm on cybersecurity fun.30:06
+* I'm not on the on the lab machine, and I'm trying to issue the same command to create a new element in the API.30:09
+* What do you expect to happen? Any suggestions?30:17
+* I sort of gave it away. So. Will it be successful or not?30:24
+* Just try some marked. No.30:35
+* Okay. Why not? It would violate the same origin policy.30:40
+* Okay. Basically the main security policy of the browser, things in different origins cannot talk to each other.30:47
+* Yeah. So I'm just pasting the same code. So the difference now is only the IP address where we are at.30:52
+* So the different origin the origin is the protocol the host name and the port.30:58
+* We are on a different hostname. If I issue this we get uh you cannot do it.31:03
+* It's block by the course policy okay.31:08
+* So. There is the possibility to exchange data across origins, but that must be explicitly granted by a server.31:12
+* So to enforce the soap, this was blocked. People in reality do it.31:21
+* So how do they do it? That's why there is the course the Cross Origin Resource Sharing specification in the31:25
+* browser that lets a server specify that is willing to access accept cross origin requests.31:33
+* What the browser internally has done, it has seen a cross.31:41
+* It has had a request to send a post message somewhere coming from JavaScript.31:46
+* The browser said okay, that's in a different origin.31:52
+* I'm going to first send a different kind of which the request is called the header request saying, hey, do you want cross origin request?31:55
+* Should we relax the same origin policy for you? The server decides is the owner of the possible sensitive data that will be stolen otherwise.32:02
+* The server can reply saying yes, I love it always or yes, I can allow it from pages coming from a certain origin,32:12
+* and the browser can do the check because it knows the origin of the page where the JavaScript was running.32:20
+* If their request is allowed the request, the post is sent, the API is updated, we get a response and we are happily ever after.32:26
+* Otherwise, if the request is not allowed or if there is no response,32:35
+* then we get the message that in this case there was no response because in the code implementing the API, there was nothing saying to do course.32:41
+* Okay, so fortunately is very easy to obviate that.32:49
+* Now we're going to. Change it if API pay to see API because API.32:54
+* Now we run this server. I'll show you the differences later.33:02
+* We repeated the same request and now we succeeded and created a new object.33:07
+* Okay, so what was the magic that led us this thing go through?33:12
+* We just had to let the browser know that we allow.33:16
+* Of course, in Python there is a trivial way to do it.33:20
+* If we check the difference between API dot pi and capital Pi, uh, well, let's do it.33:24
+* Uh, defer with a bit more context. Five lines.33:32
+* We see that at the beginning where we're creating the app. We just have to import course and run this command.33:41
+* Oh, allow course for this up. By default will allow any origin to do cross origin requests.33:49
+* If one wants. Add parameters to say only from people coming from this domain or this other domain.33:55
+* Okay. That's the only difference. So this three pluses.34:02
+* And this plus means these lines have been added in the new file.34:05
+* All the other lines are giving you context or are remain the same.34:08
+* So the only difference here is just to literally import course and say course of up.34:12
+* Now it works cross domain. So we solve the one of the issues here.34:16
+* Good. Then the next topic we want to do cover is getting up to sessions.34:21
+* Sessions. So the idea is that each Http request and response in a webapp in an API is independent from the previous request in response,34:26
+* if you want to maintain knowledge that this is the same user asking me something,34:36
+* you need to implement it explicitly to keep track of the user maybe having a first an authentication phase where you understand what the user is.34:41
+* Then you associate that data to the rest of the communication.34:49
+* So there are different ways that we need we can leverage to implement this.34:53
+* The server can store everything you want. Some file can keep a memory of everything that happens if he wants the client in principle couldn't,34:58
+* but then it's been extended in the browser to have different ways of storing data.35:07
+* One is cookies, probably the most known one, but the prevalent one that gets used now is local storage.35:11
+* We see both of them very briefly. So the idea of cookies is that a server?35:18
+* And a client can exchange little bits of data that the client will store.35:24
+* Okay. So typically they were created to just use it as a way to store preferences about our website.35:30
+* What background colour do you want? What's font or what dimension.35:37
+* But now then gradually is being used more and more to implement sessions.35:40
+* So remembering who the user is, give permission to that browser to access the personal data of a certain user.35:44
+* And you will ever read a lot in the news, and you get probably annoyed every time you go to a new website.35:51
+* You have a popup about cookies because they have been used for tracking.35:56
+* Then they became a privacy issue and therefore because of that, you have to accept cookies from a website now.36:00
+* So there are potential privacy implications of cookies.36:07
+* And that we don't discuss here because they go out of the scope, but so they can be useful for track users.36:11
+* So, you know, they're the same guy visiting you is the same person because you have set information in a cookie.36:17
+* The cookie remains in the browser every time they come back. You can update that cookie.36:25
+* So technically, how does it work? Is part of the Http protocol.36:30
+* Is a pair of errors in Http requests and responses.36:34
+* When your browser issue your first request to a website, it has no cookies.36:38
+* There is no state initially mentioned as a brand new browser you never used before.36:42
+* So we go to Google.36:46
+* Nothing is sent there except for oh, give me a get of that URL as usual and insert and headers that say maybe what content length you accept, etc.36:47
+* What content types. Now, if Google wants to send a cookie to your browser to remember it locally, it will give you a response error called set Cookie.36:58
+* And a cookie is really a name value pair.37:09
+* So in this case is setting the pref cookie with value after the equal id equals blah blah blah blah blah blah blah, which is going until a semicolon.37:12
+* After the semicolon, you can have an optional list of attributes.37:23
+* The attributes here saying it expires on this date and is good for this path in this domain.37:26
+* We'll discuss attributes, one for each cookie. So this one is setting another cookie called a need to the value 67 equal blah37:32
+* blah blah blah blah blah until the attributes start down here with the expires.37:40
+* From then on, the browser is told this data will keep this data until the expiry dates.37:44
+* Every time you show another request to the domain, the data gets put in a cookie error.37:50
+* So the cookie error here will contain the two cookies press equalised, blah blah blah until the end of the cookie.37:55
+* It doesn't show any attributes because the server no, the server is the one set the attributes it doesn't care about.38:02
+* This just wants the data and followed by the other code by the other cookie.38:07
+* So there is a single cookie error with all the cookies inside that need equals six, 67,38:12
+* blah blah blah is the second that gives the possibility of the server say, hey, remember this on the client.38:16
+* Keep it in the browser until expired, until I renew it by setting a different value in a different set of cookies.38:24
+* Okay, that's how that is sort of implemented. And so it's not even an Http protocol thing set by responses and then retrieved via request.38:31
+* So we kind of swap in the order. But it can also be accessed by JavaScript.38:44
+* And we briefly discussed it. But I don't want to spend too much time on cookies.38:49
+* So there are a number of attributes. The most important one are specifying what website is is valid for.38:53
+* Kind of kind of ignore the path is not very much used when it expires.39:01
+* So for how long the browser should keep it.39:06
+* And when do they become updated? You can delete it by putting in a date in the past.39:09
+* And then security related attributes like should it be sent only over Https or also over Http,39:15
+* can be accessed by JavaScript, or should it only be used at the Http protocol level?39:22
+* A lot of this is easy to to see from the.39:30
+* Uh, if we go to a real website like a Google Maps.39:35
+* We can go in one of these tabs.39:43
+* The application tab of the developer toolbar has a lot of information about the various storage that the browser can have and the cookies.39:45
+* So here if we go in cookies, we see the cookies for Google the.39:53
+* Com domain. And it has all the attributes listed here.39:57
+* This is a bit small to see. Um, not sure to make it much much bigger.40:00
+* Yes, we can say the name of the cookie and its value. The domain for which it is set in this case is Google Earth.40:05
+* And then the attributes like is it HTP only, when does it expire?40:12
+* When is it secure or not. And you can from there see how it's configured.40:16
+* Okay. But the key point is a way to say my securely stored data in the browser.40:21
+* Questions about cookies. Okay.40:31
+* So it's important to be aware that they exist and sort of what they do.40:35
+* But you don't always need to program them a low level, especially if you use Python and frameworks that help you with that and you can access them.40:40
+* Also in JavaScript there is a document, the cookie interface.40:48
+* In the browser object model, you can read the value or set the value of the cookie.40:52
+* This corpse. Is there more for your convenience, but I don't want to go into that right now.41:01
+* But basically, for each cookie is associated sort of to the origin of the page where it was set.41:05
+* But you can be a bit more general if you Google Maps dot Google.41:10
+* You can see also the cookies for Google or UK on this case on Google you can see cookies also for the.41:14
+* Higher level domains that include your specific subdomain is for convenience to sale or set to cool cataloguing and everyone can see it.41:24
+* But then on maps say have the cookies of maps on on uh, sheets.41:32
+* I have the, uh, the cookies, sheets and so on and so forth. Now.41:36
+* More frequently, websites use the HTML storage interface because it gives more space than cookies, and it has a better programmatic interface.41:42
+* You can effectively imagine that there is a persistent database in the browser, and one can access it in a in a very standard programmatic way.41:51
+* So you can check how much data there is in there, uh, or read the, the,41:59
+* the item number and or get to the item with the specific key, or set a new item using this key and putting this value in it.42:04
+* Or remove an item or delete the whole database. So to which origin we can associate storage in the browser.42:13
+* And that's very helpful for optimisation of reducing bandwidth.42:20
+* When you have a web app that you keep loading new information, you can gradually build the data into this local storage and not always update it.42:25
+* And then for implementing sessions. So again to keep track of what user is interacting with the web application42:33
+* so we can give a relevant information and know that it was authorised okay.42:39
+* So there is a general conceptual way to, to to see sessions.42:46
+* So typically you start browsing by accessing a resource that is public.42:50
+* So the target website doesn't know where you are. You can start some interaction expressing potentially some preferences in the browser.42:55
+* Can use these cookies or localStorage to save data about you, but it doesn't know yet who you are.43:03
+* And in this case, we to model it by saying you request some public resources,43:08
+* you receive some new token that hasn't been used before to identify you as an unknown entity.43:12
+* Then you can interact using that token to, for example, maybe change preferences, change things that don't depend on your specific account.43:20
+* With that up. At some point you want to access your account, you're going to log in.43:27
+* So imagine at the beginning you're filling up a shopping cart okay. You use a generic token.43:31
+* They don't know where you are. Then you say log in so you can get your credit card details.43:36
+* Are you ready? Use on this side to pay. At that point you get authenticated externally, probably using an authentication server or something.43:40
+* At that point, the web knows who you are. It uses some different kind of token, more specific to say good.43:48
+* From now on, we interact because they put in the cookie some secret information about you or in the local storage.43:53
+* I know it's all with you, and you can now get to not only have the shopping cart, but also pay using your credit card details.43:59
+* So that is the idea of a sessions. And that's kind of the blueprint over which all sessions are implement.44:07
+* The most simple way to do it is just by cookies you can implement and deploying via cookies more sophisticated using,44:14
+* using local storage and adding information. Fortunately for you, the flask provides ways to handle the cookies for you quite transparently.44:21
+* Another framework can do the same, so you don't need to low level worry about the low level implementation,44:31
+* but you have to be aware that this is the mechanism underlying.44:36
+* So one of the big problems that could happen is a session hijacking, meaning someone manages to steal this notion of token that identifies a user.44:43
+* If I can be in your browser, stole your token,44:52
+* that could be the cookie from a social network or the local storage item that identifies you together with the cookie for Google.44:55
+* I put them in my browser and then I can start browsing and to Google, I look exactly like you because I have the right information in my browser.45:02
+* Okay, so that's a session hijacking attack and we need to be careful of protecting about that by.45:09
+* Cryptographically defending the data that we use to identify a user not sending it.45:17
+* If we are not using Https, etc. again, frameworks normally take care of that aspect for you, but you have to be careful of the notion.45:23
+* Once you have a session, you are. You have a concern that somebody accessing that information could hijack your session and also plan B in case.45:33
+* Vulnerability found in the session. Implementation of flask. What do you do now?45:43
+* Okay. Now we need to say a little bit about injection attacks, which are probably the number one problem with web applications.45:52
+* These are the attacks that can create problems in the database that you connect to your app,45:59
+* to the server on which you run your apps, and can lead to stealing a session from a user so that the session can be abused.46:06
+* Someone else can impersonate that user and access the bank details or other personal information, or do actions on their behalf.46:12
+* Okay, so the idea is always the same.46:19
+* It's a sum, some input 

@@ -1,0 +1,89 @@
+Higher level domains that include your specific subdomain is for convenience to sale or set to cool cataloguing and everyone can see it.
+41:24
+But then on maps say have the cookies of maps on on uh, sheets.
+41:32
+I have the, uh, the cookies, sheets and so on and so forth. Now.
+41:36
+More frequently, websites use the HTML storage interface because it gives more space than cookies, and it has a better programmatic interface.
+41:42
+You can effectively imagine that there is a persistent database in the browser, and one can access it in a in a very standard programmatic way.
+41:51
+So you can check how much data there is in there, uh, or read the, the,
+41:59
+the item number and or get to the item with the specific key, or set a new item using this key and putting this value in it.
+42:04
+Or remove an item or delete the whole database. So to which origin we can associate storage in the browser.
+42:13
+And that's very helpful for optimisation of reducing bandwidth.
+42:20
+When you have a web app that you keep loading new information, you can gradually build the data into this local storage and not always update it.
+42:25
+And then for implementing sessions. So again to keep track of what user is interacting with the web application
+42:33
+so we can give a relevant information and know that it was authorised okay.
+42:39
+So there is a general conceptual way to, to to see sessions.
+42:46
+So typically you start browsing by accessing a resource that is public.
+42:50
+So the target website doesn't know where you are. You can start some interaction expressing potentially some preferences in the browser.
+42:55
+Can use these cookies or localStorage to save data about you, but it doesn't know yet who you are.
+43:03
+And in this case, we to model it by saying you request some public resources,
+43:08
+you receive some new token that hasn't been used before to identify you as an unknown entity.
+43:12
+Then you can interact using that token to, for example, maybe change preferences, change things that don't depend on your specific account.
+43:20
+With that up. At some point you want to access your account, you're going to log in.
+43:27
+So imagine at the beginning you're filling up a shopping cart okay. You use a generic token.
+43:31
+They don't know where you are. Then you say log in so you can get your credit card details.
+43:36
+Are you ready? Use on this side to pay. At that point you get authenticated externally, probably using an authentication server or something.
+43:40
+At that point, the web knows who you are. It uses some different kind of token, more specific to say good.
+43:48
+From now on, we interact because they put in the cookie some secret information about you or in the local storage.
+43:53
+I know it's all with you, and you can now get to not only have the shopping cart, but also pay using your credit card details.
+43:59
+So that is the idea of a sessions. And that's kind of the blueprint over which all sessions are implement.
+44:07
+The most simple way to do it is just by cookies you can implement and deploying via cookies more sophisticated using,
+44:14
+using local storage and adding information. Fortunately for you, the flask provides ways to handle the cookies for you quite transparently.
+44:21
+Another framework can do the same, so you don't need to low level worry about the low level implementation,
+44:31
+but you have to be aware that this is the mechanism underlying.
+44:36
+So one of the big problems that could happen is a session hijacking, meaning someone manages to steal this notion of token that identifies a user.
+44:43
+If I can be in your browser, stole your token,
+44:52
+that could be the cookie from a social network or the local storage item that identifies you together with the cookie for Google.
+44:55
+I put them in my browser and then I can start browsing and to Google, I look exactly like you because I have the right information in my browser.
+45:02
+Okay, so that's a session hijacking attack and we need to be careful of protecting about that by.
+45:09
+Cryptographically defending the data that we use to identify a user not sending it.
+45:17
+If we are not using Https, etc. again, frameworks normally take care of that aspect for you, but you have to be careful of the notion.
+45:23
+Once you have a session, you are. You have a concern that somebody accessing that information could hijack your session and also plan B in case.
+45:33
+Vulnerability found in the session. Implementation of flask. What do you do now?
+45:43
+Okay. Now we need to say a little bit about injection attacks, which are probably the number one problem with web applications.
+45:52
+These are the attacks that can create problems in the database that you connect to your app,
+45:59
+to the server on which you run your apps, and can lead to stealing a session from a user so that the session can be abused.
+46:06
+Someone else can impersonate that user and access the bank details or other personal information, or do actions on their behalf.
+46:12
+Okay, so the idea is always the same. It's a sum, some input that is controlled by the attacker

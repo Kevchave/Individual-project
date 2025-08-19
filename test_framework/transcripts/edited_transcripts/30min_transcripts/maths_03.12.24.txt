@@ -1,0 +1,271 @@
+I think. Okay, so this is the final topic that we hope to complete this week.
+I don't know how far we can go today. Um, and this is about the Fourier series.
+So the preamble, what is the Fourier series that can be captured from the diagram on the top right corner?
+So Fourier series basically helps us to represent any periodic thing.
+So here this is a periodic signal more or less approaching towards a square waveform.
+But that the Fourier series essentially helps us or tell us that if you use the basis function sinusoidal function signs and cosine um,
+in finite number of uh harmonics of the sine and cosine, and if you sum them up all, then you can create different kind of periodic waveforms.
+It could be uh, a square wave, triangular wave, any other shape,
+any periodic waveform can be constructed by infinite number of, um, sinusoidal signals.
+Essentially that is a Fourier series. And we need to find out what is the frequency of different, uh,
+sinusoidal signals and what are the amplitudes, the heights of those sinusoidal signals.
+So if we know that amplitude, if I and the frequency one period from the period,
+then we can represent starting from the first harmonic, second harmonic, third harmony.
+And it can go to any harmonic where n tends to infinity.
+So if we approach m to infinite anything at all these harmonics, we get any periodic function.
+That's the whole idea of the Fourier series. And as part of this we just look at what is the periodic function,
+how we can use the properties of orthogonality of the sinusoidal signals so that they become basis function.
+Using the combination of the basis function you can create the given uh periodic function.
+Then we represent the Fourier series as a trigonometric Fourier series in form of sine and cosine signals.
+And then we represent, uh, the Fourier series in the form of exponential.
+Using Euler's identity as, we know that um e to the power um g theta could be represented by sine, theta and cos theta.
+So if Fourier series can be represented by sine and cos, then it can also be represented by this series of uh exponential.
+So that's the overview of what the Fourier series is.
+And then we will look down into the smaller parts.
+Um before we achieve the Fourier series expansion for any periodic function.
+So it's a start, a little bit more into what we discussed just now as overview.
+There are many function that can be represented in the form of an infinite series.
+We have seen power series, um, uh, finite series.
+Infinite series. The periodicity or the oscillations are quite common in science and engineering.
+For example, the vibration of the string or the waveform or the rotation of certain things.
+So you have this kind of signals, uh, very common.
+The other approach that we discussed is Fourier series allows us to represent such kind of signal,
+uh, as infinite trigonometric series in sine and cosine terms.
+And it is capable. It's slightly better, um, in terms of representing the discontinuities within the given period.
+Uh, compared to Maclaurin and Taylor series, which requires functions that was continuous within the domain throughout.
+All right. So it's an improvement. It handles some amount of discontinuities better than the uh Taylor series and Maclaurin series.
+So that's slightly uh advantages. Okay, let's go back and look at what is a periodic function.
+Because Fourier series is all about periodic function. If the function is not periodic, then we cannot really compute the Fourier series expansion.
+So if the signal is repetitive, then we need to find out what is the smallest pattern that repeats.
+And that gives us the picture. So in this case this is the period.
+And if you go to any point x one and if you add the period you go to the exactly same point.
+So everything period to value repeats. And there are certain terminology with this signal, or a function that is known as the amplitude.
+What is the height of the function? What is the field?
+So in this case we know that y is equal to sine x little sine 1X1 um PDA or one cycle of the look that for one x right.
+So it goes starts from zero comes back to two pi one rotation on a unit circle.
+So in order to compute the period you always say two. But how many location of sine for example one.
+So the period is two pi. Angular frequency is always two pi over the period always.
+So if the period is divided into five, it divides one. So the angular frequency means how much, um or the what is the value for the angular rotation?
+So it's one because the period is two pi and you have to rotate 360 degree, which is also Dubai.
+So it's just angular frequency is one. Amplitude is what in this case with other example, it will be much more clear.
+So instead of this one, if you have a sine x then the amplitude is very clear.
+But what is the period? Period is two pi over and not one bit.
+So divide by n angular frequency is always two pi over 50.
+So two pi over two pi over ten, which is just n.
+So the angular frequency n because you can see n sine x within d2.
+Uh. Given that run and revolutions.
+In this case, the amplitude is six.
+This is two third XO and is two third two pi over two third will give you three five and then angular frequency is two pi over two,
+and at the end is three by two pi over three pi.
+So two third singular frequencies so you can work it out based on that.
+Um, given um periodic function, what is the period, what is the angular frequency and what is the amplitude?
+Now in general. For any function y equals f of x.
+You can represent this function as series of sine and cosine.
+We know that. But we within that the first term when n is one, is known as the first harmonic or the fundamental of f of x the fundamental frequency.
+So in this general equation, when n is one, you get a1 sine one x.
+So this is basically the fundamental frequency.
+Sine 2X3. So the second harmonic third harmony and harmony with different periods.
+And usually we are interested in the first harmonic or the fundamental.
+The rest are the multiple of the harmonic frequencies.
+So if the first harmonic is, let's say 100Hz of the frequency, the second is 230, 300, and so on.
+So it allows us to identify what is the the main frequency content of the periodic function.
+It is not just that the sinusoidal signals are the periodic signals.
+You could have a function or a signal like this which is known sinusoidal signal, but it is periodic.
+The period is between 0 to 6 and the same function repeats, so the period is six.
+Here. The period is eight and the same thing repeats again and again.
+So the figure in this case is eight. The amplitude is more definitely in this three over set.
+These are other examples of periodic signals which are not sinusoidal in nature.
+Now, once we want to compute the Fourier series, we need to express in form of equations so that we can take and compute the Fourier series.
+So how do we describe. There are two ways you can describe a function or a signal.
+One is the question from the graph. So the graph is given.
+And you write down the equation that you use in the Fourier series expansion that we will see.
+So for this it's easy to write down. If the graph is given to us what is f of x.
+The equation of this line which is the slope one. So just x between 0 to 2 we don't catch the discontinuity.
+So we write zero less than x less than two.
+So we don't take those points less than or equal to just to make sure that those discontinuous discontinuities are treated separately later on.
+The equation of this line which is easy to find the slope.
+So three minus x over two between 2 and 6.
+The total period for this is six. So if you repeat two plus six eight exactly you get the same value over here.
+So we can say f of x plus six is f of x. So again you get the same value of the function.
+In this case it's graph from the equation. So the question is given to us and you can plot the graph.
+This is x squared will look for quadratic form. So different values of x between 0 to 4.
+Between 4 and 6 you have constant four. And then between 6 and 8 it is zero.
+The total period is eight. So if you keep repeating this you will generate a periodic waveform.
+And therefore you can say f of x plus eight equals f of x.
+All clear so far. Now.
+These fundamental concepts are quite useful for quick simplification of the Fourier series.
+So we said that the integral between minus pi two part of course, and x or cymatics for different values of x and one,
+two, three and four and so on is always zero because it is symmetrical around x axis.
+And if you take within the period minus pi two pi and the integral is zero.
+Similarly cos and x and when m and m uh not equal to zero and not see that it is zero,
+if they are same and then and then this delta becomes one, only one minute are equal, then this is fine if they are different.
+But this is zero from the definition of the Kronecker delta.
+So you can very compactly represent if m and and same, then it is fine.
+If m and uh different then it is zero.
+Costs and so on. M x and x different values of and the net always zero.
+Now this. The results are same regardless of the end points of the integral, as long as it is one period.
+So as long as it is minus five to pi total to five, the period is two pi.
+Then that period could be repeated between 0 to 2 pi minus pi to part of the integral remain same because of the periodicity.
+So this can be proved at the end of the slide. Some proofs are given or in the book suggested book.
+Um, you can check if you want to go through. You can use your calculus integral and check yourself, or quickly look at the rules.
+If you want to convince yourself that this is a true.
+Now we use the basis functions. We can use the basis functions if they are orthogonal.
+So we can say that. The functions f of x and g of x.
+Within the limit A and B. Are orthogonal if that integral is zero.
+So within the given, uh, time.
+If this integral is zero, then this functions f of x and g of x are orthogonal, and we can exploit this orthogonality of the basis function.
+The trigonometric function in case of the Fourier series.
+For any period minus pi to pi over all interval of two pi.
+We know that cos cosine x is zero.
+If m and n are not equal to zero is not equal, then it is pi.
+Similarly, if they are not, same sign into sine is zero and this is cos and sine is always zero for different values of not necessarily equal.
+All right. So this is quite important. And we encounter those multiplications.
+So as soon as you see these kind of multiplications in the Fourier series expansion you
+can quickly say okay because of this property of the orthogonality these are so you.
+Now we go to the formulation formal formulation of the Fourier series.
+What is the Fourier series and how it can be defined?
+So there are certain conditions.
+If the function satisfies certain conditions, we will list those conditions as the regular condition later in the slide.
+Then we can write any periodic function of period two pi.
+So we start with two period two pi. But this is in general true for any period t or any period t, but we start with t to be two pi.
+For simplicity. So if it is defined between minus pi to pi or 0 to 2 pi.
+If the function is periodic to pi periodic, then f of x plus two and five multiples of two pi.
+The same value remains of the function that we know. And that function can be repeated.
+Can be represented by age zero to some constant term.
+Plus the summation of the harmonics, um, of the sine and cosine.
+So for example, n is one even cos one eighth and cos cos 2X3 cos and so on.
+Similarly b one sine x be designed to x and so on.
+It can go up to infinity. So if you add all this term with appropriate values of p and then v n and if
+you sum them up then you can construct any periodic waveform we have seen.
+Just by large number of sine waves and cosine waves with different amplitudes.
+And that's the whole point that is known as the Fourier series expansion of any periodic function f of x in form of cos and sine.
+And Ian and Ben are known as the foliate.
+Coefficients. That we need for the expansion. We know this is quite easy to compute cos x equals two x.
+We can just just change of the values. But this is not that easy.
+What is the value of a0. What is the value of a1 a2 a3 are important to compute and we can take.
+Those integrals that we have computed based on the orthogonality of the basis function cos,
+cos, cosine, sine sign, that kind of thing, and find out the values of the coefficients.
+So let us see how we can find out those values of the coefficients.
+Just an example. So if I start multiplying f of x any given function with one of the basis functions.
+So I just start to see how well this function um.
+Can be. Separated in terms of a school fission by just multiplying the basis function and taking the integral.
+So I'm just doing x. Multiply this with any function I'm interested in.
+To take the four years of this x function and integral between two pi period minus pi two pi, and then substitute the definition of my f of x.
+So I say if f of x can be represented by a 40th series expansion, then this is k0 over two plus sigma a and cosine x plus sign.
+So that's the definition of f x. That's what we say. This is how a function can be represented by its basis function calls and sign times cos and x.
+And then I just open the bracket.
+So the integral remains same a0 two times scores an x then and cosine x times cosine of x and the last again integral and the sum.
+Begin sign at next. But we know that due to orthogonality and integral property, what happens?
+You. Right.
+So the integral of course within the period is zero.
+We have seen that. So this is zero over here when you have cos and next cosine x this is only five.
+When both are say that zero is different.
+So what I would write here is e n.
+The value is phi, delta and m. So you are saying this is one.
+If they are different, this is zero. So if they are saying, then if you say and thought.
+This integral. Is zero because it is sign and cost.
+And we have seen sign and cos when you have the integral within the period minus pi to pi, it is always zero.
+So that's zero. So we end up with this, I can write down because this is only true when n equals n.
+And I have started with m with that.
+So I can write let's say instead of AK and I can say m but but then I can change all two and all to k whatever I like.
+But in general I can say I can compute. Now the Fourier coefficient m is one over pi integral f of x cosine x.
+So what I need to do the given function. If I have the equation of a given function, I want to find the Fourier series.
+I will just multiply the cos and x.
+Of course m x k x. Let me take the value one to.
+And then one over five will give me the different values of the coefficients a1, a2, a3.
+Similarly, I can find out different values of sine, different values of vn in form of f of x sign at next.
+So b1, b2, b3, and so on. So problem sorted.
+Now once I have all the values of a and b n, then this is my standard for your series expansion.
+If my function satisfies the conditions.
+Certain conditions, then f of x can be represented by this equation and and can be computed using this integral.
+Always be and can be computed by f x sine.
+Straightforward. So this is the only thing Fourier series depends on this.
+This is the main slide. How to write down the equation of audio series expansion of a function f of x and how to find a and b.
+Okay. Are any questions so far? Any doubt.
+Well, good. Fine.
+Now let's take one example. Just a simple example.
+Assume your f of x is. Just see some constant.
+So my f of x I can say is just a constant c.
+Right. This is my Netflix. So if it is just a constant, what is the Fourier series expansion of just a constant?
+It is not periodic. Or if you say period, any period, you say it's always right.
+Between any two periods, let's say minus pi, two pi it is C again, it is C again it is C.
+So I need to find out the yin and yang in general.
+Before I can write down the Fourier series expansion. So I say okay, my f of x is c times cos and x plus and x is same.
+It's just nice notation. And if I integrate this x out cos nx.
+For n equals zero. That is important. If you look at from the equation we have the sigma starts from one to infinity.
+And zero and equals zero. We have to compute always separately.
+So a zero term we have to compute separately. So n equals zero.
+We know that what happens cos zero is one.
+Correct. So any zero of zero is one. Therefore integral is 1DX.
+So one dx is x with limit pi and minus pi.
+So by minus minus pi two pi c divided by two c divided by five times two pi.
+So it is to C which is straightforward integration.
+Okay. Yeah. And so straightforward.
+Which means I can find out the value of C, which is a0, like y2.
+So a0 over two is c, which is quite important because I need um in this previous equation is the over two that I always need.
+And if my function is c then a0 over two is c.
+Right? So it tells us that the first step in the Fourier series expansion is a DC is a constant term.
+So for example, if my waveform is centred around the horizontal axis, then my A0 term is zero over two.
+Could be there is nothing because it's equally balanced to might be zero, but if the same.
+Term is just centred about the x axis.
+Then there is some DC value average value and my r0 over two could be that value.
+So if it is symmetric then this a0 over two value in the Fourier series expansion may not be that.
+So you see later on with the example. Begin as usual, one over five f of x is C times sine.
+Take C out as a constant. Then we know the integral of sine.
+Of course, is always zero for one period, so that that's zero VN is always zero for this constant.
+Um, there is no other value of n for one, two, three.
+So zero only there is one term is zero which is fixed and which we have computed.
+So if there is only DC term there are no oscillations.
+Then all the values of a and b and are zero except a0.
+That's important to remember. Now we move on to the condition that we mention that f of x satisfies certain condition.
+Those conditions are known as d. Recollect conditions. And what are those conditions?
+The first thing is f of x is defined. So you can write the equation of f of x.
+You should be able to write the equation of f of x, and it should be single valued at any particular point of x.
+F of x should have a value and it should be periodic with two pi to start with, but it could be periodic with any period t later on.
+We can generalise to start with periodic with two pi.
+So the angular frequency in terms of. F x and f prime x, so its derivative have at most finite number of.
+Discontinuities within the single period, so within the single period the function should be differentiable and it should have finite discontinuities.
+So for example, you have this kind of one period.
+You have a function like this. So here there is a discontinuity.
+Here there is a discontinuities. There is finite. It's countable within the given period.
+So if this kind of waveforms are there piecewise continuous then it's fine.
+Then we can represent that function in formal standard equation 42 series expansion.
+We can compute the Fourier coefficients of this integral f x x.
+But as f x sine x, we in the period minus five to 5 or 0 to do part, whichever the integral, you want to take the limits as long as it's too high.
+So any point at x, the value of the function f of x at that point can be computed through Fourier series expansion.
+Even at the discontinuities we will see later. Great.
+Which the Taylor and Maclaurin series will not allow us to discontinue.
+So in that sense, um, it is an improved. Okay.
+This direct light conditions are sufficient for the Fourier series to represent VFX, so they are sufficient and they are not necessary.
+In this sense, there are certain functions, um, they do not satisfy this direct light condition, but still have the Fourier series expansion.
+So they have a convergent Fourier series in the sense you can say that these conditions are sufficient, uh, but not necessary.
+Now let's take the example. This kind of example probably was asked in the last, uh, exam, for example.
+But if you look something similar.
+So if you are given an exam, let's say this is the way form or this is the function defined, find out it's Fourier series expansion.
+That could be a one of the question if I remember that was that were three fourths probability.
+This was one of the last part in the first example. So from the graph we can see that this is periodic because of the minus pi to I.
+If you just keep this repeat, you will have this video the waveform.
+It has the amplitude four. So that's fine.
+And you can write down the expression what is happening between minus five divided by 2 to 0 from minus pi over two pi over two.
+It is constant for and then from five until the bar is zero.
+So 040. We have to write down the expression for one period.
+We are choosing to write from -5 to 5, but you may choose to write the expression from 0 to 2 pi as well.
+It doesn't matter as long as you pick one interval.
+So you can write either way minus pi to part or 0 to 2 pi.
+And then compute the Fourier series, and you will see that you will get the same answer.
+Our aim is to represent the Fourier series expansion of this periodic function in the form of some constant plus.
+The sum of signs that cosine wave forms two different ways.
+If we do that than we have done before of this expansion.
+And for that, what we need is to identify what is the period of the waveform, which is very easy to buy in this case f of x plus two pi f x.
+And the crucial aspect is what is the value of A0A and b.
+If we can compute those, then we are done. Let's start with the general equation of n.
+N is always one over two pi minus pi to pi f of x equals x.
+Now we need to compute n equals zero separately.
+So let's say when n is. Zero.
+What happens if zero? So if any zero in this case to zero is one.
+So it's just the integral of f of x between -5 to 5.
+Now we break it down from the waveform.
+Okay. So this would be minus pi to pi over 2040 as we know from the variable.
+So this is zero. The last is zero. We just need to concentrate on this.
+The middle integral. So we can say this is one over five integrals of the DCS is just x.
+So for x. Five over two minus five over two.

@@ -30,12 +30,16 @@ import transcriber_app.main as main_module
 # Options: 'fixed', 'vad', 'adaptive'
 CURRENT_MODEL = 'fixed'
 
+# Select which audio set to test: '10sec', '5min', or '30min'
+AUDIO_SOURCE = '10sec'
+
 class TestRunner:
-    def __init__(self, test_audio_dir="test_audio", results_dir="test_results"):
+    def __init__(self, test_audio_dir="audio_files", results_dir="test_results", audio_source=AUDIO_SOURCE):
         self.test_audio_dir = Path(test_audio_dir)  
         self.results_dir = Path(results_dir)        
         self.json_dir = self.results_dir / "json_results"
         self.report_dir = self.results_dir / "report_results"
+        self.audio_source = audio_source
         
         # Create directories
         self.results_dir.mkdir(exist_ok=True)
@@ -45,28 +49,62 @@ class TestRunner:
         self.results = []
         
     def find_audio_files(self):
-        """Find audio files in test_audio directory"""
-      
-        # For quick testing - use specific file
-        audio_files = [self.test_audio_dir / '10sec_medium_pace_audio.mp3']
-        return audio_files
-        
-        # # For full testing 
-        # audio_files = []
-        # if not self.test_audio_dir.exists():
-        #     print(f"Warning: {self.test_audio_dir} directory not found")
-        #     return audio_files
-        # for audio_file in self.test_audio_dir.glob("*.mp3"):
-        #     audio_files.append(audio_file)
-        # for audio_file in self.test_audio_dir.glob("*.wav"):
-        #     audio_files.append(audio_file)
-        # return audio_files
+        """Find audio files based on selected source in audio_files directory"""
+        source = (self.audio_source or '').lower()
+        if source == '10sec':
+            audio_path = self.test_audio_dir / '10sec_version' / '10sec_test.mp3'
+            if audio_path.exists():
+                return [audio_path]
+            print(f"Warning: {audio_path} not found")
+            return []
+        elif source == '5min':
+            base_dir = self.test_audio_dir / '5min_versions'
+            audio_files = []
+            if not base_dir.exists():
+                print(f"Warning: {base_dir} directory not found")
+                return audio_files
+            for pattern in ('*.mp3', '*.wav'):
+                audio_files.extend(base_dir.glob(pattern))
+            return audio_files
+        elif source == '30min':
+            base_dir = self.test_audio_dir / '30min_versions'
+            audio_files = []
+            if not base_dir.exists():
+                print(f"Warning: {base_dir} directory not found")
+                return audio_files
+            for pattern in ('*.mp3', '*.wav'):
+                audio_files.extend(base_dir.glob(pattern))
+            return audio_files
+        else:
+            # Fallback to 10sec if misconfigured
+            audio_path = self.test_audio_dir / '10sec_test.mp3'
+            if audio_path.exists():
+                return [audio_path]
+            print(f"Warning: Unknown AUDIO_SOURCE '{self.audio_source}'. {audio_path} not found")
+            return []
+
+    def get_audio_source_display(self):
+        mapping = {'10sec': '10sec', '5min': '5min', '30min': '30min'}
+        return mapping.get((self.audio_source or '').lower(), str(self.audio_source))
     
     def load_reference_transcript(self, audio_file):
         """Load reference transcript for WER calculation"""
-        # Look for transcript in test_transcript folder
-        transcript_dir = Path("test_transcript")
-        transcript_file = transcript_dir / audio_file.with_suffix('.txt').name
+        # Select transcript directory based on audio source
+        source = (self.audio_source or '').lower()
+        if source == '5min':
+            transcript_dir = Path("transcripts/edited_transcripts/5min_transcripts")
+        elif source == '30min':
+            transcript_dir = Path("transcripts/edited_transcripts/30min_transcripts")
+        elif source == '10sec':
+            transcript_dir = Path("transcripts/edited_transcripts/10sec_transcript")
+        else:
+            # No reference transcripts for 10-second quick tests
+            print(" -> No reference transcript for 10sec tests (WER disabled)")
+            return None
+        
+        # Map audio filename to transcript filename (assumes matching base names)
+        transcript_basename = Path(audio_file).with_suffix('.txt').name
+        transcript_file = transcript_dir / transcript_basename
         
         if transcript_file.exists():
             with open(transcript_file, 'r') as f:
@@ -92,12 +130,11 @@ class TestRunner:
         
         print("\n" + ("=" * 100))
         print("Testing Session")
-        print("=" * 100)
-        
+        print("=" * 100)        
         # Find audio files
         audio_files = self.find_audio_files()
         if not audio_files:
-            print("No audio files found. Please add audio files to test_audio/ directory")
+            print("No audio files found. Please add audio files to audio_files/ directory")
             return
         
         # Get configurations for the specified model
@@ -111,7 +148,7 @@ class TestRunner:
         total_tests = len(audio_files) * len(configs) * num_runs_per_config
         
         print(f"-> Testing {model_display_name} model")
-        print(f"-> Testing {len(audio_files)} audio files")
+        print(f"-> Testing {len(audio_files)} audio files ({self.get_audio_source_display()})")
         print(f"-> Testing {len(configs)} configurations")
         print(f"-> Testing {num_runs_per_config} iterations per audio per configuration")
         print(f"-> TOTAL: {total_tests} tests")
@@ -324,7 +361,6 @@ class TestRunner:
         
         print("Testing Complete")
         print(f"-> Tested {model_display_name} model")
-        print(f"-> {len(self.results)}/{total_tests} tests complete")
         print(f"-> Results saved to: {json_path}")
         print()
         
@@ -362,7 +398,7 @@ class TestRunner:
 
 def main():
     # Create test runner
-    runner = TestRunner()
+    runner = TestRunner(audio_source=AUDIO_SOURCE)
     
     # Run tests for specified model_type
     runner.run_model_tests(CURRENT_MODEL, num_runs_per_config=3)

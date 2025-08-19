@@ -33,7 +33,7 @@ start_time = None
 metrics_collector = None  # For end-to-end latency measurement
 
 # Start the full pipeline: audio, transcription, metrics
-def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=True, enable_adaptive_control=True, metrics_collector=None):
+def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=True, enable_adaptive_control=True, metrics_collector=None, fixed_chunking_mode=False, fixed_chunk_seconds=3.0):
     global audio_stream, transcriber, metrics, track_insider_metrics, adaptive_controller, transcription_thread, start_time
 
     # Clear previous data if there exists
@@ -89,7 +89,9 @@ def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=Tru
                     frame_duration_ms=frame_duration_ms,
                     max_silence_frames=max_silence_frames,
                     metrics_collector=metrics_collector,
-                    metrics=metrics  # Pass metrics object for insider metrics storage
+                    metrics=metrics,  # Pass metrics object for insider metrics storage
+                    fixed_chunking_mode=fixed_chunking_mode,
+                    fixed_chunk_seconds=fixed_chunk_seconds
                 )
 
     # Safeguard to ensure exactly one background thread is active 
@@ -165,6 +167,7 @@ def start_transcription_pipeline_with_virtual_audio(audio_file_path, enable_insi
         adaptive_controller = AdaptiveController()
 
     def run_transcription():
+        global track_insider_metrics, adaptive_controller
         if audio_stream is not None:
             audio_stream.start()
             if transcriber is not None:
@@ -195,6 +198,18 @@ def start_transcription_pipeline_with_virtual_audio(audio_file_path, enable_insi
                 
                 print(f"      Using config: aggressiveness={aggressiveness}, frame_duration_ms={frame_duration_ms}, max_silence_frames={max_silence_frames}")
                 
+                # Determine if we should use fixed chunking mode
+                fixed_chunking_mode = False
+                fixed_chunk_seconds = 3.0
+                
+                if config is not None and 'chunk_size' in config:
+                    # Fixed chunking mode
+                    fixed_chunking_mode = True
+                    fixed_chunk_seconds = config['chunk_size']
+                    # Disable insider metrics and adaptive control for fixed chunking
+                    track_insider_metrics = None
+                    adaptive_controller = None
+                
                 transcriber.transcribe_stream(
                     audio_stream.audio_queue, 
                     on_transcription, 
@@ -203,7 +218,10 @@ def start_transcription_pipeline_with_virtual_audio(audio_file_path, enable_insi
                     aggressiveness=aggressiveness,
                     frame_duration_ms=frame_duration_ms,
                     max_silence_frames=max_silence_frames,
-                    metrics_collector=metrics_collector
+                    metrics_collector=metrics_collector,
+                    metrics=metrics,
+                    fixed_chunking_mode=fixed_chunking_mode,
+                    fixed_chunk_seconds=fixed_chunk_seconds
                 )
 
     # Safeguard to ensure exactly one background thread is active 

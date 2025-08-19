@@ -1,0 +1,532 @@
+starting with this picture again, I had, uh, I guess last week or other, um, someone suggested what it is.
+6:18
+Um, when we get to the final lecture, I'm going to come back to it and try and draw analogies to software engineering,
+6:35
+um, uh, and try and pull together the different pieces of the, of the picture.
+6:43
+Um, it's actually an animation by, uh, a lady called Sidney Powell.
+6:48
+Um, and it's a series of comics which which I really like. She, uh, gave a guest, I guess, lecture at Christmas.
+6:54
+Lecture. Um, uh, gave me permission to use the image in teacher, which I appreciate.
+7:02
+And it's. Yeah. Like I say, I think it's quite a quite illustrative image of what software engineering is.
+7:08
+This week we're going to talk about legacy code.
+7:16
+Um, and when we talk about scrum, we're going to come back to, um, what the different roles are, how things can go well,
+7:19
+what some of the symptoms are of an effective team and some of the symptoms of a team that's, uh, that's not performing well.
+7:25
+Um, but we'll start, as we always do, by reviewing last week, uh, looking at the assessment,
+7:33
+um, then we'll talk briefly about legacy code and then talk about agile pitfalls.
+7:39
+So last week we talked about designing for testability and resilience.
+7:45
+So using the a wider range of design patterns this week.
+7:49
+So we started with the uh strategy and template design patterns which hopefully were quite familiar in terms of composition and inheritance.
+7:53
+Um, um, this week we're starting to look a little bit more, uh,
+8:01
+how you might build the methods and structures within your objects in classes, uh, to build out resilience.
+8:05
+So when you're, uh, when you're refactoring your code, you're not just thinking about, okay, how does this look?
+8:13
+Or how is this, um, how is this structured,
+8:19
+which typically would be a decision made when you're creating the objects or the classes in the first place?
+8:22
+Um, but how can I restructure my code to remove coupling, um, to improve resilience so that when you have access to particular objects,
+8:28
+you're constraining it in a way which is which is constructive and also allows for more refined testing.
+8:38
+Um, we also looked at the scrum roles, and we'll come back to the second model at the end with some questions.
+8:45
+Um, but when we're thinking about the software development lifecycle,
+8:51
+we go through from requirements design, implementation, testing, deployment and maintenance.
+8:54
+What we're starting to think about now isn't just that early start, early parts of that phase of the software development lifecycle,
+9:01
+but how do we revisit that software development lifecycle as your code matures, as you join a more substantial code base?
+9:10
+And what can you contribute to a code base that is existing,
+9:19
+and how can you restructure code to make it more resilient and to be a better software engineer?
+9:23
+So this assignment this week, um, we started with the builder pattern.
+9:32
+Pretty sure everybody had a good idea of how to use the build a pattern.
+9:37
+Um, well, I think most people did, but some people fell short of was the naming convention.
+9:42
+So this with name attributes is something of a of a convention that we should follow.
+9:50
+Uh, and as we talked about, um, and a couple of weeks ago, there's these tiers of expectation of what,
+9:56
+what is what it means to be a software engineer, what it means to produce good software.
+10:04
+Some of the low level tiers are built into the compiler. So it's things that the, uh,
+10:08
+the system will recognise some of the higher level stuff about removing redundancy in your code and building in good patterns in good practice.
+10:13
+All of these software policies, guidelines, ultimately, that you and your team will follow, which means that your code is following standard practice.
+10:22
+And the structures in there are following standard practice so that you're all maintaining good standards of code,
+10:32
+and that I think that means things like naming conventions are standardised and you follow guidelines.
+10:38
+You do that, do that in a in a systematic way. Um, it's a trivial thing, but easy marks.
+10:43
+Pretty much everyone got the build. Uh, the build method. Um, uh, I wanted to ask about default values.
+10:50
+So have you seen the build a pattern elsewhere, or why do you think you might not have seen elsewhere?
+10:58
+How would the builder pattern look in Python? Uh, so it could work, but it wouldn't be needed.
+11:07
+Um, anyone know why I say, um, default values is a thing that we can't do in Java, so you can't in the, uh, in the message signature.
+11:30
+Say, um, I don't know if, like, string arg1 equals placeholder, whereas in Python you can just give default arguments.
+11:40
+Python is a much more modern language, which means it's much more adaptable to change.
+11:51
+Whereas if you were to implement that in Java, there's a lot of like legacy code that goes back a long way.
+11:57
+So you add that and it breaks all of that, um, reverse compatibility to previous versions.
+12:03
+So the builder pattern is this is quite outdated, but it's quite difficult to get rid of.
+12:11
+Um, you look at Kotlin, which is um, very similar to Java.
+12:17
+It builds on Java and is completely compatible with Java.
+12:22
+They have default values and therefore you don't need to use this.
+12:25
+This builder pattern.
+12:29
+Um, there's a series of features that you see in modern programming languages which make some of these design patterns redundant.
+12:31
+The builder pattern is kind of an obvious one. Um, long chain method calls.
+12:40
+So again, coming back to these naming conventions.
+12:45
+Did anyone notice that when you're using the builder pattern, sometimes you are going like, um, with last name,
+12:48
+with first name, with published date with, uh, the other published date was started and published date.
+12:54
+Um, and then what the build execute.
+13:00
+And then you are passing in quite a long, um, get instance at the end.
+13:05
+In some cases, uh, how might you fix them?
+13:10
+So we split it onto multiple lines. And what would be?
+13:16
+How did you do that? It's just that it's all.
+13:20
+Huh? Yes. Good segue.
+13:29
+Um, did you do that for every every time you use the dot method?
+13:35
+I mean. If you went past 220 characters, then you started to sort of.
+13:42
+I'm okay. Yeah. Did you talk to your partner about it?
+13:48
+Yeah. Again, it's something where you look at the, um, the Google style convention.
+13:55
+It's quite particular about what it allows and where it allows some discretion for the developers.
+14:02
+And you look at the JetBrains, um, style guidelines.
+14:07
+And again, that's quite particular. That follows the like always with the documents the next line and kind of have this structure.
+14:12
+Um. See.
+14:20
+Uh, have the structure. Kind of like this. Uh, I assume you can see that this is human.
+14:39
+Um, could you say where each dot goes onto the next line?
+14:45
+Uh, and then if it's. I've lost my cursor.
+14:50
+Okay. After it.
+14:56
+Sometimes people will say to the operator before the line, um, except for it's a bracket, and this should be indented, and then you close afterwards.
+14:58
+Um, again, some conventions will say this should be on the next line, and so we'll keep it up here.
+15:13
+Um, the key is that you're consistent and that you're talking to the rest of the
+15:23
+development team to start setting these kind of standards that you want to follow.
+15:27
+Okay, so build a pattern most people really buy on, uh, the singleton pattern.
+15:37
+Um, I think most people understood the singleton pattern, but didn't understand some of the implications for, uh, for testing.
+15:45
+So, for example, with your singleton pattern and this potentially could have been the case here,
+15:54
+is that if you're running this unit test very regularly and the,
+16:00
+uh, the actual data store, which is being referenced from the Singleton,
+16:07
+which is singleton for a good reason, um, is part of the production environment.
+16:12
+You may well be creating, um, quite a significant, uh, like, um,
+16:19
+lock on the system because you're making a whole bunch of read processes interact with the system.
+16:26
+Hopefully you're constraining quite how many write processes you make,
+16:34
+but you may well be interacting with an operational system because your singleton class is designed
+16:38
+in such a way that there should only be one instance of the live class which is being used.
+16:46
+In that case, you really don't want to be testing it over testing it.
+16:51
+At least you certainly don't want to be writing to it. Um, only to read, uh, um, an instance back and then to delete that instance.
+16:55
+That would take up quite a lot of, um, CPU cycles for what might well be, uh, an active, overloaded, um, bottleneck in your production system.
+17:04
+So typically you wouldn't actually test your singleton pattern or your singleton class,
+17:15
+except in these kind of system level tests where you're going to check the whole system's working.
+17:21
+And if it doesn't, you know that your singleton is the the place where it's going wrong, because that's the that's the kind of core part.
+17:27
+Um, yeah. Okay. So most people um, maybe about half actually, um, um, did separate this out isolation on the, uh, on the testing framework here.
+17:36
+Um. Yeah, although.
+17:51
+To some extent.
+17:57
+Many people still left some, uh, singleton calls baked into their either the testing framework or the, um, the other class which was using it.
+17:59
+Any questions on that? So this was where the dependency inversion was key, which allowed you to have the isolation.
+18:12
+Most people got the dependency inversion in terms of introducing an interface,
+18:19
+which allowed you to not directly reference the singleton class from, uh, from your, uh, catalogue query.
+18:22
+But most people still reference the singleton class from the mock object I have from the test method, uh, where they could have used the mock object.
+18:31
+Okay. So, uh, this is what I was talking about and say, uh, we could have used, uh, a mock object.
+18:42
+Um. There was a couple of questions about what's the difference between using an anonymous object and a mock object.
+18:50
+Um, I don't want to sort of make a suggestion.
+18:57
+What would be the difference? How might you how might you benefit from or use either?
+19:02
+Sometimes. Uh, to some extent you can do it with a number of subjects, because you can see that something's been updated in your anonymous subjects,
+19:13
+but you're essentially you're creating this emulation of a mock object at that point.
+19:23
+So you might as well just have a mock object.
+19:29
+And the mock object gives you kind of a more precise isolation of the, of the interactions between the objects.
+19:31
+Um, what you might get from an anonymous object is a closer replicates of your singleton class.
+19:39
+So if you're not going to be able to test your singleton class, you can create an anonymous object very similar to singleton class,
+19:46
+which gives you a at least a sort of handle into what might be happening in your singleton class in the same way.
+19:53
+Now. It's it can be quite problematic to do that, but it can be a way to do that, um, without having a single spin class.
+20:02
+So yeah, it's, um, not ideal, but you might have a secondary singleton class,
+20:12
+which looks pretty much like you said it was in class so that you can do that kind of testing.
+20:20
+Um. That's not what you should have done here. Like we should have done here with you is the mock object.
+20:27
+Uh, okay. So you're starting, hopefully now to see that we're designing code not just for small projects, but for somewhat large projects.
+20:34
+And some of the practice that you're developing is good practice, again, not just for small projects.
+20:44
+And, um, actually, it's probably significant overkill for this size of projects that you're working on.
+20:51
+But when you get into using substantial software systems, substantial codebases, this is where it's really going to give you,
+20:56
+um, leverage in terms of the techniques and tools to be able to navigate through that.
+21:05
+What is a legacy? So this is a broad question.
+21:12
+Yes. Uh, so you'll see that the.
+21:25
+It's like the download or something. Okay.
+21:33
+Interesting. So when I typically when I ask what's legacy code, that's what people describe.
+21:38
+Um, but if I ask what's legacy, people would say, um, like some major achievement or like shaping the culture of a, uh, like, uh, of history, um, or,
+21:44
+uh, some kind of grandiose idea of what, um, what someone achieved and how that influenced, uh, the downstream populations or people or practice.
+22:00
+Um, but I think you've quite eloquently described what people consider as legacy code.
+22:12
+It's almost like this burden typically is, as people say, of like, uh, asking was left all this problematic stuff, which I've got to go and fix.
+22:17
+But if you think of it actually as a legacy of what are the achievements that
+22:26
+have gone before and how has this stood up to influence what's there today?
+22:31
+It, uh, I think it's important to frame it like that and consider that your code will also be legacy code in the future.
+22:37
+So when you consider how do I want to pass this code forward to future developers or future software engineers?
+22:44
+Um, what practices do I want to bake into it, and how is that going to shape the way that it's used in the next ten years?
+22:52
+Um, we're going to talk about, uh, the group dynamics and how that can change with different products, owner inputs.
+22:59
+Um,
+23:07
+but I think that's important to recognise is that you might think this legacy is a pain in the ass because someone hasn't touched it for ten years,
+23:07
+but if it stood the test of time for ten years and it's still basically, um,
+23:15
+running the company that you're, you're working for, it holds a lot of weight, holds a lot of value,
+23:19
+and it's worth really kind of keeping that in mind and trying to be like, optimistic about how, uh, how legacy code is, um, is a valuable prospect.
+23:25
+Uh, it's a fresh faced engineers.
+23:37
+Um, you're going to go into brownfield coding whenever you, you go into software engineering roles.
+23:40
+So you were given a big code base.
+23:46
+And it's very common for the first thing to do is to go into that code base and say, uh, we've got this, um, this tool or this feature.
+23:48
+It's not been updated for quite a while. Be really useful to get some fresh eyes on it.
+23:57
+It'll be useful for you to get a handle on what we do as a company.
+24:02
+Go and spend a couple of months dig into the code. Figure out what's going on and if you can bring it up to date and write a test framework.
+24:07
+That might seem pretty intimidating from day one. Um, but it's very common.
+24:18
+It's a it's quite a formative exercise in getting to know a company, getting to know that their coding style is getting to know their code base.
+24:23
+Um, you're not going to go at it like you've gone at the exercises here.
+24:31
+You're not going to be able to say, all right, so I'll start with test driven development and start building something new.
+24:37
+You're going to be doing, um, what's called classification testing,
+24:42
+which is trying to test existing behaviours that are in the code aren't necessarily captured in the tests that are already there.
+24:46
+One of the things that you'll be tempted to do, uh, and this is, um, this is definitely the case in bioinformatics,
+24:56
+uh, is you'll be tempted to just re-engineer yourself to basically rebuild the whole thing from scratch.
+25:03
+Ignore what was there before the paper was published that they wrote to kind of substantiate this work, and then they've forgotten about it forever.
+25:10
+Let's just leave their that code behind and and build it again.
+25:19
+But often there's, there's kind of a butterfly effect of any, any flaws in a system that you might not see.
+25:24
+So if that system has been around a while and it has issues,
+25:31
+typically other people will have compensated for those issues by changing their systems to, um, to recognise and to sort of fix that issue.
+25:36
+So instead of fixing things that seem broken, just check that they work or check how they work first.
+25:45
+And as a rule of thumb, don't change what you don't need to change.
+25:54
+It might seem like all of the feedback that we're giving you now is like, you have to follow these patterns.
+25:59
+This is the best way of doing it. This is like the correct way to do it.
+26:05
+But if it's not done in that way, it's still can be can be functional.
+26:09
+Uh, and sometimes changing things makes it not functional, which is, which is worse than, uh, than it not being well engineered.
+26:14
+Um, yeah. Okay. So. How then would you go about changing things if you do need to change?
+26:23
+Things. Um, and just going back to the point, um. Uh, software engineering.
+26:32
+Uh, when I was doing my PhD, there was, uh, uh, a letter to bioinformatics, um, in which, uh, a postdoc wrote that I didn't know them directly.
+26:37
+It's kind of, uh, someone that someone new, um, uh, and it was basically, um,
+26:46
+this like, uh, uh, so, uh, not say for work letter that was basically saying, um,
+26:56
+there is so much poorly written software that is strung together to do the supposedly
+27:05
+world leading science that it's hideous and I can't put up with it anymore.
+27:12
+And we didn't get a proper job in software engineering.
+27:17
+Um, but now there is like over the last couple of ten years or so, there's this, um, like, research software engineer where there's a whole,
+27:20
+like, discipline of people going in to do software engineering for science, building robust systems, because this was a real problem.
+27:29
+Reproducibility, repeatability of replicability in in science was a major issue, uh,
+27:37
+because there was a bunch of people like me 15 years ago writing Perl and Python scripts
+27:42
+to pull together like different tools that had been written in different languages.
+27:49
+Putting together these analysis pipelines, coming up with some interesting results.
+27:54
+Uh, again, this is this is like really interesting.
+27:57
+This is really worthwhile. And it's going to change the way that the, the lab scientists see the, the field.
+28:01
+Um, but it wasn't very well-written.
+28:08
+It was written on a shoestring, often by people who were like lab scientists that we trained within a couple of years,
+28:11
+kind of like yourselves, uh, maybe, uh, maybe a little bit more qualified.
+28:17
+Um, but if you were to go into a bio informatics lab now, that's the position that many of the positions were in at that stage.
+28:22
+So a lot of the tools that were built were, were quite, um, quite hastily written and often written for,
+28:31
+for research papers, not for writing well engineered software.
+28:39
+It doesn't mean that it was it was terrible and that the world sort of fell down.
+28:46
+Actually, the science was moving very quickly, and it was, uh, a really kind of,
+28:51
+um, transformational period for science when, uh, I don't know if you.
+28:56
+So the the Human Genome Project around 2010, um, was really exciting.
+29:02
+That was a period of, like, really data intensive, um, science.
+29:08
+Like I say, that kind of transformational period comes with a lot of hastily written software.
+29:13
+You get a lot of this technical debt, which we talked about in the previous lecture, where people write software which starts off not terribly,
+29:18
+um, overreaching, but quite quickly can become overreaching because they're not structuring the software.
+29:28
+Well, when you start to string these things together and you have these kind of dependency structures,
+29:33
+um, so you've used Gradle and you've used Maven, um,
+29:38
+you regularly have kind of 20 external dependencies on different software tools that were built into your Maven manifest file,
+29:42
+which would be pulling recently updated tools from different places around the world.
+29:51
+Different labs were producing these different, um, different tools. And that was kind of the that was that was the the gold standard.
+29:57
+That was what the best science science was at the time.
+30:05
+That's not that long ago. Things are better now. Um, but it's it's worth noting that sometimes it's good to just reproduce the reproduce.
+30:10
+The results are there.
+30:22
+Understand why things worked before you then improve them and understand with the original authors, um, how that can be improved in a systematic way.
+30:23
+So it's widely adopted and so that you're not just creating a functional duplicate that's going to be ignored in the future,
+30:33
+but so that it can be, um, adopted more widely. Uh, okay.
+30:39
+So how do we do that? Well, we create this test harness.
+30:43
+So if you're going into a project and there's not much of a testing framework there already, um, you're not really familiar with the whole code base.
+30:47
+Really. What you want to do is highlight the bit that you're interested in, um, and start to build this test harness around the component you got.
+30:56
+So how might you how might you understand the bit that you're interested in?
+31:05
+How would you start to get a handle on, uh, a software system?
+31:10
+We talked about some some methods last week. 17 year old connections between the and.
+31:24
+Yeah. Perfect. Um, so there's a few different things to this.
+31:38
+The the coupling matrix. So there was that matrix where you had like a heat map which said how much fuel,
+31:42
+how strong the coupling was between the different units of like as a code, if you've got a huge code base,
+31:48
+sometimes that can be a little bit intimidating to navigate, but you can start to get those,
+31:53
+um, like network diagrams to see where are the, uh, the hubs, where are the edges.
+31:58
+And that can be based on coupling. You can also do that based on the commit log.
+32:03
+So you might start to use some, um, uh, some okay.
+32:07
+You might write your own analysis script is easy enough.
+32:13
+But take the commit log and say um, which parts of the code have been updated at what points and map that with your,
+32:16
+um, coupling matrix to see which clusters of code are updated regularly.
+32:24
+And how am I going to start to do this? And I think you we talked about the turbulence plot.
+32:30
+So which things are complex and updated often they're probably the things that are highest priority.
+32:35
+If you're new to a company, you're probably not going to be put on the complex things.
+32:42
+You might be the the less complex things which are not updated that often, but also maybe,
+32:45
+uh, maybe you could do some complexity analysis and look for poorly, um, poorly styled code.
+32:51
+And that might be a way of targeting it. But what you want to do is try to do it in a systematic way, rather than just going one click the first,
+32:59
+uh, alphabetically listed object and then try and going from there.
+33:08
+So if you use some of the tools that we've talked about over the last couple of weeks,
+33:13
+you start to highlight chunks of the code, sometimes called seams, where you,
+33:15
+you find this kind of thread of functionality where you can say,
+33:22
+or this is the bit I'm going to get a handle on, and I'm going to start by doing some classification tests.
+33:27
+So what is the overall behaviour?
+33:33
+You might do a system test or a series of system tests to start with which say what's the the the system level behaviour kind of black box.
+33:35
+If I do this thing I expected you to do this thing and then you might start building your unit tests.
+33:44
+Once you have your unit tests, then then you have this kind of, um.
+33:52
+This would call a test harness, which allows you to say, all right,
+33:58
+so I know that if I change anything and it breaks it, my unit test will tell me that it's not working anymore.
+34:03
+If you just go in and break something and you don't have a test framework, just fall back on.
+34:13
+You're really in dangerous territory. And it's it's not recommended.
+34:19
+Now, there are ways where, um, or there are times like the singleton examples that we've,
+34:23
+we've had where the code will be, um, highly complex or fragile or inflexible.
+34:29
+Which of the three characteristics we've talked about over the last few weeks?
+34:36
+Um, and you might not be able to edit the code or test the code without it being problematic for the production code or the operational code.
+34:40
+In that case, you might want to try and change the behaviour without editing the code in its place.
+34:51
+Sorry that, uh, edit the behaviour without change.
+34:57
+The code say in this case it would be like your dependency inversion.
+35:01
+So you might introduce some structures that make it compatible with testing that improve the, the coupling problems.
+35:05
+Um, but they don't actually change the behaviour.
+35:14
+The dependency version is a good example where you would enable, you have this enabling point where you can then isolate parts of the code.
+35:17
+You can start to build out your testing framework in your test harness,
+35:24
+to enable you to highlight parts of this code base that you want to kind of traverse through and check this feature or this cluster of the code.
+35:28
+So this gives you, uh, a good kind of start to okay, I'm going to look at this part of the code.
+35:39
+I'm going to start by characterising it with a system test or a series of system tests.
+35:46
+And then I'm going to start breaking it down into unit tests.
+35:52
+I'm going to look for places where I need to adjust the, uh, adjust the enabling points so that you can have that change of behaviour,
+35:55
+which you would need to be able to test it in isolation, um, without changing the operational state.
+36:07
+Some things, however, won't be possible to test.
+36:13
+Let's say, uh, you want to check? I said next week you'll be using a weather service.
+36:16

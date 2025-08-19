@@ -1,0 +1,286 @@
+Um, yeah. Just, um, today we're going to have to carry on looking at some of those old, uh, patients, and we're going to have, uh,
+look at how we start to express our thoughts about and our designs for a system, uh, using a so-called modelling language.
+And I'll talk about that in a moment. Just a quick recap of everything that we talked about last time.
+Uh, as being the key, uh, concepts.
+Right. So we have classes which are blueprints for objects. We have objects which are concrete instances of a class.
+We want to protect the internal state of all objects from interference from the outside.
+We want to be able to send and receive, uh, requests for services, which we do via the methods that we declare in the classes.
+And we have this notion of, uh, generalisation and specialisation of being able to have,
+uh, classes which somehow inherit properties of operations from, uh, parent classes.
+And we have the notion also of polymorphism.
+So being able to pass, uh, objects around as being, uh, different, uh, in different forms.
+Right. So, yeah, when we ran through all of that in great detail last time, now we're going to talk about.
+Right. So how when we work particularly on a large, uh, project, do we communicate to many different kinds of stakeholders with different backgrounds?
+What is going on with, uh, with the system and what is the structure of, uh, uh, the system?
+All right. So a classical, uh, design lifecycle for a piece of software is to do a bit of requirements analysis,
+like find out what is the system supposed to be doing,
+then somehow formally specifying that this is only a functional specification which says what the system is supposed to do.
+And then there's a technical specification that somehow going to tell you how it's going to do it.
+And from that you come up with the technical architecture for, uh, the system.
+And this is kind of here. This is this is the modelling phase here.
+This is where you have to come up with a representation of the system that you can share with everyone,
+so that everybody can agree how things are going to be implemented, how they're going to look, uh, when it's all done right.
+You then coded up, you test the individual subsections, subsystems that you've then coded up.
+You then integrate all those subsystems together and you put the the system into use.
+Right. But there's a lot that can go wrong along the way.
+All right. Um, it's kind of like when you're trying to build a complicated building, right?
+What do they come up with so that everybody can understand how things are going to look?
+So and this when this. Yeah they can either do they can do like, um uh like a virtual,
+um immersive visualisation of what the thing is going to look like or much more simply.
+When you print the print. Yeah. I will let you look at the blueprints.
+Well, sometimes they make. These architectural models.
+Yeah, they make the little models so that people can see what it's going to, to to to look like.
+Right. And these models are very simple to read and interpret.
+Right. And everybody can agree what the final product is going to look like.
+Yeah. Now notice, um, you know, this model is allowing us to describe some kind of complicated system.
+Clearly, efficiently and elegantly. That's what a model is supposed to do, right?
+It's supposed to abstract some complex system and give you a simpler representation that is elegant and easy to,
+to, to, to, to deal with and reason about.
+Okay. Now each you may have several different models for the same system.
+If you think about it right. This is very good at showing, for example, the interior layout of all these different rooms and so on.
+It's no good at, for example,
+telling me how the plumbing is organised or how the electrics are organised or what's going on on the other floors of this, this building.
+Right. So it may be that in order to communicate your your model to the group of stakeholders that you have to work with, um.
+You will need to use several different models, and each different model may not include all the details of the system,
+but it just gives you a particular perspective on the system.
+Can you see that? Yeah. And who are all of these stakeholders anyway that we're talking about here?
+And when you're designing a system who who are the stakeholders?
+This, the uses of the system will be one set of stakeholders to show who else other engineers.
+The other includes other engineers. Yeah, that's all that have to develop and build the thing.
+Yeah, absolutely. So other engineers and other developers who are also stakeholders.
+End user. The end user? Yeah, absolutely. That's this.
+Hey, that's these investors. Yeah, somebody has to pay for it.
+Right. So there's going to be somebody with budget responsibility who's definitely an important
+stakeholder and is going to be very interested in what they're getting for their money.
+Right. All of these parties are super involved in here.
+And of course, when you when you work on, for example, a large software development project, you don't just have one developer who builds it,
+you have like a team, all right, maybe 10 or 20 people assigned to build the software for a particular product.
+Now, the most I ever heard, uh, size of a team working on a software project was 110 by a company called orchestrator,
+which collapsed in spectacular fashion. No.
+And I was spending a lot of money on these 110, uh, developers.
+Um, actually, they were not coordinating their work properly. Right.
+So they could have done with some good modelling language to help each other decide what they were all supposed to be be doing.
+Right. And in the end, they never released a product and they just ran out of money because they'd also
+bought several fancy sales offices in London and Paris and Tokyo and so on and so.
+So it's just a waste, right? So what is the form of model that we like to use when we discuss software?
+It's something called the Unified Modelling Language or uh, UML.
+Okay. It's been designed over the last 25 years or so.
+So it's a very well established, uh, standard.
+And the idea is this lets us build easily accessible representations of different aspects of a system using a standardised graphical notation.
+So this formalism is supposed to be visual.
+It's it's supposed to give us the same kind of insight into software that we would guess about a building by looking at an architectural, uh, model.
+Okay. And you can always the object management group is the, uh, standards body responsible for overseeing the UML certification.
+And you can always go there to get the very latest, uh, specification, right.
+Um, now, remember we said you can have lots of different perspectives on the system, which gives you insight into different aspects of a system.
+And here it is. And this is, this is what's cunningly referred to as a, uh, meta model,
+because we have in UML described all of the kinds of diagram that you get in UML.
+All right. So how do we how do we see what's going on here.
+Do you see at the top here? It just says you have a diagram and it's got a box around it.
+Right. The diagram is a kind of, uh, class.
+Yeah. It's a kind of, uh, object that we have in our in our system.
+And do you see this little triangle there?
+That means is a kind of, in other words, is what you use for inheritance.
+All right. So diagrams come in two flavours.
+You get structure diagrams and behaviour diagrams.
+So the structure diagram tells you about the static aspects of your system.
+And the behaviour diagram tells you about the dynamic, uh, aspects of your system, how it behaves, uh, when it executes.
+Uh, right. Um, now, for the purposes of this course, uh, we mercifully do not, uh, expect you, uh, to know all of these,
+like, how many different types of the one, two, three, four, five, six, seven, eight, 910 1112 1314.
+1560. We do not expect you to know all of these 16 diagrams.
+We expect you to be incredibly familiar with class diagrams, because that's going to tell us about the structure of our software and so on.
+And we expect you to have a passing familiarity with object diagrams, use case, uh, grams and sequence diagrams.
+And once you know about these things, you'll start to see them everywhere.
+And these are also the most useful kind of diagrams that.
+Yeah, as I said, you'll see in lots of different, lots of different contexts,
+and you'll probably end up pushing a few of these into your final individual project reports or your group projects or whatever,
+because it's a great way to explain to people what you've what you've done, particularly the class diagram and the sequence diagram.
+See, the class diagram tells you about what classes do you have?
+How do they relate to each other?
+The sequence diagram tells you how the different classes communicate with each other, or what messages they send between them.
+Okay. So this is have a look at some of the other types of diagrams that you get.
+Uh, besides, uh, a class diagram. This is what's called a use case diagram.
+What's the what's the use case for a system. Scenario in which it would be a utility.
+Yeah. It's a scenario which shows how the system's going to be used.
+Yeah. It shows you who are the stakeholders in your system.
+What are they trying to achieve? Right. Uh, and how do they communicate?
+Um, uh, with, with with each other.
+Right. So here you have the research associate.
+You can query student data. You have the professor, you can create courses, issue certificates and so on.
+And you have the the assistant. You can also issue certificates as well as, uh, publishing various, uh, tasks.
+All right. Uh, we're going to do, uh, class diagrams.
+This incredibly simple class, uh, diagram here where you have the professor and the student, all kinds of people.
+Right. So this is the inheritance thing again.
+Yeah. That is, uh, so both students and professors, all kinds of people, uh, a professor, it can teach many courses.
+Um, many courses can be taught. A course can be taught by many professors.
+You see these little stars on the end. You will get to discuss all of this.
+This is basically talking about that. This is a many to many relationship.
+Yeah. And a student can attend the course and of course can be attended by many as a
+student can attend many courses and of course can be attended by many students.
+Right. So what we have there is a bunch of classes and then we have some kind of relationships between the classes.
+This is called an association. All right. We'll talk more.
+We'll talk more about those.
+There's also more that usually goes inside these boxes because all the moments, all we've given is basically the title of the class have.
+But we know there's more information that belongs in a class.
+What other information belongs in a class? We talked about it last year.
+Yeah. The attributes or the properties of the class and then the operations as well.
+Right. Okay. So, uh, there's also something called an object diagram.
+So in an object diagram you get to see that for example database the DB is an instance of oh of course.
+So this is an um an object called uh uh DB.
+It's uh, it's instance of of course the name of the course is databases takes place in the summer semester.
+It's two hours long. It takes place in lecture hall two. Um, Paul Schubert here is a student who's presumably attending this.
+This database says course.
+Right. And similarly, I probably as the course integrated programming probably, uh, which takes place in winter in lecture oh one and so on.
+Right. And both Helen Lewis and Mike Fox, who are instances of students are taking that, um, course.
+Right. So an object diagram tells you what's going on with particular instances of the, um, um, classes.
+Sequence. Diagram tells you what is the communication, what kind of messages go backwards and forwards between the, uh, classes.
+So here we have, uh, a student know we have some kind of system,
+and the student tells the system they wish to register for a course on a certain date, and the system says, well, okay.
+Yeah. But the most important kind of diagram that we need to focus on for this course is the class diagram.
+So we need to be able to create cluster grams if we need to, or we need to be able to at least interpret class diagrams.
+And we need to be able to translate them as well into uh c plus plus.
+All right. So your class diagram will typically contain well a class.
+And each class will be represented by a box with a title right.
+And inside the box we will find two things.
+There will be some attributes or some properties or some fields or what else can we call them.
+State to whatever you want to call the data members, right?
+And then they'll be the operations, the member, the member functions.
+All right. There may be binary or any associations between classes.
+So what does that mean? What do you suppose is a binary association?
+It's an association between just two classes. Or it may.
+There may be also something called an emery association.
+So it's a three way or more association between the different number of of class.
+So for example a professor in grade an examination script uh and then associated with that, there's also a mark.
+Right. Um, we can have these things called aggregations.
+So sometimes one class is part of another class.
+Yeah. So like a car has four wheels. That kind of thing is what we call an aggregation.
+Yeah. We can also have something called an association class.
+So sometimes on a relationship between, say, somebody, an employee works for a company that is associated with that,
+uh, an employment contract, which, for example, specifies things like the, uh, salary and so on.
+Right. So there can be more information, um, of about an association between two classes.
+And then we've also seen this notion of, uh, inheritance.
+Okay. Let's look at an example and go through very carefully everything that we can we can see here.
+Okay. And let's talk about. Yeah. Let's talk about exactly what we, we are seeing.
+So first thing tonight we got four boxes. Yeah.
+Each box has a title and then two sections.
+Yeah, yeah. So this is the name of the class.
+This is the attributes that I find in the class. And these are the operations that happen on the, uh, the class.
+Right. We see here we've got some kind of lines.
+We've got this little triangle again here. We see we've got the line here called lives.
+That. Okay. Um, so okay, let's just stop and just have the think about what we see in one box.
+Right. So we see we've got a person, um, in this upper part of the, uh, the box here,
+we got name, age, phone number and email address, each of which has a top.
+So what are those? That's the attributes, right?
+That's what constitutes the state of the person. Exactly.
+And you'll notice next to them on the left hand side what do we see.
+It's little harsh, right? What's that about? Sometimes it's a minus.
+Sometimes it's a plus, and sometimes it's a hatch.
+What do you suppose that means? Public or private?
+Yeah. It's got to do with the visibility of these attributes.
+Okay. If it's minus. And what does that mean?
+It's private. It can only be seen by members of that class.
+So only the student class can look into the student number.
+Okay. What if something is got a plus next to it?
+What does that mean? That means it's public, means anybody can access it.
+And if there's a hash next to it, this means protected.
+This means only the person, class and children of the person class.
+In other words, student and professor is allowed to access those those attributes.
+Okay. And you'll notice that all of our data attributes are either.
+Private or protected. We don't have any public data attributes.
+Why do we not have any public data attributes? Because that would violate the principle of encapsulation.
+Do you remember our third major theme of object orientation was about protecting the state of our objects.
+In order to protect the state of our objects, we make everything private or protected.
+So if you just have a class like a dress, you know, like street and city and so on, then everything's just private, right?
+If you have a class and things inherit from it and they should access this stuff, then make it protected.
+Otherwise, make it private. Right. So that's the correct way to deal with with with with attributes.
+Okay. I just quickly recapping mine as fast as hash.
+Which one is more private? Right. So mine.
+This means only this class can access this attribute.
+Yeah. So children and stuff of this class couldn't do it, right?
+So. So you say the name here, have the minus next to it.
+Yeah. Now student inherits from person. Student is special kind of person.
+So the student will also have all of those attributes.
+But if that was a minus that a student couldn't even see its own name.
+And that seems a bit extreme, right?
+Uh, to me, it seems like, uh, professor should be able to see that email address and phone number and so on.
+That would be absolutely fine. And the student should be able to see the age and name and so on.
+Um, yeah. Which is why here these are made protected and not just private.
+Yeah. Um, basically, if you're expecting to have a child class and it's reasonable for that child class to have access to these attributes,
+it should be protected.
+If you have the last sort of class in the hierarchy and you're not expecting to have any more, uh, child classes, just make it right.
+Yeah. Or if it's just, uh, a class with no children,
+then you can just make all of the attributes private that a student would be able to say professor's phone number in this instance.
+So. But a student would be able to see a professor's phone number.
+Uh. Yes, but not the salary.
+Salary? For example. Yeah. Yeah. Yes. Uh, is there any reason why we couldn't have student have, uh, protected, uh, student number instead of private?
+Yeah. I mean, if you were expecting to have other kinds of student year, like maybe a full time student and a part time student.
+Yeah. Then it would be good to get that to also be protected.
+Yeah. We're not expecting any children for the student then.
+Uh, protected and private is essentially the same thing. Yes, yes.
+So? So, yeah, but it's a bit of overkill to make it protected if you're not expecting any subclasses.
+Right. But if I had part time student and full time student, then it would be quite reasonable for them to have access to the student number.
+Right? So therefore you would you would get it like that.
+Now you can see then we have all these operations.
+Yeah. Some of these operations. So all of the operations have a return time.
+And some of the operations take a parameter.
+So here is a is eligible to enrol.
+Um kind of a method which takes of course.
+And it does true or false according to whether the students are allowed to enrol on the uh, uh, course.
+Right. Um, what else do we say?
+Uh, yeah. And you'll notice that what's the usual thing to do without operations?
+To make them public. Because this is kind of like the interface that we want to offer to the outside world,
+to let them manipulate these objects in some kind of consistent way.
+Okay. Yeah. Thanks to, course, for having to the virus course in terms of attributes.
+Uh, but uh, okay. So they should probably be as well a separate box, of course.
+And I mean, yeah, this can go on crazy, right? So students can take courses, professors can teach courses and so on.
+We haven't quite um, I mean, we sort of hinted here that what was going on with all the teaching and the attending and so on.
+So, yeah, I mean, this course things should be defined somewhere else in the diagram,
+and we should give the relationship between students and professors courses.
+All of that is kind of coming. All right. Let's have a look at this line here.
+This is what's called an association. And it's telling us about the relationship between two of the, uh, the classes.
+Right. So we're learning that a person lives at an address.
+Do you see this little black triangle there? That's very important.
+You know just where that black triangle is? The black triangle is not on the end of this line.
+Everybody, when they draw UML diagram showing triangle on the end of the line.
+No. And that the reading direction goes with the name of the association above the line.
+Okay. And so what? And and the reason why we have a reading direction is because this is a directed relationship, right?
+That a person lives at an address.
+Right? And indeed the person lives at one address.
+An address can have zero or more people living at it.
+This little star means as many as you like. Right.
+And these are what I referred to as multi cities.
+All right. So do you see how to to read it.
+Like. Yes. Uh, this diagram, like, it seems to me kind of incomplete because we have a person who lives at an address,
+but there's no, uh, there's no, uh, attribute that stores the address as if there's, uh.
+No, no, you see that when we translate this into C plus.
+Plus, we will include this lives that thing in the person.
+Well, for example, have a pointer to an address.
+All right. Yeah. So, so we we we will encode these associations in the data.
+That's a very important point actually. What do you notice about every single one of these attributes.
+Yeah, they're of what's called simple type. They're the basic fundamental types that are already built into C plus.
+Plus that instead of doubles. The most complicated thing we allow ourselves is a string.
+Right? But we don't have anything more complicated than that.
+There's no array of anything.
+Okay. If there is a relationship between two of the classes, it's expressed as an association.
+And we will encode that association when we translate into C plus plus in a different way.
+Yeah. Okay.
+Yeah. Uh, uh, the definition of zero.
+What does one mean? Every person has at most one address.
+Yeah. So this means a person has a lives at exactly one address.
+But an address can have zero or more people living access.
+Yeah. I suppose for students this is just not true for you anyway.
+This is probably like 1.2. whatever, right?
+Depending on, uh, on, on, um,
+where your actual home is versus where you're staying while you're studying versus where you crash and your friends couch and so on.
+But this is just a simplification of the real world. Okay.
+Everybody happy with that before we move on, I mean, we will cover all of these things again in a lot of detail,
+all of our attributes, all of our operations, all of our associations and what makes them different.
+Yeah. But just for the moment, is everybody happy with, uh, that?
+The example. Right. And we've seen.
+Yeah. We have the visibilities. And we've talked about how, generally speaking, your attributes, you make them private and protected your operations.
+You would make them public. Sometimes you would make your, um, operation private or protected.
+When would you make your operation private or protected?
+Another operation is going to use it like, yeah, when it's not for external use, it's only for your internal use.
+So it's not something you want to offer to the outside world,
+but it is a service that you want the members of the class to be able to, to, to, uh, access.
+Okay. So and the operations are functions that may be applied to objects.
+Right. So they are the. These.

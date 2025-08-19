@@ -53,7 +53,7 @@ class Transcriber:
             pass  # No updates to apply
 
     def transcribe_stream(self, audio_queue, on_transcription, on_audio_chunk, track_insider_metrics=None, 
-                         aggressiveness=3, frame_duration_ms=20, max_silence_frames=10, metrics_collector=None, metrics=None):
+                         aggressiveness=3, frame_duration_ms=20, max_silence_frames=10, metrics_collector=None, metrics=None, fixed_chunking_mode=False, fixed_chunk_seconds=3.0):
         """
         Transcribe audio stream with optional insider metrics tracking for adaptive chunking.
         
@@ -67,6 +67,8 @@ class Transcriber:
             max_silence_frames: Maximum silence frames before ending chunk
             metrics_collector: MetricsCollector for testing
             metrics: MetricsTracker object for database storage
+            fixed_chunking_mode: If True, use simple fixed-size chunking instead of VAD
+            fixed_chunk_seconds: Size of fixed chunks in seconds (only used if fixed_chunking_mode=True)
         """
 
         # Initialize current parameters
@@ -74,10 +76,67 @@ class Transcriber:
         self.current_frame_duration_ms = frame_duration_ms
         self.current_max_silence_frames = max_silence_frames
 
+        if fixed_chunking_mode:
+            # Simple fixed-size chunking mode
+            self._transcribe_fixed_chunks(audio_queue, on_transcription, on_audio_chunk, 
+                                        fixed_chunk_seconds, metrics_collector, metrics)
+        else:
+            # VAD-based chunking mode (original implementation)
+            self._transcribe_vad_chunks(audio_queue, on_transcription, on_audio_chunk, 
+                                      track_insider_metrics, aggressiveness, frame_duration_ms, 
+                                      max_silence_frames, metrics_collector, metrics)
+
+    def _transcribe_fixed_chunks(self, audio_queue, on_transcription, on_audio_chunk, 
+                               fixed_chunk_seconds, metrics_collector, metrics):
+        """Simple fixed-size chunking implementation"""
+        sample_rate = 16000
+        chunk_samples = int(fixed_chunk_seconds * sample_rate)
+        buffer = np.empty((0,), dtype=np.int16)
+
+        while True:
+            pcm = audio_queue.get()
+            
+            if pcm is None:
+                break
+
+            buffer = np.concatenate((buffer, pcm))
+
+            if buffer.shape[0] >= chunk_samples:
+                chunk, buffer = buffer[:chunk_samples], buffer[chunk_samples:]
+
+                # Record when chunk processing starts
+                if metrics_collector:
+                    metrics_collector.record_chunk_start()
+
+                # Normalise the audio data to the range [-1, 1] for whisper model
+                audio_float = chunk.astype(np.float32) / 32767.0
+                chunk_duration = len(chunk) / sample_rate
+
+                if on_audio_chunk:
+                    on_audio_chunk(audio_float, chunk_duration)
+
+                # Transcribe the audio data
+                result = self.model.transcribe(
+                    audio_float,
+                    fp16=(self.device != "cpu"),
+                    language="en"
+                )
+
+                if on_transcription:
+                    on_transcription(result["text"], chunk_duration)
+
+                # Record when transcription is completed
+                if metrics_collector:
+                    metrics_collector.record_chunk_end(result["text"])
+
+    def _transcribe_vad_chunks(self, audio_queue, on_transcription, on_audio_chunk, 
+                             track_insider_metrics, aggressiveness, frame_duration_ms, 
+                             max_silence_frames, metrics_collector, metrics):
+        """VAD-based chunking implementation (original code)"""
         # Configures a VAD object with configurable aggressiveness
-        vad = webrtcvad.Vad(self.current_aggressiveness)
+        vad = webrtcvad.Vad(aggressiveness)
         sample_rate = 16000         # Must match AudioStream 
-        frame_size = int(sample_rate * self.current_frame_duration_ms / 1000) # Samples per frame 
+        frame_size = int(sample_rate * frame_duration_ms / 1000) # Samples per frame 
 
         speech_frames = []          # Store speech segments
         silence_counter = 0         # Counts consecutive silence frames 
@@ -121,7 +180,7 @@ class Transcriber:
                 else : 
                     silence_counter += 1
                     # print(f"[DEBUG] Silence frame detected. silence_counter={silence_counter}")
-                    if silence_counter > self.current_max_silence_frames:
+                    if silence_counter > max_silence_frames:
                         if speech_frames:
                             # Record when chunk processing starts
                             if metrics_collector:
@@ -138,9 +197,9 @@ class Transcriber:
                                 on_audio_chunk(audio_float, segment_duration)
 
                             result = self.model.transcribe(
-                                audio_float, 
-                                fp16=(self.device != "cpu"), 
-                                language="en"   
+                                audio_float,
+                                fp16=(self.device != "cpu"),
+                                language="en"
                             )
 
                             # Calculate chunk-level metrics for insider tracking

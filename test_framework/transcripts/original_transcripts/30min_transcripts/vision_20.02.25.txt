@@ -1,0 +1,229 @@
+* Good morning. Uh. Let's start.0:58
+* So in last lecture, uh, was, uh, we start a topic on self-supervised learning, and we mentioned that we can even without labels.1:00
+* We can leverage the similarity and the contrast in the data to define some loss function and start training the neural network.1:10
+* And in this way that this part, this, uh, convolution neural networks or other models here, they can be trained.1:18
+* Um, this is uh, for this example that, uh, we assume we have two samples for the sample dog that we can create two versions dog.1:27
+* And the features for these two version of the dog should be similar to each other.1:35
+* This is one part of the loss function. Uh, and then we also have, uh, these comparison between the dog and the sofa.1:40
+* And that feature should be dissimilar. And this second part of the loss function we want to define.1:47
+* So that's the high level idea. And now we can look at uh the exact loss function we're going to use for training this model.1:53
+* So here we to for to train this uh, a model that, uh, we need to have, uh,2:03
+* loss function that can maximise the agreement between z I and z j and z a and z z z are two versions of this talk, and they are uh, to.2:08
+* You can apply data computation to the same image of dog creates two different versions, and there's two different versions.2:21
+* When it goes through these convolutional neural networks, the the network can generate the features which are z,2:27
+* I and j here at meantime one to minimise the agreement between z I and other z.2:33
+* And this are that is a feature of that. So for image.2:41
+* And the rough idea is that maybe we can put this to loss function into one equation, which is this equation that h is a fraction at the numerator.2:49
+* This is something we want to maximise. Uh, so we want to maximise the the similarity between z and that j.3:00
+* And at the denominator it is uh all the other, all the similar sums for all different paths.3:09
+* And we want to throw in these uh, uh denominator that uh, it contains the simultaneous z,3:16
+* I and J and also the similarity between z I and all the odds is that,3:25
+* um, if we can minimise the similarity between z I and, um, that this fraction will be it become uh, will be also be maximise.3:30
+* And so that's a rough idea. And the here that we are using this idea, however, that we will try to put this term into the,3:43
+* uh, into the cross-entropy loss, which is, uh, classification loss.3:53
+* And we know that if we want to perform classification tasks that once you define the, uh, different classes,3:58
+* we will know, uh, if there are two classes, one class means, uh, the positive class, uh, uh, that are.4:06
+* And that session will be similar to each other. We can call this, uh, positive path.4:16
+* And the second class is Z, R and others, we can call them negative paths.4:20
+* If you have these two classes, we can use, uh, cross-entropy loss to define the loss function.4:25
+* And to define this loss function that, uh, we need to draw some samples from the images.4:33
+* And if you if you have a dataset with a billion images,4:39
+* you cannot like utilise all these one colour images in one pass, but instead that we each during each iteration,4:43
+* we randomly throw a batch of a big and images and we can apply the augmentation to these big, um, images so that each image will have two versions.4:51
+* We have a two times, and for each sample I that we would regard this sample I and its own augmentation j as one positive pair.5:02
+* And this sample. Oh with all the other two times m minus one samples they will form the negative pairs.5:14
+* And in this way that we can define, uh, a binary classification problem to tell the difference between positive pairs uh,5:22
+* against negative pairs, um, to perform binary classification, we can use the cross-entropy loss function.5:29
+* And at the bottom you can see for example, suppose pick n equals four from the original four images.5:37
+* After augmentation you will have eight images um each of number a form the pair with uh its corresponding even number.5:45
+* So actual one and two. They are coming from the same original image three and four.5:56
+* They are also coming from the same original image. And for this interpretation we can maybe define three and four as one called the path.6:01
+* We colour coded them using blue. And then if we pass away with two, three um two are from different images.6:09
+* So they should form a net path three and one also from a negative pair.6:17
+* And three with five is also a negative. And in this way we can have a number of negative paths and one positive path.6:23
+* And after that we can go down the cost of loss which would look like this.6:32
+* So we know that, uh, cross entropy loss is, uh, a function that can, uh, measure the distance between two probabilities.6:37
+* So if you have the. Two probabilities p and q.6:50
+* That p is defined as. One.7:01
+* Negative sum of pi. Cons logarithm of xi.7:13
+* Here PR means the ground truth probability.7:18
+* QR means the predicted probability by the neural networks, and if it is for the ground truth,7:22
+* if it is, uh, binary classification problem, it means for some samples, uh, the.7:30
+* Oh point. Four.7:41
+* We can use the. One hot encoding to represent pi, which means it might be for class the for the files class.7:46
+* The ground truth is 100% and for a second class the ground truth is 0%.8:00
+* That is the one hot encoding for PR. Um, if we use one hot encoding, it is also not the end.8:07
+* This term it become just some pii which is times logarithm of xi.8:16
+* And this means that the pii which uh falls into class one, which well we have pii equals one.8:25
+* And so the cross entropy loss function would look like this minus logarithm of something.8:33
+* And that is exactly what we are looking here. Um, and also we notice that, uh, within the logarithm, it's uh quite complicated.8:37
+* Um, uh, but uh, the idea is very simple.8:50
+* The most in part is just a similarity between two, uh, two pairs of images between their features.8:54
+* And then we have this exponential term, which is the softmax function that can transform the original similarity into some probability.9:02
+* So if we have the original. Smart.9:14
+* Looks like this. Some similarity between z I and z z.9:27
+* Uh, if we take z, uh, simpler notation, let's just quit.9:31
+* Uh oh. And we know that, uh, one if, uh, is if we want to transform a and also the other A for,9:36
+* for the similar patterns that are and other z into a probability vector, you can use the softmax function.9:48
+* And what the softmax function does is just to make sure that this number is a positive number.10:01
+* So we'll use the exponential to the power of A.10:09
+* And instead of saying the softmax does is to make sure at the end.10:14
+* If you have, uh. If you have none of these arrays, you want to make sure that the sum is equal to one.10:20
+* So in order to achieve that, you need to have this the denominator that which is the sum of all the exponentials.10:30
+* And that is what we are looking at here.10:40
+* So here that at the bottom this is a cross entropy loss function for binary classification problem between the quality of pairs and negative paths.10:43
+* And for each pair of uh image features that we first calculate the similarity.10:52
+* And then we transform this similarity into a softmax of probability.10:58
+* And there is another term here which is this towel. And this tie is called the temperature parameter.11:05
+* It controls how how sharp how steep your exponential function will look like.11:11
+* And at the bottom it's a sum of all the exponentials.11:20
+* And that is the indicator function here which said this letter looks like one.11:23
+* And it's just, uh, means that we have, uh, when the code goes through, we'll start from zero, uh, one all the way to, to n.11:30
+* And the only thing we're not going to to choose it is R itself.11:41
+* So one, we clear out all these paths or we're only if we're looking at sample three.11:46
+* If we're looking at the samples, we swear we are not from a par with it itself.11:57
+* It will only from par with other samples. And that has a what this, uh, indicator function is doing.12:03
+* And this function.12:19
+* It looks like a cross entropy function, but it also have this, uh, temperature here, which controls, uh, the softness of the exponential term.12:22
+* Uh, so, uh, we gave its name, which is called normalised temperature, scaled cross entropy loss question.12:33
+* Because the scale of the temperature. Okay.12:40
+* So the temperature is.12:44
+* So if you have a. If you have a very large temperature like, uh, 1 million or 1 billion, if time equals 1 billion,12:48
+* then all these similarity come right is divide by the temperature will be become very, uh, small number close to zero.13:09
+* I mean, that way that the probability for all the paths will be looking similar to each other.13:20
+* However, if Tao is a very small number, such as nought point, nought nought one,13:27
+* then when the similarities divide by this very small number, it will be exaggerated.13:33
+* And that means that if. For example, if this is samples why is sample for.13:39
+* They have some similarity and between samples way and sample to the.14:00
+* Also we can also calculate the similarity. And if this tile is very small.14:06
+* It will exaggerate the difference between these two similarities.14:15
+* And while we choose these samples that, uh, in this example, we define the part three and four as a positive sample.14:36
+* And all the other pair. 3231356 as negative pairs.14:45
+* And because that is the eight samples here, we can have a number of ways to define the positive versus negative.14:51
+* And for this case that we we define one positive versus six negatives the positive15:00
+* between 3 and 4 we can calculate the similarity uh divide by Tao and then this number.15:07
+* Well then we will apply the soft maximum function to this number.15:15
+* And this number is called the logits largest means uh, when you are using the softmax function.15:20
+* Which is uh, this function, this oh, this power of the softmax is called the logits.15:29
+* Um, after you apply softmax on function to the logits, you get the probability.15:39
+* Um, also, we can define the ground truth label for the positive power.15:45
+* Positive power label one and negative of paths will have label zero.15:49
+* And after you calculate uh this column the largest column, and define the labels column,15:56
+* you can call the cross entropy function from PyTorch to calculate this contrastive loss.16:04
+* And this as a for uh this positive path.16:11
+* We can also define other policy paths. For example, we can also define a positive power to be between 4 and 3.16:16
+* Um, to defines a negative path to be uh 424145.16:25
+* And in this way you can calculate this cross entropy function gain.16:32
+* And at the end you can add all these cross cross entropy loss functions.16:35
+* Questions? Yeah. Uh, could you and we should get out of there so that the general patterns when you said,16:40
+* uh, if you only consider a specific person like, uh, how do you manage this situation?16:47
+* Uh, so we've never seen that. Consider, uh, the last number of courses.16:53
+* You can see there are two images that are similar but not the same.16:57
+* Uh, so, uh, so how would you like to view the patterns of this information that are similar but not the same?17:01
+* Okay. Yes. So we can go from, uh.17:09
+* Let's suppose that, uh, we're looking this, uh, this kind of images.17:32
+* So this is much. Here.17:42
+* We have a bar in the image. This is another image.17:47
+* And they look similar to each other. But we also have the image which looks different between it because the orientation of the bar is different.17:56
+* And initially that we don't have any model here.18:06
+* And we need to define some model which can be a thing, which can be something else to learn, uh, pattern from this, these paths.18:11
+* And here we assume that this has a positive colour. And this is a negative pair.18:20
+* Um, maybe they contains ten by ten pixels.18:29
+* So this time that by pixels will be our, uh, input data x.18:33
+* And this function, suppose it has only one layer of convolution.18:41
+* It will look like this. So we'll calculate some weight multiplied with this x.18:51
+* And then we apply activation function. Then we get some output.18:57
+* Initially we have x but we don't know w.19:02
+* So we need to adjust this w so that when w is multiplied with x this number can19:08
+* tell the difference between these kind of patterns against those kind of patterns.19:16
+* And in this process that W will learn how to detect these kind of bars or edges and orientations,19:21
+* and so that it can utilise these, uh, edge information to tell the difference.19:29
+* But that is a for a very, uh, simple image.19:35
+* And you right here, when we look at the image of a dog versus the image of so far, we need to define, uh,19:40
+* a convolutional neural network with a few layers so it can learn features from both images to understand the difference.19:48
+* And as long as you tell the network that between the dog and the sofa, this should belong to different classes.19:57
+* But using just this very simple, uh, supervisory information, at the end, the network can learn how to define W.20:09
+* Okay. Um, for this, uh, eight samples here, in this example, we can find lots of different ways to define the positive versus negative path.20:21
+* So actually that each time you can define one number which is both both function number.20:37
+* And then you find its corresponding uh or even number to form a positive pair.20:44
+* And between these both constant number and all the orange number you know from the next pass.20:50
+* And if you do this for all possible combinations at the end,20:58
+* you can write down the total loss function, which is the sum of several cross entropy loss,21:02
+* and that is the loss function we use to, uh, train, uh, this convolutional neural network so it can understand the difference between images.21:08
+* And the in this entire training process, we don't need to use any human annotations.21:20
+* And after this, uh, image encoder F is trained.21:28
+* How do we know that it's working well? So there are two ways to assess its performance.21:34
+* One way it's called the linear probing, which means that, uh, we only add a linear layer onto the network and then evaluate its performance.21:41
+* And in linear probing we phrase encode the parameters.21:53
+* If we have some input image. And during contrastive learning what we are trained is this f function.22:04
+* And this f function can learn some features. And this f function it looks like this.22:15
+* If you have zoom in it, it will look like it contains the first convolution layer, then second convolution layer, then some maybe max pooling layer.22:21
+* At the end it gets a feature. So here that at the bottom we have the input image.22:32
+* And for this all these blue blocks they are trying to during contrastive learning22:39
+* and for linear probing what we do is that based on the final output of f function.22:44
+* We add a fully connected layer similar to multi-layer perceptron.22:54
+* And the number of neurones in these fully connected layers is the sum of the number of classes you want to classify from a of classification task arm.23:01
+* So if you are testing this for ImageNet classification, then you need to put 1000 neurones here for the 1000 classes.23:12
+* And then you the phrase this part.23:22
+* So all the parameters in these the blue blocks, they are not changed.23:26
+* They are they are frozen. The only parameter we try is the connection weights between this blue layer and the last layer.23:32
+* And this is called the linear probing and art.23:42
+* You adjust the weights between this blue block and this green block.23:46
+* You can evaluate the classification performance. And, um, on the right you can see the, uh, performance of linear probing for this method.23:53
+* So, um, the image net takes that after the inner probing, you can see like around 75% accuracy and all the other dots,24:10
+* uh, the, uh, the method it compares to, which are also, uh, self-supervised learning methods.24:21
+* And if you use the fast learning methods, the accuracy you can see of is is shown here.24:28
+* It's about like 77%. It's actually that the performer is quite close to each other, however,24:34
+* that here we don't need to use any, uh, human annotations in training the model.24:41
+* The second way to the balance performance is called fine tuning.24:50
+* For fine tuning that. We are training others in here.24:54
+* So we are turning the, the the weights for this, the last layer and also the weights for all these blue layers.25:01
+* So it's the reason it's called fine tuning is that for all these blue layers the parameters are rather pre-trained.25:11
+* So assume let's see. We have some very good initial values.25:19
+* So we don't need to train it for a very long time.25:23
+* Maybe you just train for one epoch or ten epoch that it is sufficient for this green block.25:27
+* Uh, we don't have good initial values, but we still have to train you on this process.25:34
+* And when you have fine tuning all these layers, you still need to use a small, uh, that's that with human provided labels,25:39
+* like, because this, this time that the majority of networks have already been trained.25:49
+* So you don't need to use a very large, uh, training set with labels, maybe like, uh,25:55
+* 1000 images with human labels will be already sufficient to train or to fine tune this neural network.26:01
+* And after fine tuning again, that you can compare the performance of this contrast method,26:10
+* which is at the bottom of this table, to the other methods and also to the supervised method.26:15
+* So just learning, uh, all this, uh, so, um, I said it was proposed in 2020.26:25
+* And after that, also, there are some other contrastive learning approaches being explored, including Biol, Duino or Duino version two,26:31
+* etc. we are not going into details, but most of these methods will follow this same framework, which is at the bottom right.26:41
+* How our biology would maybe change the component for this UQ uh f function, or define a different way to uh, for this loss function.26:49
+* Um, and uh, to improve and then evaluate whether by doing so that we can improve the performance for self-supervised learning.26:59
+* So after contrastive learning, uh, next approach we are going to describe is called mask image modelling.27:14
+* This is also a way to train a model without human annotations.27:21
+* So it is also a type of self-supervised learning technique.27:28
+* And this technique, uh, was inspired by research in natural language processing and in natural language processing.27:33
+* A very common way to train a method is to mask, in some words out, then ask model to predicting these, uh, missing words.27:44
+* So it's a bit like, uh, the English exam papers you were taken during high school that for some question that, uh, that was a blank.27:53
+* And you need to fill in the word, uh, in that blank so that it can complete the sentence.28:01
+* And in natural language processing that either for bad or for GPT, that a lot of self-supervised learning was done uh,28:09
+* to to pre-trained model to get good weights without human annotations.28:17
+* And we are going to first briefly review the ideas in these natural language processing techniques.28:23
+* And we assess how we can adapt these techniques to computer vision problems.28:31
+* So the first message that we are going to look at is called GPT, which stands for a generative pre-trained transformer.28:36
+* So from its name we can see it's you know, it has uses, uh, a transformer architecture, which means you have a number of layers.28:44
+* Each layer has this self-attention mechanism.28:52
+* And in terms of training this kind of GPT model, there are two stages.28:57
+* The first stage is self-supervised learning.29:02
+* So you need to pre-train this model. And during pre-training we don't need to use any human labels.29:06
+* We just ask the model to predict the next word in the document or the next tokens.29:13
+* Um, by doing this very simple task of the next, how can prediction you can get good weights for all these, uh, attention layers.29:20
+* And up this pre-training stage there is a fine tuning stage.29:28
+* So in fine tuning stage, we need to use some knowledge from human.29:33
+* So we can either use, uh, human labels.29:37
+* So if you have some sentences which are questions and if you human provide ground truth answers to these questions,29:39
+* you can use these pairs of questions versus answers to train, uh, the GPT model.29:46
+* But there are also other ways to utilise human knowledge, such as you can use, uh, human feedback.29:52
+* So in this process that you don't need the human to create the ground truth answers for any question,29:58
+* you just provide the answer generated by the GPT model and the human with the rates, the quality of these.30:05
+* Uh, answer. So if the answer is good, you can give it a mark of ten.30:13
+* If the answer is not good, is not aligned with human knowledge, you can give it a rate of, uh, zero.30:19
+* And in this way, this kind of a human feedback can also be defined.30:26
+* Uh, we can also define a loss function to, to propagate these kind of human feedback, to fine tune the, uh, parameters in the GPT model.30:31
+* And here you can, uh. You can in this diagram, uh, we show you that, uh, how we can, uh, define a model to predict the next token.30:43
+* So we will assume that some model in, uh, in the middle, which are these blocks?

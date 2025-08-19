@@ -1,0 +1,108 @@
+So, uh, I wanted to talk today a little bit about some more aspects of scaling up our application.
+3:08
+I think there's a few kind of dimensions that we might be scaling.
+3:16
+Like it might be scaling to have more capacity to have more users.
+3:19
+So if you're building a business, obviously you want to try and grow that business.
+3:23
+Typically you want more users to use your product. You want to support that.
+3:26
+How can we do that? There's also an aspect of reliability as well.
+3:30
+So in the same case where we're starting to grow, we start to have more people using our system.
+3:35
+We want it to be more reliable, so we don't want it to go down, especially when lots of people are using it.
+3:40
+Maybe lots of people are spending money through it. There's also aspects which we've been thinking about a little bit this time about cost.
+3:45
+So you could scale up everything just by spending loads of money on everything.
+3:53
+But maybe there's an optimisation to be made that right. Maybe you don't want to spend too much money on things that you don't need to.
+3:57
+Maybe there's a way for us to architect the system so we pay in money, but we need to pay money.
+4:04
+But we don't pay money for things that would be a waste.
+4:08
+And then the last thing I think that we would start to think about, which we talked a bit about yesterday when we talked about designing the system,
+4:12
+in breaking it up into small services that could be looked after, perhaps by different developers in different teams.
+4:18
+Working independently is like, if you're growing a company, you're growing an engineering team.
+4:24
+You can't have everyone work together in one team on one thing all the time.
+4:29
+So how are we actually going to like, organise that, break that up,
+4:35
+organise the system so that it allows people to work more independently so that you can be more productive.
+4:39
+And so kind of when we were designing this course, something that I was thinking about was like, where would I like to get to?
+4:45
+Why did I like all of you to get to like by the end of this course, I thought about this book.
+4:53
+I wrote this book almost to have a look.
+4:58
+So this book came out a couple of years ago, and it's really like sort of targeted at people who are interviewing at tech companies.
+5:01
+And what has become popular in recent years is to do coding interviews and algorithmic things,
+5:08
+but also this system design interview where they talk about, okay, how would we design a system that would do this?
+5:13
+And they're not talking about how would we write the code to do this within a particular function or anything they're thinking about,
+5:20
+you know, what are the components that we would have? How would you deploy them?
+5:26
+How would you put them together? What kind of choices would you make that would solve a particular problem?
+5:29
+And so because these courses were like in parallel to the principles and practice of programming, I thought, okay,
+5:35
+well, I don't want this course to be all about learning to program things because we're kind of doing the math.
+5:41
+But what are all the other things that we need to know in order to design a system effectively?
+5:45
+And so I'll talk to you a little bit today about some of the, some aspects of like some of the things that come out in this book,
+5:51
+but you can have a look it's worth it's not a what do I mean?
+5:58
+It's a good book. It's useful to look at. It's not quite as polished as maybe some other books are,
+6:03
+but it's definitely written by someone who's been through a lot of these interviews and also sat on the other side.
+6:10
+They were particularly popular. I Amazon started to do that first, I think, and then Facebook did a lot of these type of interviews.
+6:15
+And now across lots of different tech companies, these are quite popular.
+6:21
+And so the sort of questions they have is like, how would you design a newsfeed system like,
+6:25
+you know, it would be serving hundreds of thousands of people or, uh, designing a URL shortener.
+6:30
+So you offer a service where people can shorten their URL and then, you know, you are serving those out and then fulfilling the longer URLs.
+6:36
+What else have we got here? Uh, designing a rate limiting system.
+6:45
+What was that? The chat system. It's kind of interesting. Uh, search autocomplete is kind of interesting.
+6:54
+So when you type in, like the front search box of Google and you start to type a couple of letters, but it's actually auto completing that.
+7:02
+How is it doing that? Like what's the pattern that you do when you do that?
+7:10
+And how do you do that at scale that Google operates at? So and you can see in the book there's lots of these like diagrams of different pieces that
+7:13
+would fit together kind of in the style that we've been looking at in the past week or two.
+7:21
+And so as you start to go through the project, we're going to do in the rest of the time, like,
+7:26
+this is the sort of level that we want to start thinking about the system design, not so much.
+7:30
+How would I code up a particular function,
+7:35
+but more how are we going to design the system so it has suitable qualities in terms of what kind of capacity we could have,
+7:37
+what kind of reliability we could have, what kind of cost we would need to incur,
+7:44
+or where we might be able to make some efficiencies and how it would support our development team
+7:48
+growing and our organisation being able to keep maintaining that system and grow over time.
+7:53
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+8:00

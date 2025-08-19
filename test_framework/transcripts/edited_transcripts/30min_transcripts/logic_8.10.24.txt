@@ -1,0 +1,289 @@
+So welcome to the Logic and Mathematics for computing course.
+Um, I'm teaching the first part, which is logic, and I will finish in October.
+And then in November, Doctor Shukla will be here to teach you the mathematics part.
+Um, this is our plan, um, for this course.
+So this is week two from weeks 2 to 4. Uh, we have logic.
+Okay, so that's three weeks. Uh, we have logic.
+And then there will be one coursework, which I will probably set towards the end of next week.
+And then the mathematics will start. It will go from weeks five until eight.
+And that lecturer will also set one coursework.
+And then we have one examination in April or May.
+So, you know, whenever term starts is in the summer term, the exam for this course will take place.
+And there will be one question from logic and one question from mathematics.
+And as you probably know, this course isn't compulsory for you.
+So you can choose either this course or I think you have a list of maybe for other courses, um, that you can choose.
+Um, they are designed for people who have a really good maths background.
+So that's the balance. If you don't have a very good maths background,
+and in particular if you are thinking of doing introduction for Introduction to Machine Learning, then this is the right course for you.
+If you have a solid maths background, you are quite comfortable with your maths, um,
+including doing the introduction for machine learning and you are comfortable with one of the more mathematical options this term,
+you can do one of those options. Those options will have an exam in December.
+Okay. End of end of this term. So this, uh.
+And please excuse me for sitting down. I have a bit of a difficulty moving around too much.
+So then I have a two hour stretch. It's good to sit down a little bit.
+Uh, the module teaches formalisation and formal reasoning.
+As I said, the maths part will be very useful to you if you are thinking of doing Introduction to Machine Learning next term.
+And, you know, probably 99% of computing students plan to do that course.
+The logic part is useful for you just as a tool for reasoning.
+You know, any computer scientist really needs to know a little bit of logic.
+And also there is a branch of learning which is logic based learning.
+So if you are excited about logic, you want to see how logic based learning maybe differs from machine based learning.
+Then this course would be quite useful for you and you can follow your interest in logic based learning, maybe through a project, um, in the sum.
+So you have these options open to you. The contents of this course will be as follows.
+So together we will have four hours a week for three weeks.
+So there are 12 hours. And on Fridays on Tuesdays I plan to teach on both the hours and on Friday I plan to teach in the first hour.
+And then the second hour will be a tutorial where there would be an exercise already.
+Exercise one is on is on Ciencia. Uh.
+You may be able to see it today or tomorrow so you can work on it by yourself.
+Um, and then on Friday they would be myself and some helpers and we can discuss any any questions you have.
+Uh, so that's the plan for the course. And these are the contents.
+Um, the course is completely introductory.
+So for those of you who've already done logic, is there anybody who's already done logic?
+The last person to come in has already done logic. Okay. Anyone else?
+One. Okay, so for you, this is probably too introductory because we start from absolute scratch.
+And those of you who don't do logic, then be reassured that we do start from absolute scratch.
+It's a first course in logic. Um, it's the beginning of a course we teach to our first year students.
+You know, it's it's that level. But of course, the pace is a little bit faster than the pace we used for the first year.
+I will start with propositional logic. I will teach you the syntax.
+That's the how you write sentences. These are the rules of grammar of propositional logic and the semantics.
+That's the meaning of the symbols and the sentences.
+Then I will move on to predicate logic. Again we will do syntax and semantics.
+And logic, as well as being a language that we can write things in.
+We can speak in it if we so desire.
+It is also a formal language of inference, and I will teach you the rules of inference for both propositional and predicate logic based on resolution.
+There are many other, uh, proof techniques, and I have chosen resolution because that's the one which is often mechanised.
+That's the basis of programming languages that use logic.
+So you may know a programming language called prologue, for example, of an AI language is a niche, very niche AI programming language.
+And that uses resolution, um, uh, as the program runs, as the program is executed.
+I doubt if we will have any time, but if we did, as a final flourish, flourish.
+I will teach you abductive reasoning.
+And this is not about kidnapping people. It's about a form of reasoning which is a little bit different from deduction.
+So with logic we can do deduction. We can do abduction and we can do induction.
+Deduction is what you are familiar with.
+You know we act upon in our daily lives to you know, infer things to believe or disbelieve arguments that, uh, people posed to us.
+Abduction and induction are tools that are used, um, very much in AI, um, for example,
+for logic based reasoning, these are the bases, um, that are used and they are explainable via deduction.
+So they are really all linked together. But three different forms of of reasoning.
+All the material, uh, notes, tutorial exercises, solutions and the coursework will be, um, science.
+Yeah, hopefully. Yes yes, yes. It's possible.
+A question regarding this. It is equivalent to natural deduction.
+I mean, they're all correct and complete forms of deduction for propositional logic and for predicate logic.
+We don't have a complete deduction. But they are.
+You know you can justify one with respect to the other.
+But natural deduction for example will have multiple rules of inference introducing and eliminating the connectives.
+And you know, proof by inconsistency and so on.
+The beauty of resolution is that through equivalences you put your theory of logic into one particular form.
+And then there is one single rule of inference that does everything for you.
+And this is why it's so easy to Mechanise is this one single rule of inference?
+There's no choice. Okay?
+Okay. Um. Lecture recordings.
+Well, this green light is on. So hopefully Panopto is, uh, looking after itself, so they should, uh, the recording should appear on Panopto.
+If you have difficulty accessing it, please contact me.
+Um, and I will sort it out. I'm contacting me.
+It is obviously through email. Um, that's possible, but the best way is Stem, which is our information and discussion forum.
+I've already welcomed the MSC computing cohort.
+I hope you received the welcome on ETS then.
+Um, so that is our discussion forum. And either you already know how to use it or you will learn very, very quickly.
+So when you put a question there, your colleagues can answer, um,
+I will get triggered and if I know the answer, I will then respond to you, uh, as well.
+So these are our resources. This is a very old fashioned slide.
+You know, books we don't need. Really? Course books.
+Um, for this course, I've listed some books, all of which are in the library.
+But you don't need to buy anything. You probably don't even need to access these books.
+Um, hopefully my notes are detailed enough.
+I will give you a lot of examples, a lot of exercises, a lot of solutions.
+And you know how to search the web if you want, um, any more information, if you fancy doing any more exercises.
+But these are classic books on logic.
+As I said, they are, um, in the library. And here is a book.
+Ivan. Practical prologue programming for Artificial Intelligence.
+Uh, as as you can see, he's been updating this book now for a long time.
+It's still a very good book. If you just want to get a hint.
+This is not something I will be teaching, but if you want to get a hint of this prologue.
+Programming languages prologue means programming in logic. How is logic actually used?
+Um, as a programming language then, you know, have a quick look, um, at this book.
+So why do we teach logic?
+Well, it is a foundation, really.
+Any computer scientist need to have, you know, and it's the basis of a family of programming languages, such as prologue.
+There is another famous language called ESP, um, on programming.
+So if you're doing machine learning via logic, this is the language that that you would be using.
+Um, if you end up doing a project, um, you know, in the summer, uh, based on logic learning,
+logic based learning, the chances are that would be the language, um, that you will be using.
+And there are probabilistic versions of logic languages.
+One of them is called problem. There are many others.
+And logic is also the basis of verification tools for reasoning about programs written in Java, C, JavaScript, and algorithms for concurrency.
+For example, a logic based technique logic based tool is called separation logic.
+Um, we teach this to our fourth year students who want to specialise on verification of concurrent system verification of algorithms.
+Or Hoare logics. These these are quite well known logics for these kinds of formal verification applications.
+Um, logic is a tool for software engineering for formally specifying what you want to program and for, for many, verifying, um, your program.
+Um, so how do you make sure that a program is correct?
+Well, the, uh, you know, one technique, a very common technique and necessary technique is to review the spec and the code again and again.
+Test, I don't know, unit testing, global testing, etc., etc. again and again.
+Um, but how many tests do you write? Uh, do you run to be absolutely sure that what you've done is correct?
+Well, logic provides a way of proving the system correct.
+It's a way of saying under such and such condition, under such, if your input is of this nature,
+then your program will terminate and the result will have this relationship to the input.
+And this is the sort of thing that logic allows you to specify and then gives you the tools to prove.
+And this can be automated, you know, separation logic or logics.
+These have been automated as well.
+Not part of this course, not part of your curriculum unless you deliberately bring it in through some projects that you do.
+You know this kind of formal verification. Given that potentially a lot of you may be new to computing.
+My examples will come from just lies from, you know, ordinary things.
+Um, in life. And logic is a very useful tool for clear thinking, for judging validity of arguments and justification of conclusions.
+As I said, we are often asked to make judgements and we tend to say, oh no, that doesn't make sense.
+That's not logical, that that's irrational. Well, this course puts it on a more formal basis.
+So we know at least we are aware how we make these decisions and whether or not others are making decisions based on all
+this kind of rationality and spotting inconsistencies and awareness and avoidance of ambiguities of natural language.
+So many times people say, and when they mean or or they say or when they mean and or when they mean implies with logic, you can't get away with it.
+Uh, you've got to be precise as to what exactly is, um, intended.
+So let's, um, start exercising the the, you know, the logical parts of the brain with a few, uh, small, um, exercises here.
+Suppose that you see an advertisement for a, uh, book in computing.
+And the advertiser says, if you don't use computers, you don't need this book.
+But you are a person who uses computers. So you need this book.
+What do you think? Would you pay for that book?
+Do you think that the person is justified when they say so?
+They mean. Therefore, from the things I've said above, you need this book.
+Come and buy it. How many people think that he is justified in the conclusion he wants you to draw?
+And who thinks is not justified. And who is unsure.
+So in order to unravel an argument, we have to basically parse it.
+What is the premise of the argument? These are the givens.
+What is the conclusion that, um, the arguer wants us to draw?
+Then you have two decisions to make. Do you accept the premise?
+Maybe the premise is just faulty, you know, absolute nonsense.
+And if you accept the premise. Then does the conclusion follow up from that premise?
+Okay, so the first thing is to basically unravel the text to find the structure in.
+So what is the premise of this argument? The premise consists of two sentences.
+The first sentence says, if you don't use computers, you don't need this book.
+Let's begin to put it slightly in pseudo logic.
+It's an if then very much looks like a sentence of logic.
+If not, use computers then not need this book.
+You know, we've gone from English to pseudo logic. The second item of the premises.
+But you are a person who uses computers, so use computers.
+I see that I have used the same terminology of the use of computers, and this is referring to exactly the same proposition used to mean.
+Just so there is a link between the two. Then the conclusion is that so?
+That's always a hint that says here comes the conclusion. Therefore, um, hence, you know, the conclusion is coming.
+You need this book. So I've used the preposition here, need this book which links it to the first sentence.
+Okay. So we have need this book and it makes it easier to read this book.
+So there is a bit of a structure here. It's not absolute nonsense.
+But you're absolutely right. The conclusion does not follow up from the premise.
+I've put it in less of a pseudo logic.
+So the symbol for if then is that arrow.
+The direction is from the uh. Not use computers to not need this book.
+The premise number two doesn't have any structure, it just a single, uh, proposition.
+And the conclusion also is is quite simple. It doesn't have, um, any structure.
+So that's our first exercise.
+Here is our second exercise. If you work hard, you will succeed.
+Premise. Let's accept it. No. No element of luck.
+No element of cheating. No nothing. Okay, let's just accept it as as purely as it set there.
+If you work hard, you will succeed. So here comes the conclusion.
+If you do not succeed, you have not worked hard.
+So think about it. And who thinks the argument follows?
+So the population of yeses has dropped to zero.
+Who thinks the argument really doesn't follow? But a lot of people and quite a lot of people don't know, am I right?
+Who is in show? Yeah, that's absolutely fine.
+That's no problem. Um. Okay, so how do we do this?
+Let me give you the answer. The argument does follow. But maybe somebody who thinks the argument doesn't follow.
+Tell me why you think that. And I absolutely noticed, you know.
+Don't worry about it. It'll be better if you're wrong.
+We all learned a bit more. Yes. I was just thinking.
+You may have words. Okay.
+The first we've accepted the promise, the sorry, the premise, which is the promise as well.
+If you work hard, you will succeed. So if you accept that there is no two ways about it, if you have worked hard, you will succeed.
+Right? So when you are making judgements about arguments, you've got to completely focus on what you're given.
+Exactly. You don't put in I don't know, experiences, intuitions, assumptions okay.
+That is what it is. So if you think of logic as a programming language, it has to be precise.
+When you write a procedure, it has to be precise.
+You know, the computer can't bring in some, you know, assumptions from human, uh, experiences and, you know, intuitions and things like that.
+So. Yes. Yeah. So why? Best practices.
+Well. They'd set off work.
+Correct. Um. That's. But in 15 states, that's a state.
+That's the one size and what is almost necessary.
+So that's and that doesn't, you know, don't. Um.
+He may have succeeded without working out.
+That seems to be compatible with the premise. You're to be.
+Um. Very intelligent. Yes you are.
+Yes, I think I can understand what you're saying. You're half correct.
+Indeed, in the first sentence, if you work hard, you will succeed.
+Says working hard is a sufficient condition. Says nothing about working out being an, uh, necessary condition.
+So there may be other ways of succeeding. However, the second sentence is not saying working hard is is a necessary condition.
+It is the contrapositive of the first sentence.
+So if let me explain it to you, maybe in this way.
+Suppose that, um, you have not succeeded.
+Okay. So the second sentence says, um, if you do not succeed, you have not worked hard.
+Suppose that you have not succeeded.
+But you are arguing that. What? I have worked hard.
+Is is that possible? Is the first sentence says if you work hard, you will succeed, so you're inconsistent.
+If you're saying, I haven't succeeded, but I have worked.
+So if you haven't succeeded, you haven't. That's once you accept that first sentence, then you can see that the second sentence.
+You have no choice. And basically the structure is the following.
+So the second sentence I said is the contrapositive, which means it negates the succeed,
+puts it to this side and negates the work code and puts it on the other.
+So the first sentence says work load implies succeed. The conclusion says not succeed implies not.
+To say that as, uh. Uh, my friend of the back said to say that working hard is a necessary condition.
+Would be right. To succeed implies work hard, which is a slightly different thing.
+And just to note. Now. Logic is all about abstraction.
+You know, whatever we say here, you just replace any symbols.
+To succeed or work hard, it works. So abstracting it here.
+Something to note and we can prove it later when we know a bit more.
+A implies B is equivalent to not being closed, not eight.
+So you have a sentence like that. You turn it the other way around and you get two sides.
+They are equivalent. How many people have I confused so far?
+Do you follow now? Are you more convinced that this this one follows?
+Good. Um, there are more of these types of exercises in the notes, if you want to amuse yourselves.
+Uh, on a sleepless night. You can go through this one.
+I heard a while back, as you can imagine, um, in a radio interview with a well-known politician.
+And, uh, I don't know whether it was a he or she.
+They said all our problems have come from the EU, the European Union.
+So nothing good has resulted for us from our membership of the EU, which is.
+You know, not very rational. Um, all our problems may have come from the EU.
+I don't know, let's accept that. But maybe some good also came, right?
+It's. It's really a very strange, but these are the sorts of things you hear every day.
+You just turn your radio on and listen to interviews.
+So hopefully with a bit of logic, you can, uh, you can get irritated.
+I mean, you can get frustrated, but at least you will develop a bit of awareness to catch, um, these sorts of things.
+Um, a few more exercises for us to step through quickly before I get down to the nitty gritty and teach you the formal language.
+So just have fun with it. You know, as I said, not a test. Sit back and think.
+Um, we are given the first three sentences.
+They're given us their premises. Um, all the trees in the park.
+Uh. Flowering trees. Some of the trees in the park are dogwoods.
+These are dogwoods. I didn't know what they were, but those are dogwood trees.
+Old dogwoods in the park are flowering trees.
+If the first true. Sorry I was, I was wrong the first true.
+The first two sentences are premises, so they're given.
+Let's assume they're true. The question is, is the third sentence true?
+False or you can't tell? What do you think?
+Hands up for a. Hands of be.
+Hands out for sea. Somehow, in my notes to myself, I've written D.
+So either I wasn't thinking or you're mostly wrong.
+Let's let's think about it. It's all dogwoods in the park are flowering.
+All trees in the park are flowering. Some of them are dogwoods.
+I'm right. You're wrong. Think about it.
+All the trees are flowering. You're right.
+I'm wrong. There you go. Well done.
+Well done. Well, you've saved 12 hours of lectures.
+You know, I could go home and rest. You're absolutely right.
+It's true. Because all of them are flowering. A subset of them are dogwoods.
+So all of that substance is a flower. Yeah.
+Well done. Good. Let's see if I can embarrass myself with a second one as well.
+Uh, will taking the first two statements. We want to check the status of the third one.
+All the tulips in Suse Gardner White.
+All the roses in shoes. Garden are yellow.
+All the flowers in Sue's garden are either white or yellow.
+All the tulips are white or the roses are yellow.
+All the flowers are either white or yellow.
+Hands up for a. Hands off be.
+Hands of a sea. Yes.
+I mean, there is a hint the be, you know, is is also acceptable.
+But we don't know if Su's garden has any other flowers.
+Right. So it's uncertain. Okay. I've made a mistake here in my mood as well, so.
+Oh, if that was a bad time. Yes. Put this away. Um, and the final one here.
+All dogs like to run. Some ducks like to swim.
+Some dogs look like their owners.
+If these three statements are facts, i.e. we accept them as premise, which of the following statements must also be a fact?
+All dogs who who like to swim look like their owners.
+Dogs who like to swim are also like to run.
+Dogs who like to run do not look like their owners.
+Um. Hands up for a.
+Hands up for be. As for sea.
+Hands of a D. Yeah. We'll do. The is is good.
+So you see that, you know, logic apart from the mistakes that I've made.
+Um, you know, we….

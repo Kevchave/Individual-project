@@ -1,0 +1,265 @@
+No problem. All right. So you have no problem access the, uh, um, uh, the slides and other teaching materials on the website.
+All right. So I rely on you to tell me you got me problem.
+All right. So in that case, I simply don't.
+We caught this last laugh, uh, unquote, last week to speak up.
+All right. So I'm not going to record it this time to save resources.
+All right. Um, let me continue.
+Um, okay, here we are.
+Okay. Um, ivc. Com, uh, I receive email, an email asking about, um, uh, exam, and, uh, when I have, uh, coursework, uh,
+when the coursework would release and all those, um, uh, I am a slightly liberal professor, if you may want to say.
+And you are a grown up adults, I, I treat you as such.
+Okay. All the teaching materials, including exercise.
+Um, questions I would like you to try have been posted on the website.
+Look at the tutorial sheets. All right. I would suggest you look at those questions.
+Try to answer those questions on your own. Okay.
+And I'm not going to force you, but, um, to hand in because you're all going live at us.
+So I let you make your decision when you want to try those questions and, um, uh, look at the schedule as well.
+For example, for the coming Friday, I'm going to have a tutorial session.
+So I will cover tutorial one and two. Okay.
+By that time, by the time I finished today, you should have, um, enough, uh,
+materials to learn about so that you can, you know, how to handle those questions in tutorial one and two.
+Okay. Go to the website. Try those questions before you come Friday.
+And then in case you haven't got the time, then you can still try later.
+Try those questions Raiders. It's important to try those questions because those are the questions.
+Um, similar questions will appear in your exam.
+And given what I the way I handle it. Uh, you don't have any submitted coursework for this module.
+For my part, I was teaching the second part. Second half. I don't know.
+You have to ask the lecturer. And, uh, for my part of this term, there would be purely, uh, assessment based assessment based on your exam.
+Okay. And I will contact your class rep to schedule some so-called revision lecture.
+And I would, uh, walk through somewhat of some of the questions in previous exams so that, you know the style of my questions.
+Are we okay? Okay. Self-regulated. Self-motivated.
+It's my way to go. Okay. Um. Any questions so far?
+Regarding teacher materials and a comment. If not, I resume naturally.
+Okay. All right. Now. So far. Um.
+In the past week, I introduced an overall concept of a CPU, the uh, central processing unit, and, uh,
+described how the memory can be used to store both the upper and the data as well as the programs,
+the instructions, the assembly instructions in the memory.
+And then the instructions will be bought into the inside the CPU for the hardware to interpret, to execute.
+And then in the process, we may need to grab some ultra and some data from the memory and put it into some registers inside the CPU and more operands,
+and do calculations of this logic operations.
+The resource may temporarily store inside a CPU in some register inside the CPU, or maybe stall back to the memory for future positive.
+So is it a concept you have now? Okay, that is very much the the computer internal architecture that has been still existing running.
+But the fact is that it is running very fast. It passes so many instructions per second.
+It. So that is the computational power.
+Now what I described last week is kind of, um, uh, simple, um, toy architecture.
+And just to illustrate the concept and starting, uh, from today, I would use a specific architecture, uh, Intel, um, core Pentium architecture,
+uh, to illustrate, um, more specifically, in practice, you will move away from the simplicity of the toy architecture.
+What specific instructions have we can we expect?
+What kind of, um, uh, mechanisms we can allow, uh, programs to call from one program, call another program,
+call another function, do some computation, return your business, uh, back to a low calling program.
+All the rest that you are familiar with at a high level programming language.
+And also we would talk about how input output of data okay.
+And input output is very important. Do you use, uh do you play video game.
+You do. Right. How do you do input output for video game?
+Keyboard. I thought this this no is a joystick.
+And that is input to the form of input output. Of course keyboard is important you know and but so input output is part of that discussion.
+So that at the end of this my part of the um module of teaching, then you have an overall, uh, understanding of a practical system.
+I want to mention that Pentium, uh, has been in existence for quite some time.
+All right. And also Intel, uh, has, um, uh, um, uh, it's, uh, discontinued, uh, Pentium, uh, marketing, uh,
+Pentium architecture is talking about from last year, but I thought still got lot of Pentium out, uh, processors out in the field.
+People are using it. And so I thought it is still good to use that as illustrative example.
+Now, for those of you who will move on with your career, even if you want to spend more time to look at, uh,
+to even do research on computer architecture, what I'm teaching will serve as a good foundation for you to understand more advanced architecture.
+That's my idea. Okay. So, Pentium, um, I will I define our opinions very, very day back to, um, very early days of microprocessor.
+And, um, I think really, um, this going to stick with my, my, my here, uh, and.
+Oh. Um, I think the year 1978, when I was studying at university.
+Decades ago. Okay. And I want to point out to you, though, the, um, the amount of memory size we have at that time, decades ago.
+They can only deposit. So you can only have one megabyte of memory.
+This is the size and Ram really kind of come with it. Remember, the before architecture was the memory size of our toy architecture 1024.
+So it is 1K1 kilo. And now we are talking about one mega.
+Okay. But we importantly look at transistors.
+So, um, you heard that you must heard the term uh, called computer chips or integrated circuits.
+AC chips. Okay. Those are AC chips. Uh, I give you an example of what I think is somewhat on on the slides here is AC chips.
+So you could have many, many pins. And be careful.
+Those pins are very, very hot. Don't slip up the icy chips using fingers which I did wear off and when I was young.
+So you look at my hands, my fingers.
+There's so many cuts by the lip. They got those ice age as you chips.
+So there's icy chips. Okay, that is computer chips.
+Importantly, when we fabricate the ice chips to build a hardware to carry out some logic and functions functionality for us,
+the most important, um, uh, device or unit of uh, computational capability is called transistors.
+Okay. And transistors is one single, single single device and fabricated in a much, much smaller.
+And if we look at the memory, um, have you heard of a term flip flop?
+Okay. No. Okay. So this is the smallest unit of one bit of information.
+Uh, one bit storage. Okay. Essentially, every single bit has to be stored.
+Uh, and by using a number of transistors.
+So that means if you look at a computer chips,
+the number of transistors implement on a chip is an indicating indicator of the complexity of the logics and circuits you can have.
+Okay. So look at the number of transistors on this particular processor.
+Call 80. Uh 86. Only 29,000 transistors.
+That was state of the art many years ago. Okay, let's fast forward.
+Okay, fast. Uh oh. Before I go, I want to point out the clock rate.
+Okay. I know you are not a quantum computer science. I know you, most of you are not familiar to engineering.
+Um, how we drive our computer is driven by a clock.
+Usually, a clock is a signal. Okay.
+And kind of going up and down. Up and down is like a pulse.
+Trains. Okay. Of signal. Kind of.
+On. Off on off on off. Okay. In time you plot the clock in time is like pulse trains.
+And you fit this signal, which is time for, uh, varying signal voltage onto the digital circuits.
+It would the digital circuit with ten states. Often during the rising edge of your clock or during the falling edge of your clock.
+Okay, that's a circuit design. Okay. Hardware. Just take it out like this.
+So how fast a computer can run is very much depending on the clock rates.
+It's. That means what kind of call rate you fit into to drive your computer.
+The higher the cup rate tend to have higher.
+Uh um uh um um, uh, the the puzzles can handle larger not possibly finish complete large number of operations.
+Okay. Per time unit per second, for example. So that is measured by, uh, so-called MIPs.
+Average MIPs. What an MIPs, MIPs is million instructions per second.
+Okay. So at that time, there's only 1 million instructions per second.
+It's not a huge number, but that's a a baby 40 some years ago.
+And if you move far forward after decades, have you heard of Moore's Law?
+You got to uh, uh, remember this.
+More, uh, it's a very famous, uh uh, uh, computer scientist hardware design version.
+He he he he he observed the complexity of a computer chips, namely in terms of density of transistors, can be doubled once every 18 to 24 months.
+Okay. And so today you buy a computer.
+This is the density of your transistors. And then 24 months later the technology would enable you to double the number of transistors.
+That means once you double the transistors then the transistor density on your circuit,
+implying that your, uh, complexity of your operation can be, uh, doubled.
+So. So that means the computational power can be doubled.
+Kind of. Okay, but it's ongoing for the last, whatever, 40, 50 years?
+Yes. How long do you think it's going to hold up? Uh, that's a lot of a guess.
+Uh, it seems like, um, uh, some people are saying we must.
+We must have reached a limit all close to the limit already, because a fundamental issue is, um, uh, uh, the resolution of our, um, our technologies.
+So for human eyes, we see things using the, um, the visible spectrum.
+So we see this line. And this line.
+Okay. This line could be the conductor conducting the electricity.
+That's the tricity to go through. The distance between these two lines has certain resolutions.
+So the highest, uh, um, um, resolution you can have, you must be used in some ways, uh, the electromagnetic wave, which is.
+Can its way. I mean, highest to smallest in wavelength.
+Therefore, that is how much? How close two lines can be put together.
+Acts together on a computer chip. That is the fundamental limit we are going to have.
+We are approaching that subject. But using quantum computing can make it better or okay.
+This is the very interesting one so far.
+This this module is a talking about conventional computer.
+Okay. Quantum computer is entire different design you know is entirely different.
+Okay. There's no comparison. Okay. So so if you want to understand quantum computer, stay behind after the lecture I give you I give you some ideas.
+I do work on quantum computing. Uh, research. Fascinating.
+Okay. But this is the conventional computer. Okay.
+Uh, however, I would like to say quantum computer.
+In my personal opinion, quantum computer will be useful to solve very complex problems.
+Complicated problems, but may not be entirely replace in conventional computer.
+Computer would have a role to place in the future.
+So essentially we are going to see hybrid of quantum computer and conventional computer coexisting in the future.
+Okay. So now this is what we had, um, uh, in 1978.
+Fast forward even um, uh, 15 years, uh, almost 20 years ago.
+You look at the rate. You look at, um, you look at the transistor density.
+Okay. After 20 some years, it's huge.
+It's kind of, um, exponentially growth because Moore's Law is saying we double every two years.
+After two years, we double and double again another two years.
+So two to power ten is a large number. Okay.
+Even though two is small. Okay. And so, so the complexity of our circuits.
+And now I see chips. I'm sure each one of us, uh, has something like this.
+Right? This is a supercomputer.
+The computational capability comparing with Bataan is 40 some years ago.
+This is a supercomputer. When I was at university, I was I worked as some as a part time computer operator.
+So I was my computer system that I was helping, um, probably occupy half,
+but maybe two thirds of the size of this room with so many, uh, you know, boxes, the whole with rank in the room, air conditioned.
+And it was only one computer and one computer system.
+Um, the computer system didn't do any anything close to what we we have in our pocket today.
+So this is a supercomputer relative to the vast and is keep on, uh, improving.
+Right. So resolution or the memory size and all the rest is still, um, uh, in some sense unlimited,
+although new technology will be, uh, uh, will be invented along the way.
+All right. So with this kind of, um, background.
+So our toy architecture was really very simple. Okay.
+What? I would not be able to help us to do some, uh, uh, practical, uh, calculations.
+So for Pentium, we have a number of registers.
+Remember the toy detector? We have only for general purpose registers.
+So now we have a whole set. Okay. We have a register eight here.
+Oh. Okay, that's just a, b, C, d.
+And we also have the source index, register of destination registers, stat pointer and based pointers.
+All these names to you do not mean very much at this point I understand.
+Okay. We'll come back to that very very soon so that you can understand all the names.
+All the register names carry some meaning.
+Okay. And but for each register you can see label at the top from 0 to 31.
+So essentially each register has 32 bits.
+Okay, so we use 32 bits to percent our numbers.
+Okay. Our integers remember so-called two's complement number.
+Now we have we used 32 bit. Now we can also uh represent numbers using more than.
+So two. We can represent uh using 64.
+I come back to that later. But these are the general purpose registers inside the CPU.
+Why? General purpose register is helpful because, um, we if we without general purpose registers all the operands,
+all the data you want to operate on store are store in the in the memory.
+So memory is the problem because it takes time to access the memory.
+Okay. So for for for for for for efficiency it's better to have some internal registers inside the CPU.
+Uh, we can use these registers to store, um, intermediate results instead of going back and forth, storing back and forth, uh, into the memory.
+So general purpose registers as well.
+As a matter of fact, there's one, um, one way to design your your CPU is actually have a large number of general,
+general purpose registers inside your CPU just to avoid swapping in and out, uh, the data, uh, into the memory or our memory.
+Nevertheless, we have these general, general purpose registers.
+Okay. Each one of them 32 bits. Okay.
+In addition, um. For each register, for example, total one we call it is a X register.
+E stands for extended. That means its 32 bits and that we have a x.
+A x is a register okay. A x register has 16 bits.
+Essentially a ex-Manchester is the lower 16 bits part of the X register.
+All right. And same for uh d x x in the x.
+So so you can see the green part here essentially is the least 11 part of the whole register which is 32 bit.
+The the other part has 16 bits. It's okay.
+So that is what we can. That means this architecture allow us the flexibility to handle data, which is so Rubis or 16 bits as we see appropriate.
+Okay. Furthermore, sometimes you know, as we described remember the C code how to represent ABCd.
+Lowercase uppercase actually one byte end of this end the character you know a or b a to z.
+So the extra stuff can be further broken into two parts.
+An Al register is the lowest and byte of the x register.
+A register is the more significant byte of that x register, and all these single five registers can be.
+Name can be accessed by assembly instructions.
+Okay, if our assembly instruction need only to manipulate single bit data, then we can use X, you know, uh, LPL or H or the H.
+So these are one by, uh, registers. Okay.
+Um, and that is how we set up with, without um, uh, some of the not just us may not allow us to break down the,
+uh, the of by in and the more significant bytes of, uh, operand.
+Uh, but at least these four registers allow us to do so. And then the corresponding bytes can be store and accessible by assembly program.
+Are we are we okay so far? Okay. Remember when we talk about a toy architecture, we have the uh uh, register call, uh uh, program counter.
+Can anyone remind me what program counter is? What that means?
+Yes. The program counter is storing the memory address of the next instructions in the memory.
+Okay. So. Well, Pentium, it also has the problem.
+Kind of. As a matter of fact, this mind of thinking about program counter pointing to the next instruction
+to execute is actually still exists in virtually every single architecture.
+Computer architecture. Okay. They may send slightly, you know, inform or whatever the length or whatever, but they still do.
+It's the same function as the, uh, program counter.
+So this is call instruction pointer register.
+Yeah. Repeat when you see the word E for uh, Intel uh architecture, that uh, Pentium architecture.
+That means the stage two bits. So, so essentially, as I said here.
+The, um, this registers, um, simply holds the address of the next instruction to be executed.
+Okay. Uh, and, uh, I skip the rest.
+Okay. Usually, usually we won't manipulate.
+We don't we won't change the IP. Okay.
+Can we IP uh, the IP will automatically increment.
+So when you are executing one instruction now, it will automatically, uh, increment to point to the next instructions.
+Because instructions are executed normally in, in sequence.
+Okay. So we plot on the next one while you execute the previous.
+However the the IP like the program counter can be updated by your John statement or your plan statement.
+By your testing, you know you when you're done, you essentially you just put uh, the the address of the John two instruction into the IP.
+Then next step, when you execute that, uh, next instruction, it would fetch to the new address where you want to jump into.
+Okay. So that is the purpose. But normally we don't uh, we don't mess up with IP.
+Now, this is something that the toy architecture didn't have.
+Uh, it's called fat mattresses. So when we do computation, you know, we act two numbers together as possible.
+Um. Uh, um, the result is not that it is possible that the result may be zero.
+The, um, when you, um, when you when you add two numbers together, remember, we have a problem.
+Overflow. Okay. Because we use a finite number of bits to represent any number,
+then that final number of bits has to have corresponding uh range of uh value representation.
+Integer representation. So when you add two numbers together then it's going beyond the range of valid representation.
+And we you because of trouble. Then we need to have a place within them of some flats to reflect that kind of a condition.
+So that is what you flat uh register is all about every single bit what carries some specific meaning.
+For example this this if that register has altogether 32 bits okay.
+Some of the bits are used by the operating systems and some are not, you know, use for example, uh, number six somewhere here.
+Okay. Carbon from the left. Uh, from the right hand.
+Uh, right hand side. Bit number six. We also can get zero.
+Okay. This is a computer scientist, uh, character. So the number six, uh, this is called this is called, uh, zero fact that Mr.
+So, uh, um, so basically what it means is you finish, we finish one instruction execution.
+We must have the results from that instruction. Execution. Just the previous instruction execution just completed.
+Then this bit was set to be one.
+If the results from your previous instruction execution is zero, otherwise it would be clear to be zero.
+So this bit indicate whether the result was, uh, of your last instruction.
+Execution is, uh, a zero or not another, and not a bit next to bits.
+Uh, six is seven slightly to the right, one to push this one to the right, uh, to, uh, to the left.
+This assignment, after you execute one instruction, then this little seven sign bit will be set.
+If the result, um, uh, set according to the most significant bit of your results.
+Let's say I have a plus speed. Okay.
+The results of A plus B can be positive. Can be negative.
+Right. If we use um, uh, two's complement. So if when you use complement, uh, two's complement,
+the most significant bit of a number represent whether the numbers positive or negative right is zero is positive
+when this one is negative according to the tools to uh to complement uh tools complement uh representation.
+So this sine bit what we say, whatever the result is you have just finished your last instruction execution.
+Then most 11 bit of the result will be move into this bit 7% the sign of your result, the sign of your last instruction execution.
+All right. And also we have overflow bit I don't want to get into uh, um, uh, details about it,
+but these actually you have an and is to indicate whether we have, uh, we have, we have, uh, overflow or we have any, any underflow problem.
+We also have underflow problem was underflow. Um, you add two, we add two negative numbers together.
+Is two negative which cannot be represented by your number but by you'll find the number of bits.
+So that is underflow okay. So yeah overflow you have underflow.
+And so this you have a and you know the count effect.

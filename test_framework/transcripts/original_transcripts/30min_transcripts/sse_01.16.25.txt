@@ -1,0 +1,318 @@
+* Okay. Hi, everyone. Oh, that's quite loud. Um, yeah.3:51
+* Uh, so I think a couple of people were confused.3:57
+* Maybe I said something wrong in the lecture yesterday, but, yeah, we have got a lecture during this slot.3:59
+* Uh, for the first three weeks. So on the first three weeks, we'll have a lecture on Wednesday early, then the labs, then the lecture in this slot.4:04
+* And then after those three weeks have gone by, then we'll just have the lab after that.4:12
+* But yeah, for the first three weeks, uh, big room on Wednesday and this room on Thursday.4:16
+* So I wanted to carry on a little bit from where we were talking about, uh, different types of cloud provision.4:23
+* And I'll talk a little bit more today about how we might design our application to take advantage of some of those things.4:29
+* I don't. I don't think I showed you this chart at the end of Wednesday,4:38
+* which kind of compares all the different types of provision that you might have and the sort of things that you have control over,4:41
+* but also the things that you have responsibility for.4:50
+* So if you look at the far left hand side, then we've got the thing where you own your own hardware.4:53
+* So you go out and buy your own machines and you run those machines somewhere where you own them.4:58
+* Uh, and you have to operate them, but you have total control over absolutely everything.5:04
+* So you design the application, you install the software, you install the operating system, you have to patch it with new security updates.5:09
+* Uh, if you're working in a virtual machine, then you have to provision the virtual machines.5:18
+* And you look after those and you have networking configuration that you probably go5:22
+* and do with physical cables between the networking between the machines that you own.5:26
+* You have to look after the machines. You have to run them somewhere which needs air conditioning.5:32
+* You have to look after the, you know, provision of connection to the internet. And you even have to ask this pointing.5:36
+* This happened in every lecture theatre. There we go.5:43
+* Uh, and you even have to pay, like, the electricity bill and negotiate that with your provider of electricity.5:50
+* So you have absolute control and you can choose, you know, to switch electricity provider if you want.5:57
+* Uh, but you also have responsibility to look after all of these things,6:04
+* which may not be like the core business advantage for you to worry about the air conditioning in the data centre.6:08
+* You might want to outsource that to someone else.6:15
+* And so then as we go across from left to right, you have the co-location facility, which I talked about yesterday,6:18
+* where basically you still look after everything and you still own the machines,6:24
+* but you run them in a data centre that's owned and operated by someone else.6:28
+* So at least someone else takes care of the electricity supply, the internet connection and the air conditioning.6:32
+* Uh, but you can still go and see the machine that belongs to you,6:38
+* and you can switch out components in it, and no one else runs anything on your machine.6:41
+* Then we looked at the infrastructure as a service provision.6:48
+* So this is what you were doing in the lab yesterday, where you were logging into a console provided in a browser by Azure,6:51
+* and you could configure whatever you wanted, but you could create virtual machines.6:58
+* You created some network configuration with the firewall.7:03
+* Uh, but you created that network configuration in software by clicking on buttons.7:06
+* You didn't create it by plugging in physical cables between things, and you picked an operating system.7:10
+* So when you were creating your VM, you said, we'd like to run up to 24, whatever it was,7:16
+* you installed some software, so you installed like a Python version and some other things.7:22
+* Uh, and then you designed your application and ran that on the top. So you were still maintaining and responsible for.7:26
+* I had control over all of these things.7:33
+* But all the things about the physical hardware, what actual machine you were running on, where that was, which rack it was in?7:36
+* Uh, you didn't have control over, but you also did not need to worry about.7:43
+* And if you needed to make another VM, you didn't have to, you know, actually go and buy any physical computational equipment.7:47
+* So that was good. So there's a couple of levels further to the right here.7:53
+* This is going to be not just this part just like any difference.8:00
+* Oh okay. Something came back. Okay fine.8:05
+* These levels further to the right, which are higher up in this stack where we yield control of more layers to the cloud provider,8:09
+* but there's less that we have to worry about. So this one is platform as a service.8:17
+* This is kind of like the empowered stuff that we were doing last time.8:22
+* But you were able to deploy your application and you picked like what libraries8:26
+* to install and what Python code you wanted you to run on anything else.8:31
+* And then basically you just said, fine, pass deploy, and it would go and deploy it onto the system,8:35
+* but you didn't actually know where that was running.8:41
+* Uh, and probably you didn't care which was an advantage to you because you were just working on this part.8:44
+* And then you started up your, you know, once you deployed it, it was running, and then sometime later you could switch it off.8:51
+* Um, so I can tell you actually that that's, uh,8:57
+* impact platform was running on Azure and it was running inside a subscription of Azure that's run by the department.8:59
+* Uh, but you didn't need to know that, and you didn't really need to care about that.9:07
+* And we could have switched it to running Amazon and you wouldn't have had to change anything.9:10
+* So actually, that's an advantage to you because you don't have to worry about all of that stuff.9:15
+* But you didn't have explicit control over a lot of the things that we were doing yesterday, like how much CPU is there in this particular machine?9:19
+* How many machines have I got? Uh, where are they? Where are they geographically?9:28
+* You couldn't control any of that stuff. Uh, you couldn't control the operating system version.9:32
+* You were just working up here. But in a lot of cases, like that would be an advantage.9:37
+* So if you were. If I was starting a Start-Up company and I had just one or 2 or 3 developers, I don't really want to be worrying about all this stuff.9:41
+* Like, being here is much better because you can just build the application and deploy it and someone else.9:50
+* What about all of this stuff here? But if I have a much more, um,9:55
+* mature business and I have lots more people and I can afford an infrastructure team of people who know about some of these things,10:01
+* and we can optimise a bit more. I want control of some of those things.10:08
+* Then maybe I want to move over here and do this.10:11
+* But I would say more and more these days we tend to go over a little bit more to the right, so we concentrate on doing things at the top.10:14
+* This is definitely going to be, you know, even. And we let the cloud providers deal with all the things at the bottom where they are the experts.10:21
+* And we don't have to be experts in all of these things.10:32
+* And then there's one more on the right hand side here, which I didn't really talk about so far.10:36
+* I'll talk a bit more about this today, which is the idea of serverless computing.10:41
+* And so in this case we really only deploy by individual functions.10:46
+* So we don't deploy a thing that says actually I need these libraries installed.10:52
+* And here's my server process. Right.10:56
+* Like when you were writing applications last time or even yesterday, you did a flask application that you could flask run and it started a server,10:58
+* in the terminology of server being a piece of software that accepts network11:07
+* connections and returns requests that you could run that server on your computer,11:11
+* and then you copied that code over to Azure, and then you could run it on your Azure VM.11:15
+* So the server was under your control. And in a serverless model, we even yield the server to the cloud provider to run.11:21
+* And we just give them a function. And we say like when a when a request comes in from a browser please run this function.11:29
+* Or maybe when someone puts a file in this directory, please run this function over that file.11:37
+* And so that really means like a lot of the stuff that's lower down,11:43
+* even having to like figure out how to install flask and all of that kind of stuff that still gets pushed down to the cloud provider.11:48
+* And you just write a function and deploy a function, maybe write another function and deploy another function,11:55
+* and you build your application out of lots of separate small functions.12:01
+* And there's other benefits to this, uh, that I'll talk about a little bit later on.12:06
+* But obviously you lose control of all of these things.12:10
+* So again, there's some there's some trade offs here. And I'll show you an application that's designed in a serverless way.12:14
+* And you can kind of see the difference between those things. So there's no like correct choice in this spectrum.12:20
+* But you're building something and you might have particular reasons for choosing to be in a certain place.12:29
+* So like we talked about high frequency trading firms wanting to be close to the stock exchange.12:34
+* They don't want anybody else running on their machines.12:41
+* They want to be over on the left hand side. They can buy their own hardware.12:44
+* If you're a Start-Up company and you want to grow quickly, you don't want to be here because you've got that lead time problem.12:49
+* You've got to buy all the machines. You got to configure everything.12:54
+* Like I would say, probably here, maybe even today, maybe even over here, something like that is probably going to be where are you going to start up.12:58
+* And maybe over time if you really need control.13:06
+* Maybe you want to go here to get some some optimisation. Just to talk a little bit about some of these right hand options.13:10
+* So uh, so these are the control panels for the Azure and AWS portals.13:18
+* So you used the Azure portal yesterday. This is like the equivalent thing in AWS.13:25
+* And there are all the services that you can choose from. But it's the same kind of thing.13:31
+* You can go in there. You select something you want to create. You configure all the options.13:35
+* You can see everything that's happening give you everything through the browser.13:39
+* Both of those are pretty simple. I know they're not very simple. Interacting with them is a simple way of doing things through the browser,13:43
+* but there's a lot of complexity in what you can do and what you can control.13:50
+* The next one across is the platform as a service. And as I say,13:56
+* the one that you've probably interacted with the most is the impact platform that we provided to you with through a few other alternatives,14:00
+* um, that are run externally as third party things.14:08
+* So you could use in projects, but you could also use when you leave, and you may use when you go to work in different companies.14:12
+* One of what I think one of the best experiences, and I think the one that's closest to what you did with Siri, is probably Heroku.14:19
+* That's been around for quite a long time, and it was very popular, uh,14:26
+* provide a very nice service where you just build your application and you do the same kind of commands that we did with Siri,14:29
+* and it will deploy it and it runs it. It used to have we used to use it in teaching.14:35
+* And part of the reason was that was it had a free tier where people could sign up and they could basically run an application,14:41
+* uh, for free as long as they didn't have too many users. And that was nice.14:47
+* Unfortunately, Heroku, as well as many of the other cloud providers, were subject to,14:51
+* uh, enterprising engineers mining cryptocurrency, using free accounts, um,14:57
+* and generating lots of lots of free accounts of mining, quite a lot of cryptocurrency,15:02
+* uh, paid for by the cloud providers, uh, which they weren't very happy about.15:06
+* So now it's pretty difficult to find anything that will actually give you a free tier account, um, without registering with a credit card.15:10
+* And that's part of the reason that we switched to using this thing that we could provide to you, uh,15:19
+* run internally if you want to use Heroku, which, as I say, is a good experience and is available externally.15:24
+* If you are a student, you can sign up to GitHub Student Developer Pack.15:32
+* And that has credits for Heroku. So I think you get $13 a month for Heroku.15:37
+* And so you can run that app in there. And it is a basically that means you get an app for free pretty much.15:43
+* Um, so you might want to try that out at some point.15:49
+* Heroku um, used to be a company in its own right, and it's now owned by Salesforce, and they run all of their stuff on top of Amazon.15:54
+* So it's actually running in Amazon's cloud. But you never see Amazon's cloud.16:02
+* You would never know that from interacting with Heroku would mean I'm taking too long until these lines.16:05
+* Uh, a pretty similar products in the middle is flight Ohio.16:16
+* So they are operating with the same kind of developer experience,16:21
+* but they run on all their own hardware, so they own their own data centre and all their own machines.16:24
+* They don't run on top of Amazon. So in theory, I guess that means it may be that they are not subject to Amazon's pricing policy variable,16:30
+* and they're not subject to, uh, wherever Amazon wants to put the data, they can control that more closely.16:38
+* But from a developer point of view, the experience is very similar between these two.16:45
+* And then on the right hand side, I've got, uh, vassal, which is another kind of popular one.16:50
+* Uh, this is more towards the serverless end. You can't run a long running process on vessel.16:54
+* You can't start something up and leave it running for a month. It's much more of a thing.17:00
+* You'll deploy something and when someone makes a request, it will run your code.17:04
+* So there's much more in that in the serverless model.17:09
+* But otherwise, again, like a popular tool that people are starting to use more and more to make it easy to build and deploy your application.17:11
+* But when you have kind of very little knowledge of what's running underneath what the actual infrastructure is,17:19
+* but in many cases that's that's good and that's helpful.17:24
+* So this idea of building a platform that accelerates what the developer can do is kind of a current trend.17:30
+* You if you read job adverts at the moment, it's quite a lot of stuff around platform engineering and that kind of thing.17:37
+* And one of the reasons so even within a company, some quite often is the company is a subscriber, say, to Amazon's cloud or to Azure as a cloud.17:44
+* They don't want to expose the developers directly to the portal that you were using yesterday in the lab because as you saw, it's quite complicated.17:53
+* And so it's easy to like you can take a long time to set things up.18:00
+* And it's also quite easy to build something and set it up in a way that perhaps is not perfect, right?18:04
+* It's not perhaps in line with the company's policy for security or reliability or where things should run or pricing.18:09
+* And you might just, like, pick a very expensive machine and cost a lot of money.18:16
+* And so some of the things that are proving quite popular at the moment is for internally in a large company,18:22
+* for one team to build a platform, maybe of a kind of Heroku style that all the other teams use in order to deploy their applications.18:27
+* And then that abstracts some of that complexity off the cloud and allows the developers to go a little bit faster,18:38
+* but allows the infrastructure team to really control. Okay, we're never going to provision that kind of machine because it's too expensive.18:43
+* Or whenever anybody deploys anything, we're going to make sure that it's encrypted or whatever you want to do.18:49
+* We're always going to keep our data in this location. We're not going to allow it to be in that location,18:55
+* and we're going to control the network configuration so people can't open things up to attackers from outside.18:59
+* We're just going to give them the opportunity to like deploy applications.19:05
+* That might be what you might want. So this example here is taken from the UK government's digital service,19:08
+* which is like part of the Cabinet Office, which builds all the digital services for the government.19:17
+* This is Anna Shipman, who used to be a technical director at the Government Digital Service.19:22
+* And then after that she went to run a big of the Financial Times websites.19:27
+* And now she's a Start-Up CTO. And when she was working in the government digital service,19:32
+* one of the things she led was this project to create an internal platform for their developers.19:37
+* And one of the reasons for that, or two of the reasons I'm going to come back, would be nice.19:45
+* Yes. Thank you. If you see on the left, I have a whole bunch of different teams in different departments, all building applications to do things like,19:57
+* you know, allow you to pay your taxes, allow you to arrange a visit to someone in prison,20:05
+* uh, tell you when the next bank holidays are all the sorts of governmental interactions that you might have,20:10
+* and all of the teams ended up building things in a quite a similar way.20:16
+* So there was quite a lot of duplicated work between what the different teams would do.20:21
+* So they would all bills, you know, they'd all set up a database, they'd all probably have some search functionality for the website.20:24
+* They'd all want to do logging so that if something went wrong, errors would be logged in to a certain place.20:31
+* And they all have monitoring so that, um, if you're running operations, then something goes wrong in the middle of the night,20:36
+* it's going to alert one of the engineers and tell them to get up and try and fix it.20:42
+* Like this is a common thing they would want across all of their teams.20:47
+* And so all of their teams built things to do. That is a bit of a duplication.20:52
+* And they also, um, also work with some of our third party agencies, and they did that as well.20:57
+* And they also had a variety of different clouds that they would use.21:02
+* And so some of these teams that built stuff up on, I don't know, an Amazon, some people have built things on Azure.21:06
+* And so not only is there quite a lot of duplication of work, but it also meant that if you were a developer on team A and then you move to a team B,21:13
+* like it might be totally different, all the systems might be different.21:21
+* And they found that wasn't very helpful in being able to kind of rotate people around teams,21:25
+* because you quite like someone to be able to hop from one team to another and go, oh yeah, okay, this is all the same.21:29
+* I understand what we're doing. We're just working on a difference for the user.21:33
+* So what Anna's team did was they built this internal, what they call the government pass.21:40
+* Try to keep this light, um, which provided a lot of these core services so that if you were in a particular team,21:48
+* you could just use the services provided by the system to do search or to access a database or to do monitoring and alerting.21:57
+* And that meant that it was not stiff. Uh, it was the same between different teams because they just reuse the same service.22:04
+* So if a developer hops from one team to another, then everything was the same.22:10
+* They didn't have to learn new stuff, so that was helpful. It also meant that teams didn't build these things, which was a lot cheaper,22:13
+* and they could concentrate on building the actual applications on the top.22:19
+* And the last thing that was good was that because this is a public agency and they're spending the taxpayers money,22:24
+* one of the things they're not supposed to do is to be tied too closely to any particular vendor.22:30
+* So they're not supposed to be like, uh, you know, all of the tax industry, uh, infrastructure is running on Amazon.22:35
+* And then Amazon decided to make everything much more expensive. And that's much more expensive for the taxpayer.22:43
+* They're supposed to be able to say, oh, yeah, we've just switched to another vendor because, um,22:48
+* that's cheap out of the money for the taxpayer when it's like this, I guess quite complicated to do.22:52
+* But what Anna's team did was when they built the platform, they made it.22:59
+* So from the application side, it's agnostic to the cloud, doesn't know which cloud you're running on.23:03
+* And then they made backends that interface with all the different major clouds and they could switch.23:10
+* I don't know how often they actually did switch, but at least in theory they could say, okay,23:15
+* we're cancelling Amazon's contracts and we're going to move everything over to Google Cloud Platform.23:19
+* But the applications themselves wouldn't have to change.23:24
+* And so they were then able to take they have this ability to switch between the cloud vendors without being locked into any particular one.23:27
+* So that was an advantage. And so this is quite a common pattern that you'll see, especially in larger development organisations these days,23:35
+* is that there will be some teams within the company that work on building this platform,23:42
+* and then all of the other product teams are using that platform in order to build their applications.23:49
+* One of the best examples of this is Spotify. They their platform is called backstage.23:55
+* And after they implemented the platform, um, they actually open source that has a product.24:01
+* So you can download Spotify backstage.24:05
+* I think it's on GitHub. And you can use that in your organisation as well if you can find some.24:09
+* I type in my browser. Oh, it's very slow.24:20
+* That's what I was. What's wrong with that?24:26
+* Google stuff is too hot for my computer to do the.24:42
+* But in other situations it doesn't work as well.24:49
+* I can probably tell you that I worked in a company for a while, which had a team that implemented the platform,24:52
+* but they didn't really talk to any of the other development teams very much.24:59
+* And so they implemented the platform and said, here is the way to use the platform.25:02
+* And all the other development teams spent a lot of time trying to work around the platform so they didn't have to use it.25:06
+* So they spent a lot of time building all of these things in order to avoid25:11
+* having to use the ones that were provided by the central infrastructure team.25:15
+* And so actually, everything was duplicated even more because the people building the platform didn't understand25:18
+* or didn't bother to find out what the development teams actually wanted and needed.25:25
+* And so it slowed a lot of things down rather than speeding things up.25:28
+* So it's not always a perfect solution, but in many cases I can work quite well.25:32
+* Oh, you're doing okay.25:40
+* I'll talk a little bit more about serverless, maybe a little bit later on, actually in a bit more detail in terms of application design.25:43
+* But the idea of serverless, as I said, is that you just pay.25:49
+* Basically, you just deploy a function, just a piece of code, and you leave everything else to the cloud provider.25:53
+* And then when a certain event happens, the cloud, probably the provider will run that function.25:59
+* So it might be you put a file in a directory and then a function runs that processes that file.26:04
+* Or it might be that, um, a message is received from another service.26:09
+* And then you process that message or a request comes from a browser and you process that request and then you return the response.26:14
+* And so the sort of products that you'll see that are in this category, uh, probably the most well-known one is Amazon Lambda.26:21
+* I'll talk a bit more about that later on. Uh, Azure has an equivalent service which is called Azure Functions.26:29
+* So you can try that out inside the Azure console. Uh, Google have uh equivalent kind of function called uh, Google Cloud Functions.26:34
+* And there's also this uh, provision from IBM which is a product called Open whisk.26:44
+* I don't know why it's called open whisk. Seems like a strange name, um, which is an open source thing which you can run on your own hardware.26:48
+* So if you run a company and you want to provide a serverless experience to your developers, but you don't want to use a third party cloud provider,26:56
+* you can run open, whisk on your service as a platform, and then all of your developers can use that to deploy.27:04
+* But you don't have the elasticity of hardware because you bought the hardware to run it on.27:11
+* So I'll come back and talk about this a little bit more later on,27:16
+* but I thought it would be useful to think about if we have all of these things available to us as infrastructure in order to build our applications.27:21
+* How do we build our application to take advantage of it?27:29
+* What sort of things are we going to do differently given that we're going to build it on the cloud?27:32
+* So let's start off like this. So this is basically what you did yesterday.27:38
+* You had the cloud which was Azure. In your case you created a virtual machine on that virtual machine.27:44
+* You installed your flask application and it ran.27:51
+* And it maybe like serve requests and maybe you make it serve an image as well.27:54
+* So one of the good things, uh, about this. What's the next slide?28:01
+* Oh, yeah. So this is fine, right? But it's basically like, as if you owned your own machine and you install all this stuff.28:04
+* It's just that you rented the machine as a virtual machine from the cloud.28:12
+* But apart from that, you did everything pretty much the same. There's a slight, maybe a slight detour,28:16
+* but I think it's worth mentioning is that one of the common ways of changing this infrastructure is28:24
+* to split the serving of static resources from the split the processing of requests dynamically,28:30
+* like with your Python code. So at the moment, if you deployed this application,28:36
+* if you want to serve your hello world routes and have it compute something and potentially execute your Python code.28:40
+* But if you just want to serve an image or a CSS file or something, still does that still invokes your flask code, right?28:46
+* And then goes and gets the image and serves the house again.28:52
+* And so this means that when you, uh, deploy things, you end up putting all of things like the images in a repository and deploying it all together.28:57
+* And it can mean that over time it gets quite big if it's just a couple of images.29:05
+* This is fine if you want to put, you know, much more video media content into the thing can make this thing quite big.29:08
+* And it also means that we are executing Python, even if all we have to do is send an image.29:14
+* So one of the common things to do is to actually separate this and run a web server like an off the shelf web server, like, uh,29:20
+* Apache or Engine X or something like this, which is just a bit of software that you download and run on your virtual machine.29:29
+* And then the browser is going to make a request and it's going to go into the cloud,29:37
+* it's going to hit the web server first and it says, oh, if this is an image, I'm just going to give you a straight back.29:40
+* If it says, okay, well, actually I need to run some Python to calculate something to render this page.29:47
+* Then the web server passes it on to flask, and then flask will execute Python,29:52
+* calculate whatever you want, and then return back from flask through the web server back to the browser.29:57
+* But you've made an efficiency because if it's a static resource that the web server can just give back to the client,30:05
+* we don't need to invoke Python so it speed things up a little bit. Uh, makes it a little bit more efficient.30:12
+* But, uh, for this case, let's go back to thinking, simplifying a little bit and imagining everything's in one.30:19
+* If our application becomes very popular, then we might not have enough capacity in our virtual machine,30:26
+* and we might be not able to have not able to respond quickly to all of our requests.30:31
+* One of the nice things about the cloud is you just go in and say, oh, can I have another virtual machine, please?30:36
+* You install all the same software on another virtual machine, and now you've got double the capacity, so you can now serve twice as many requests.30:41
+* As a couple of things here.30:51
+* Now we have to know when you're that the browser needs to send a request somewhere and we need to say, well, it could go here or it could go there.30:54
+* And those two servers have different IP addresses, and you don't want the user to have to type in one of the two IP addresses to see what would work.31:03
+* So instead what we do is we add this extra bit of infrastructure in front called a load balancer.31:11
+* And so the browser actually sends a request here and that the load balancer applies31:18
+* some kind of policy to select one of our virtual machines to send the request to,31:23
+* which should then handle it. And then the response goes back to the browser.31:28
+* And in kind of the olden days we would install get engine X or Apache to do this.31:32
+* But if you run it in the cloud like this is a service that is provided to you by the cloud.31:38
+* So if I'm running in Amazon, there's a thing called elastic Load balancer.31:42
+* If I just like take and say I want one of those and I say this is a group of31:47
+* virtual machines that should all be attached to this load balancer because okay,31:51
+* this basically all you have to do. So you don't have to install the software, you don't have to configure it.31:56
+* You just take a box. And then if I grow that, I put all of these things together in what's called an auto scaling group.32:00
+* And if I need if I have a need for more capacity, I say, okay, we need to make that auto scaling group bigger.32:06
+* Let's go from two nodes to 3 or 4 and it goes okay.32:13
+* Makes the group of it bigger, starts another one of these things.32:17
+* They're all still associated with the same load balancer and everything is pretty smooth in my case.32:20
+* And the load balancer is going to apply some kind of policy about how it selects which virtual machine to send the request to.32:27
+* The simplest one is called round robin. It does the first request to the first one, next request to the next one.32:32
+* So on till it gets to the end and then goes back to the first one. That's okay.32:38
+* Pretty pretty works reasonably well,32:43
+* but sometimes you can be kind of unlucky and some of the virtual machines get busy because they've got particularly like difficult requests to serve.32:45
+* And then you can have the load balancer do smarter things like say, okay, well,32:53
+* I've noticed that this virtual machine is quite busy, so I'm going to skip it for a while.32:57
+* So it goes 134134. And when two comes down a bit it goes back to doing number two.33:00
+* Or you can say, oh, the request that went to that one took a long time to come back.33:07
+* So actually I'm going to skip that one for a while. These sorts of things.33:11
+* And again those are just like policies that you can configure in the load balancer.33:14
+* And then it will sort everything out. And this is provided to you by the cloud provider just by checking a few boxes.33:18
+* So again it's something where you don't have control, but you sort of don't want to have to install all of those things and configure them.33:24
+* That's what we used to do. Again, if you ran all of your own hardware, you would install all the software and configure it yourself.33:33
+* So now let's think about the images. So I said we're just going to create a new virtual machine and install a new copy of the software.33:42
+* That means a new copy of all like all…
