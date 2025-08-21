@@ -13,38 +13,54 @@ import os
 import sys
 import time
 import json
+import csv
 import contextlib
 import io
 from pathlib import Path
 from datetime import datetime
+import re
+import numpy as np
 
 # Add transcriber_app to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from metrics_collector import MetricsCollector
 from configs import TEST_CONFIGS
+from zoom_search import ZoomSearch
 from transcriber_app.main import start_transcription_pipeline_with_virtual_audio, stop_transcription_pipeline
 import transcriber_app.main as main_module
 
-# MANUAL CONFIGURATION - Change this to test different models
-# Options: 'fixed', 'vad', 'adaptive'
-CURRENT_MODEL = 'fixed'
-
-# Select which audio set to test: '10sec', '5min', or '30min'
-AUDIO_SOURCE = '10sec'
+# Change these flags at the top of test_runner.py
+CURRENT_MODEL = 'vad'     # Select model: 'fixed', 'vad', 'adaptive'
+AUDIO_SOURCE = '10sec'      # Select which audio set to test: '10sec', '5min', or '30min'
+TEST_MODE = 'phase_a_r1'    # Select test mode for different phases: 'phase_a_r1', 'phase_a_r2', 'phase_b_r1', 'phase_b_r2', 'phase_c'
 
 class TestRunner:
-    def __init__(self, test_audio_dir="audio_files", results_dir="test_results", audio_source=AUDIO_SOURCE):
+    def __init__(self, test_audio_dir="audio_files", results_dir="test_results", audio_source=AUDIO_SOURCE, test_mode=TEST_MODE):
         self.test_audio_dir = Path(test_audio_dir)  
         self.results_dir = Path(results_dir)        
         self.json_dir = self.results_dir / "json_results"
         self.report_dir = self.results_dir / "report_results"
+        self.csv_dir = self.results_dir / "csv_results"
         self.audio_source = audio_source
+        self.test_mode = test_mode
+        self.zoom_search = ZoomSearch()
+        
+        # Set duration limits based on test mode
+        self.duration_limits = {
+            'phase_a_r1': 60,    # 60 seconds
+            'phase_a_r2': 180,   # 180 seconds (3 minutes)
+            'phase_b_r1': None,  # Full 5-minute clips
+            'phase_b_r2': None,  # Full 5-minute clips
+            'phase_c': None      # Full 30-minute clips
+        }
+        self.max_duration = self.duration_limits.get(self.test_mode)
         
         # Create directories
         self.results_dir.mkdir(exist_ok=True)
         self.json_dir.mkdir(exist_ok=True)
         self.report_dir.mkdir(exist_ok=True)
+        self.csv_dir.mkdir(exist_ok=True)
         
         self.results = []
         
@@ -130,7 +146,8 @@ class TestRunner:
         
         print("\n" + ("=" * 100))
         print("Testing Session")
-        print("=" * 100)        
+        print("=" * 100)
+        
         # Find audio files
         audio_files = self.find_audio_files()
         if not audio_files:
@@ -143,6 +160,9 @@ class TestRunner:
             return
         
         configs = TEST_CONFIGS[model_type]
+        
+        # Sort configurations for logical execution order
+        configs = self.sort_configurations(configs, model_type)
         
         # Calculate total tests
         total_tests = len(audio_files) * len(configs) * num_runs_per_config
@@ -197,7 +217,34 @@ class TestRunner:
         
         # Save results
         json_path = self.save_results(model_type)
-        self.print_summary(model_display_name, total_tests, json_path)
+        csv_path = self.save_results_csv(model_type)
+        config_averages = self.calculate_config_averages()
+        if config_averages:
+            avg_csv_path = self.save_averages_csv(model_type, config_averages)
+        else:
+            avg_csv_path = None
+        self.print_summary(model_display_name, total_tests, json_path, csv_path, avg_csv_path)
+
+    def sort_configurations(self, configs, model_type):
+        """Sort configurations for logical execution order"""
+        if model_type == 'fixed':
+            # Sort by chunk size (smaller to larger)
+            return sorted(configs, key=lambda x: x['chunk_size'])
+        elif model_type == 'vad':
+            # Sort by aggressiveness, then frame duration, then silence frames
+            return sorted(configs, key=lambda x: (
+                x.get('aggressiveness', 0),
+                x.get('frame_duration_ms', 0),
+                x.get('max_silence_frames', 0)
+            ))
+        elif model_type == 'adaptive':
+            # Sort by starting aggressiveness, then frame duration
+            return sorted(configs, key=lambda x: (
+                x.get('starting_aggressiveness', 0),
+                x.get('frame_duration_ms', 0)
+            ))
+        else:
+            return configs
     
     def run_single_test(self, audio_file, config, current_test, total_tests):
         """Run a single test with given audio file and configuration"""
@@ -219,8 +266,12 @@ class TestRunner:
                     config=config
                 )
                 
-                # Wait for transcription to complete
+                # Wait for transcription to complete or duration limit reached
+                start_time = time.time()
                 while main_module.transcription_thread and main_module.transcription_thread.is_alive():
+                    if self.max_duration and (time.time() - start_time) > self.max_duration:
+                        print(f" -> Stopping test after {self.max_duration}s (duration limit)")
+                        break
                     time.sleep(0.1)
                 
                 # Stop transcription (also suppressed)
@@ -242,7 +293,11 @@ class TestRunner:
                 'config': config['description'],
                 'word_count': len(final_transcript.split()),
                 'processing_latency': latency_metrics['avg_processing_latency'],
+                'p50_processing_latency': latency_metrics['p50_processing_latency'],
+                'p90_processing_latency': latency_metrics['p90_processing_latency'],
                 'end_to_end_latency': latency_metrics['avg_end_to_end_latency'],
+                'p50_end_to_end_latency': latency_metrics['p50_end_to_end_latency'],
+                'p90_end_to_end_latency': latency_metrics['p90_end_to_end_latency'],
                 'wer_score': wer_score,
                 'recorded_transcript': final_transcript,
                 'correct_transcript': reference_transcript
@@ -257,7 +312,11 @@ class TestRunner:
                 'config': config.get('description', 'unknown'),
                 'word_count': 0,
                 'processing_latency': 0,
+                'p50_processing_latency': 0,
+                'p90_processing_latency': 0,
                 'end_to_end_latency': 0,
+                'p50_end_to_end_latency': 0,
+                'p90_end_to_end_latency': 0,
                 'wer_score': None,
                 'recorded_transcript': '',
                 'correct_transcript': reference_transcript if reference_transcript else '',
@@ -268,9 +327,10 @@ class TestRunner:
         """Save test results to JSON file and create readable report"""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         model_display_name = self.get_model_display_name(model_type).replace(" ", "_")
+        phase_name = self.test_mode.replace("_", "").upper()
         
-        json_path = self.json_dir / f"{model_display_name}_test_results_{timestamp}.json"
-        report_path = self.report_dir / f"{model_display_name}_test_results_{timestamp}.txt"
+        json_path = self.json_dir / f"{model_display_name}_{phase_name}_RAW_{timestamp}.json"
+        report_path = self.report_dir / f"{model_display_name}_{phase_name}_RAW_{timestamp}.txt"
         
         # Save JSON for programmatic access
         with open(json_path, 'w') as f:
@@ -280,7 +340,82 @@ class TestRunner:
         self.create_readable_report(report_path)
         
         return json_path
-    
+
+    def save_results_csv(self, model_type):
+        """Save test results to CSV file for easy analysis"""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        model_display_name = self.get_model_display_name(model_type).replace(" ", "_")
+        phase_name = self.test_mode.replace("_", "").upper()
+        
+        csv_path = self.csv_dir / f"{model_display_name}_{phase_name}_RAW_{timestamp}.csv"
+        
+        with open(csv_path, 'w', newline='') as f:
+            writer = csv.writer(f)
+            # Write header
+            writer.writerow([
+                'config', 'audio_file', 'model_type', 'wer_score', 
+                'avg_processing_latency', 'p50_processing_latency', 'p90_processing_latency',
+                'avg_end_to_end_latency', 'p50_end_to_end_latency', 'p90_end_to_end_latency',
+                'word_count', 'test_mode', 'audio_source'
+            ])
+            
+            # Write data rows
+            for result in self.results:
+                writer.writerow([
+                    result['config'],
+                    result['audio_file'],
+                    result['model_type'],
+                    result['wer_score'] if result['wer_score'] is not None else '',
+                    f"{result['processing_latency']:.6f}",
+                    f"{result['p50_processing_latency']:.6f}",
+                    f"{result['p90_processing_latency']:.6f}",
+                    f"{result['end_to_end_latency']:.6f}",
+                    f"{result['p50_end_to_end_latency']:.6f}",
+                    f"{result['p90_end_to_end_latency']:.6f}",
+                    result['word_count'],
+                    self.test_mode,
+                    self.audio_source
+                ])
+        
+        return csv_path
+
+    def save_averages_csv(self, model_type, config_averages):
+        """Save configuration averages to separate CSV file"""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        model_display_name = self.get_model_display_name(model_type).replace(" ", "_")
+        phase_name = self.test_mode.replace("_", "").upper()
+        
+        avg_csv_path = self.csv_dir / f"{model_display_name}_{phase_name}_AVG_{timestamp}.csv"
+        
+        with open(avg_csv_path, 'w', newline='') as f:
+            writer = csv.writer(f)
+            # Write header
+            writer.writerow([
+                'rank', 'config', 'avg_wer', 'avg_processing_latency', 
+                'p50_processing_latency', 'p90_processing_latency',
+                'avg_end_to_end_latency', 'p50_end_to_end_latency', 'p90_end_to_end_latency',
+                'num_runs', 'test_mode', 'audio_source'
+            ])
+            
+            # Write data rows
+            for i, (config, metrics) in enumerate(config_averages, 1):
+                writer.writerow([
+                    i,
+                    config,
+                    f"{metrics['avg_wer']:.6f}" if metrics['avg_wer'] is not None else '',
+                    f"{metrics['avg_latency']:.6f}",
+                    f"{metrics['avg_p50_latency']:.6f}",
+                    f"{metrics['avg_p90_latency']:.6f}",
+                    f"{metrics['avg_e2e_latency']:.6f}",
+                    f"{metrics['avg_p50_e2e_latency']:.6f}",
+                    f"{metrics['avg_p90_e2e_latency']:.6f}",
+                    metrics['num_runs'],
+                    self.test_mode,
+                    self.audio_source
+                ])
+        
+        return avg_csv_path
+
     def create_readable_report(self, report_path):
         """Create a human-readable text report"""
         with open(report_path, 'w') as f:
@@ -353,55 +488,101 @@ class TestRunner:
                 
                 f.write("\n" + "=" * 80 + "\n")
     
-    def print_summary(self, model_display_name, total_tests, json_path):
-        """Print a summary of test results"""
+    def print_summary(self, model_display_name, total_tests, json_path, csv_path, avg_csv_path):
+        """Print a summary of test results with configuration ranking"""
         if not self.results:
             print("No results to summarize")
             return
         
         print("Testing Complete")
         print(f"-> Tested {model_display_name} model")
+        print(f"-> Testing ({self.get_audio_source_display()}) audio files")
+        print(f"-> Test mode: {self.test_mode}")
+        print(f"-> {len(self.results)}/{total_tests} tests complete")
         print(f"-> Results saved to: {json_path}")
+        print(f"-> CSV results saved to: {csv_path}")
+        if avg_csv_path:
+            print(f"-> Averages CSV saved to: {avg_csv_path}")
         print()
         
-        print("Summary")
-        print("-" * 100)
-        print(f"| {'config/params':<35} | {'audio_file':<27} | {'avg processing':<15} | {'avg WER':<10} |")
-        print("-" * 100)
+        # Rank configurations by their average performance
+        config_averages = self.calculate_config_averages()
+        if config_averages:
+            print("Configuration Rankings (by average WER, then p90 latency):")
+            print("-" * 100)
+            print(f"| {'Rank':<4} | {'Configuration':<50} | {'Avg WER':<8} | {'Avg p90 latency':<15} | {'Avg latency':<12} |")
+            print("-" * 100)
+            
+            for i, (config, metrics) in enumerate(config_averages, 1):
+                config_name = config[:49]  # Truncate if too long
+                avg_wer = f"{metrics['avg_wer']:.3f}" if metrics['avg_wer'] is not None else "N/A"
+                avg_p90 = f"{metrics['avg_p90_latency']:.3f}s"
+                avg_latency = f"{metrics['avg_latency']:.3f}s"
+                print(f"| {i:<4} | {config_name:<50} | {avg_wer:<8} | {avg_p90:<15} | {avg_latency:<12} |")
+            
+            print("-" * 100)
+            print()
+
+    def calculate_config_averages(self):
+        """Calculate average metrics for each configuration across all runs"""
+        config_groups = {}
         
-        # Group results by config and audio file
-        grouped_results = {}
+        # Group results by configuration
         for result in self.results:
             if 'error' in result:
                 continue
                 
-            key = (result['config'], result['audio_file'])
-            if key not in grouped_results:
-                grouped_results[key] = []
-            grouped_results[key].append(result)
+            config = result['config']
+            if config not in config_groups:
+                config_groups[config] = []
+            config_groups[config].append(result)
         
-        # Calculate averages and display
-        for (config, audio_file), results in grouped_results.items():
-            if not results:
+        # Calculate averages for each configuration
+        config_averages = []
+        for config, runs in config_groups.items():
+            if not runs:
                 continue
                 
-            avg_latency = sum(r['processing_latency'] for r in results) / len(results)
-            avg_wer = sum(r['wer_score'] for r in results if r['wer_score'] is not None) / len([r for r in results if r['wer_score'] is not None]) if any(r['wer_score'] is not None for r in results) else None
+            # Calculate averages
+            avg_wer = None
+            wer_scores = [r['wer_score'] for r in runs if r['wer_score'] is not None]
+            if wer_scores:
+                avg_wer = sum(wer_scores) / len(wer_scores)
             
-            latency_str = f"{avg_latency:.3f}s"
-            wer_str = f"{avg_wer:.3f}" if avg_wer is not None else "N/A"
+            avg_latency = sum(r['processing_latency'] for r in runs) / len(runs)
+            avg_p90_latency = sum(r['p90_processing_latency'] for r in runs) / len(runs)
+            avg_p50_latency = sum(r['p50_processing_latency'] for r in runs) / len(runs)
+            avg_e2e_latency = sum(r['end_to_end_latency'] for r in runs) / len(runs)
+            avg_p50_e2e_latency = sum(r['p50_end_to_end_latency'] for r in runs) / len(runs)
+            avg_p90_e2e_latency = sum(r['p90_end_to_end_latency'] for r in runs) / len(runs)
             
-            print(f"| {config:<35} | {audio_file:<25} | {latency_str:<15} | {wer_str:<10} |")
-            print("-" * 100)
+            config_averages.append((config, {
+                'avg_wer': avg_wer,
+                'avg_latency': avg_latency,
+                'avg_p90_latency': avg_p90_latency,
+                'avg_p50_latency': avg_p50_latency,
+                'avg_e2e_latency': avg_e2e_latency,
+                'avg_p50_e2e_latency': avg_p50_e2e_latency,
+                'avg_p90_e2e_latency': avg_p90_e2e_latency,
+                'num_runs': len(runs)
+            }))
         
-        print()
+        # Sort by WER, then by p90 latency
+        config_averages.sort(key=lambda x: (x[1]['avg_wer'] if x[1]['avg_wer'] is not None else float('inf'), x[1]['avg_p90_latency']))
+        
+        return config_averages
+
+    def run_zoom_in_search(self, model_type):
+        """Run zoom-in search for Phase B Round 2 using the ZoomSearch module"""
+        config_averages = self.calculate_config_averages()
+        return self.zoom_search.run_zoom_in_search(config_averages, model_type)
 
 def main():
     # Create test runner
-    runner = TestRunner(audio_source=AUDIO_SOURCE)
+    runner = TestRunner(audio_source=AUDIO_SOURCE, test_mode=TEST_MODE)
     
     # Run tests for specified model_type
-    runner.run_model_tests(CURRENT_MODEL, num_runs_per_config=3)
+    runner.run_model_tests(CURRENT_MODEL, num_runs_per_config=2)
 
 if __name__ == "__main__":
     main() 

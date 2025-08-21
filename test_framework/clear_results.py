@@ -22,8 +22,9 @@ def clear_test_results():
     # Recreate expected subfolders
     (base / "json_results").mkdir(parents=True, exist_ok=True)
     (base / "report_results").mkdir(parents=True, exist_ok=True)
+    (base / "csv_results").mkdir(parents=True, exist_ok=True)
 
-    print(f"Cleared {cleared} items in {base}. Recreated json_results/ and report_results/.")
+    print(f"Cleared {cleared} items in {base}. Recreated json_results/, report_results/, and csv_results/.")
 
 if __name__ == "__main__":
     clear_test_results()

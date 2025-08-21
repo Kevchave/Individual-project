@@ -47,7 +47,7 @@ class MetricsCollector:
     def calculate_latency(self):
         """ Calculates both processing and end-to-end latency """
         if not self.chunk_start_times or not self.chunk_end_times:
-            return {'avg_processing_latency': 0, 'avg_end_to_end_latency': 0}
+            return {'avg_processing_latency': 0, 'avg_end_to_end_latency': 0, 'p50_processing_latency': 0, 'p90_processing_latency': 0, 'p50_end_to_end_latency': 0, 'p90_end_to_end_latency': 0}
         
         # Calculate processing time for each chunk
         processing_times = []
@@ -59,12 +59,18 @@ class MetricsCollector:
         if self.chunk_display_times and len(self.chunk_display_times) == len(self.chunk_start_times):
             for start, display in zip(self.chunk_start_times, self.chunk_display_times):
                 end_to_end_times.append(display - start)
+        else:
+            end_to_end_times = processing_times  # Fallback to processing times
         
         return {
             'avg_processing_latency': np.mean(processing_times),
-            'avg_end_to_end_latency': np.mean(end_to_end_times) if end_to_end_times else np.mean(processing_times),
+            'avg_end_to_end_latency': np.mean(end_to_end_times),
+            'p50_processing_latency': np.percentile(processing_times, 50),
+            'p90_processing_latency': np.percentile(processing_times, 90),
+            'p50_end_to_end_latency': np.percentile(end_to_end_times, 50),
+            'p90_end_to_end_latency': np.percentile(end_to_end_times, 90),
             'processing_latencies': processing_times,
-            'end_to_end_latencies': end_to_end_times if end_to_end_times else processing_times
+            'end_to_end_latencies': end_to_end_times
         }
     
     def get_final_transcript(self):
