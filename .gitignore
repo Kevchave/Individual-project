@@ -14,3 +14,4 @@ test_framework/audio_files/uncropped/
 test_framework/audio_files/5min_versions/*.mp3
 venv/
 .venv/
+test_framework/audio_files/30min_versions/*.mp3

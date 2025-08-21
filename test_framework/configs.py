@@ -1,30 +1,58 @@
 #!/usr/bin/env python3
 """
-Simplified Test Configurations for Transcription Models
+Test Configurations for Transcription Models
 """
 
-# Test configurations for each model type
-TEST_CONFIGS = {
-    'fixed': [
-        {'chunk_size': 1.0, 'description': 'FIXED (1.0s chunks)'},
-        {'chunk_size': 1.5, 'description': 'FIXED (1.5s chunks)'},
-        {'chunk_size': 2.5, 'description': 'FIXED (2.5s chunks)'},
-        {'chunk_size': 3.0, 'description': 'FIXED (3.0s chunks)'}
-    ],
-    
-    'vad': [
-        {'aggressiveness': 1, 'frame_duration_ms': 20, 'max_silence_frames': 10, 'description': 'FIXED VAD (1/20ms/10 frames)'},
-        {'aggressiveness': 2, 'frame_duration_ms': 20, 'max_silence_frames': 10, 'description': 'FIXED VAD (2/20ms/10 frames)'},
-        {'aggressiveness': 3, 'frame_duration_ms': 20, 'max_silence_frames': 10, 'description': 'FIXED VAD (3/20ms/10 frames)'},
-        {'aggressiveness': 2, 'frame_duration_ms': 10, 'max_silence_frames': 10, 'description': 'FIXED VAD (2/10ms/10 frames)'},
-        {'aggressiveness': 2, 'frame_duration_ms': 30, 'max_silence_frames': 10, 'description': 'FIXED VAD (2/30ms/10 frames)'},
-        {'aggressiveness': 2, 'frame_duration_ms': 20, 'max_silence_frames': 5, 'description': 'FIXED VAD (2/20ms/5 frames)'},
-        {'aggressiveness': 2, 'frame_duration_ms': 20, 'max_silence_frames': 15, 'description': 'FIXED VAD (2/20ms/15 frames)'}
-    ],
-    
-    'adaptive': [
-        {'starting_aggressiveness': 1, 'frame_duration_ms': 20, 'max_silence_frames': 10, 'description': 'ADAPTIVE VAD (1/20ms/10 frames)'},
-        {'starting_aggressiveness': 2, 'frame_duration_ms': 20, 'max_silence_frames': 10, 'description': 'ADAPTIVE VAD (2/20ms/10 frames)'},
-        {'starting_aggressiveness': 3, 'frame_duration_ms': 20, 'max_silence_frames': 10, 'description': 'ADAPTIVE VAD (3/20ms/10 frames)'}
-    ]
+from sobol_config_generator import update_test_configs, print_all_configs
+
+# Generate TEST_CONFIGS using Sobol sampling
+TEST_CONFIGS = update_test_configs()
+
+# Audio file categories for different speaking styles
+AUDIO_CATEGORIES = {
+    'seminar': {
+        'description': 'Fast-paced, conversational (150+ WPM)',
+        'expected_wpm': 150,
+        'file_pattern': '*seminar*'
+    },
+    'lecture': {
+        'description': 'Slower, structured, pauses (100-120 WPM)',
+        'expected_wpm': 110,
+        'file_pattern': '*lecture*'
+    },
+    'talk': {
+        'description': 'Performative, enthusiastic (130-150 WPM)',
+        'expected_wpm': 140,
+        'file_pattern': '*talk*'
+    }
 }
+
+def verify_sobol_configs():
+    """Quick function to verify the generated configurations look good"""
+    print("VERIFICATION:")
+    print("=" * 40)
+    
+    for model_type, config_list in TEST_CONFIGS.items():
+        print(f"\n{model_type.upper()} ({len(config_list)} configs):")
+        
+        if model_type == 'fixed':
+            chunks = [float(c['chunk_size']) for c in config_list]  # Convert to regular float
+            print(f"  Chunk sizes: {sorted(chunks)}")
+        else:
+            agg_vals = [c['aggressiveness'] for c in config_list]
+            frame_vals = [c['max_silence_frames'] for c in config_list]
+            print(f"  Aggressiveness: {sorted(set(agg_vals))}")
+            print(f"  Max silence frames: {min(frame_vals)}-{max(frame_vals)}")
+    
+    print(f"\nTotal configurations:")
+    print(f"  Fixed: {len(TEST_CONFIGS['fixed'])}")
+    print(f"  VAD: {len(TEST_CONFIGS['vad'])}")
+    print(f"  Adaptive: {len(TEST_CONFIGS['adaptive'])}")
+    print(f"  TOTAL: {sum(len(configs) for configs in TEST_CONFIGS.values())}")
+
+if __name__ == "__main__":
+    verify_sobol_configs()
+    
+    print("\n" + "=" * 60)
+    print("DETAILED CONFIGURATIONS:")
+    print_all_configs()
