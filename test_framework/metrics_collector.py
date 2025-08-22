@@ -1,3 +1,30 @@
+"""
+Metrics Collector for Transcription Performance Testing
+
+This module provides latency measurement for speech-to-text transcription systems.
+It measures two types of latency:
+
+1. Processing Latency: Time from audio chunk reception to transcription completion
+   - Measures core Whisper model performance
+   - Start: record_chunk_start() in transcriber.py
+   - End: record_chunk_end() in transcriber.py
+
+2. Callback Latency: Time from audio chunk reception to callback completion
+   - Measures processing + callback overhead (but NOT UI rendering)
+   - Start: record_chunk_start() in transcriber.py  
+   - End: record_chunk_callback() in main.py (on_transcription callback)
+   - This represents the "backend-to-frontend" timing bottleneck
+
+Note: True end-to-end latency (including UI rendering) would require:
+- Visual analysis of screen updates
+- Browser-based performance measurement
+- Computer vision for text detection
+- Significant additional complexity and overhead
+
+The current approach provides valuable performance insights while maintaining
+simplicity and low overhead for testing purposes.
+"""
+
 import time
 import numpy as np
 from jiwer import wer, Compose, ToLowerCase, RemovePunctuation, RemoveMultipleSpaces, Strip
@@ -21,7 +48,7 @@ class MetricsCollector:
         self.start_time = None
         self.chunk_start_times = []  # When each chunk was received
         self.chunk_end_times = []    # When each chunk was transcribed
-        self.chunk_display_times = []  # When each chunk appears on screen
+        self.chunk_callback_times = []  # When transcription callback completes
         self.transcripts = []
         self.ground_truth = None
 
@@ -40,37 +67,53 @@ class MetricsCollector:
         self.chunk_end_times.append(time.time())
         self.transcripts.append(transcript)
 
-    def record_chunk_display(self):
-        """ Records when text appears on screen (end-to-end latency) """
-        self.chunk_display_times.append(time.time())
+    def record_chunk_callback(self):
+        """ 
+        Records when transcription callback completes (callback latency measurement)
+        
+        Note: This measures the time from audio reception to callback completion,
+        NOT true end-to-end latency including UI rendering. This represents
+        processing time + callback overhead, which is often the main bottleneck
+        in real applications.
+        """
+        self.chunk_callback_times.append(time.time())
 
     def calculate_latency(self):
-        """ Calculates both processing and end-to-end latency """
+        """ 
+        Calculates both processing latency and callback latency
+        
+        Processing Latency: Time from audio chunk reception to transcription completion
+        Callback Latency: Time from audio chunk reception to callback completion
+                        (includes processing + callback overhead, but NOT UI rendering)
+        
+        Note: True end-to-end latency (including UI rendering) would require
+        visual analysis of screen updates, which is not implemented here.
+        """
         if not self.chunk_start_times or not self.chunk_end_times:
-            return {'avg_processing_latency': 0, 'avg_end_to_end_latency': 0, 'p50_processing_latency': 0, 'p90_processing_latency': 0, 'p50_end_to_end_latency': 0, 'p90_end_to_end_latency': 0}
+            return {'avg_processing_latency': 0, 'avg_callback_latency': 0, 'p50_processing_latency': 0, 'p90_processing_latency': 0, 'p50_callback_latency': 0, 'p90_callback_latency': 0}
         
         # Calculate processing time for each chunk
         processing_times = []
         for start, end in zip(self.chunk_start_times, self.chunk_end_times):
             processing_times.append(end - start)
         
-        # Calculate end-to-end time for each chunk
-        end_to_end_times = []
-        if self.chunk_display_times and len(self.chunk_display_times) == len(self.chunk_start_times):
-            for start, display in zip(self.chunk_start_times, self.chunk_display_times):
-                end_to_end_times.append(display - start)
+        # Calculate callback time for each chunk (processing + callback overhead)
+        callback_times = []
+        if self.chunk_callback_times and len(self.chunk_callback_times) == len(self.chunk_start_times):
+            for start, callback in zip(self.chunk_start_times, self.chunk_callback_times):
+                callback_times.append(callback - start)
         else:
-            end_to_end_times = processing_times  # Fallback to processing times
+            callback_times = processing_times  # Fallback to processing times
         
         return {
             'avg_processing_latency': np.mean(processing_times),
-            'avg_end_to_end_latency': np.mean(end_to_end_times),
+            'avg_callback_latency': np.mean(callback_times),
             'p50_processing_latency': np.percentile(processing_times, 50),
             'p90_processing_latency': np.percentile(processing_times, 90),
-            'p50_end_to_end_latency': np.percentile(end_to_end_times, 50),
-            'p90_end_to_end_latency': np.percentile(end_to_end_times, 90),
+            'p50_callback_latency': np.percentile(callback_times, 50),
+            'p90_callback_latency': np.percentile(callback_times, 90),
             'processing_latencies': processing_times,
-            'end_to_end_latencies': end_to_end_times
+            'callback_latencies': callback_times
         }
     
     def get_final_transcript(self):

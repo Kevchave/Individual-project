@@ -32,7 +32,10 @@ app = Flask(__name__)
 
 # Load environment variables
 app.config['GEMINI_API_KEY'] = os.getenv('GEMINI_API_KEY')
-print(f"GEMINI_API_KEY loaded: {app.config['GEMINI_API_KEY'][:10]}..." if app.config['GEMINI_API_KEY'] else "GEMINI_API_KEY not found")
+if app.config['GEMINI_API_KEY']:
+    print("✅ Gemini API key loaded successfully")
+else:
+    print("⚠️  Gemini API key not found - AI feedback features will be disabled")
 
 # Defines a route for the route URL "/"
 # - when a user visits the "/" URL, call the home() function 

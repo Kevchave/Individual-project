@@ -378,9 +378,9 @@ class TestRunner:
                 'processing_latency': latency_metrics['avg_processing_latency'],
                 'p50_processing_latency': latency_metrics['p50_processing_latency'],
                 'p90_processing_latency': latency_metrics['p90_processing_latency'],
-                'end_to_end_latency': latency_metrics['avg_end_to_end_latency'],
-                'p50_end_to_end_latency': latency_metrics['p50_end_to_end_latency'],
-                'p90_end_to_end_latency': latency_metrics['p90_end_to_end_latency'],
+                'callback_latency': latency_metrics['avg_callback_latency'],
+                'p50_callback_latency': latency_metrics['p50_callback_latency'],
+                'p90_callback_latency': latency_metrics['p90_callback_latency'],
                 'wer_score': wer_score,
                 'recorded_transcript': final_transcript,
                 'correct_transcript': reference_transcript
@@ -397,9 +397,9 @@ class TestRunner:
                 'processing_latency': 0,
                 'p50_processing_latency': 0,
                 'p90_processing_latency': 0,
-                'end_to_end_latency': 0,
-                'p50_end_to_end_latency': 0,
-                'p90_end_to_end_latency': 0,
+                'callback_latency': 0,
+                'p50_callback_latency': 0,
+                'p90_callback_latency': 0,
                 'wer_score': None,
                 'recorded_transcript': '',
                 'correct_transcript': reference_transcript if reference_transcript else '',
@@ -438,7 +438,7 @@ class TestRunner:
             writer.writerow([
                 'config', 'audio_file', 'model_type', 'wer_score', 
                 'avg_processing_latency', 'p50_processing_latency', 'p90_processing_latency',
-                'avg_end_to_end_latency', 'p50_end_to_end_latency', 'p90_end_to_end_latency',
+                'avg_callback_latency', 'p50_callback_latency', 'p90_callback_latency',
                 'word_count', 'test_mode', 'audio_source'
             ])
             
@@ -452,9 +452,9 @@ class TestRunner:
                     f"{result['processing_latency']:.6f}",
                     f"{result['p50_processing_latency']:.6f}",
                     f"{result['p90_processing_latency']:.6f}",
-                    f"{result['end_to_end_latency']:.6f}",
-                    f"{result['p50_end_to_end_latency']:.6f}",
-                    f"{result['p90_end_to_end_latency']:.6f}",
+                    f"{result['callback_latency']:.6f}",
+                    f"{result['p50_callback_latency']:.6f}",
+                    f"{result['p90_callback_latency']:.6f}",
                     result['word_count'],
                     self.test_mode,
                     self.audio_source
@@ -476,7 +476,7 @@ class TestRunner:
             writer.writerow([
                 'rank', 'config', 'avg_wer', 'avg_processing_latency', 
                 'p50_processing_latency', 'p90_processing_latency',
-                'avg_end_to_end_latency', 'p50_end_to_end_latency', 'p90_end_to_end_latency',
+                'avg_callback_latency', 'p50_callback_latency', 'p90_callback_latency',
                 'num_runs', 'test_mode', 'audio_source'
             ])
             
@@ -489,9 +489,9 @@ class TestRunner:
                     f"{metrics['avg_latency']:.6f}",
                     f"{metrics['avg_p50_latency']:.6f}",
                     f"{metrics['avg_p90_latency']:.6f}",
-                    f"{metrics['avg_e2e_latency']:.6f}",
-                    f"{metrics['avg_p50_e2e_latency']:.6f}",
-                    f"{metrics['avg_p90_e2e_latency']:.6f}",
+                    f"{metrics['avg_callback_latency']:.6f}",
+                    f"{metrics['avg_p50_callback_latency']:.6f}",
+                    f"{metrics['avg_p90_callback_latency']:.6f}",
                     metrics['num_runs'],
                     self.test_mode,
                     self.audio_source
@@ -556,7 +556,7 @@ class TestRunner:
                     f.write(f"\nIteration #{i}\n")
                     f.write("-" * 30 + "\n")
                     f.write(f"Processing Latency: {result['processing_latency']:.3f}s\n")
-                    f.write(f"End-to-End Latency: {result['end_to_end_latency']:.3f}s\n")
+                    f.write(f"Callback Latency: {result['callback_latency']:.3f}s\n")
                     f.write(f"Word Count: {result['word_count']}\n")
                     f.write(f"WER Score: {result['wer_score']:.3f}\n" if result['wer_score'] is not None else "WER Score: N/A\n")
                     
@@ -635,18 +635,18 @@ class TestRunner:
             avg_latency = sum(r['processing_latency'] for r in runs) / len(runs)
             avg_p90_latency = sum(r['p90_processing_latency'] for r in runs) / len(runs)
             avg_p50_latency = sum(r['p50_processing_latency'] for r in runs) / len(runs)
-            avg_e2e_latency = sum(r['end_to_end_latency'] for r in runs) / len(runs)
-            avg_p50_e2e_latency = sum(r['p50_end_to_end_latency'] for r in runs) / len(runs)
-            avg_p90_e2e_latency = sum(r['p90_end_to_end_latency'] for r in runs) / len(runs)
+            avg_callback_latency = sum(r['callback_latency'] for r in runs) / len(runs)
+            avg_p50_callback_latency = sum(r['p50_callback_latency'] for r in runs) / len(runs)
+            avg_p90_callback_latency = sum(r['p90_callback_latency'] for r in runs) / len(runs)
             
             config_averages.append((config, {
                 'avg_wer': avg_wer,
                 'avg_latency': avg_latency,
                 'avg_p90_latency': avg_p90_latency,
                 'avg_p50_latency': avg_p50_latency,
-                'avg_e2e_latency': avg_e2e_latency,
-                'avg_p50_e2e_latency': avg_p50_e2e_latency,
-                'avg_p90_e2e_latency': avg_p90_e2e_latency,
+                'avg_callback_latency': avg_callback_latency,
+                'avg_p50_callback_latency': avg_p50_callback_latency,
+                'avg_p90_callback_latency': avg_p90_callback_latency,
                 'num_runs': len(runs)
             }))
         

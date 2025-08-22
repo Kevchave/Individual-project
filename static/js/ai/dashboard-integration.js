@@ -47,8 +47,10 @@ function loadApiKey() {
         }
     }
     
-    console.warn('No Gemini API key found. AI feedback will not work.');
-    console.warn('Set GEMINI_API_KEY environment variable or add to localStorage for development.');
+    console.warn('No Gemini API key found. AI feedback features will be disabled.');
+    console.warn('To enable AI feedback: Set GEMINI_API_KEY environment variable or add to localStorage for development.');
+    // Disable AI features when no key is available
+    window.AI_FEATURES_ENABLED = false;
 }
 
 // Update AI feedback based on current session selection
