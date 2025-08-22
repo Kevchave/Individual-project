@@ -1,0 +1,276 @@
+====================================================================================================
+TRANSCRIPTION TEST RESULTS REPORT
+====================================================================================================
+
+SUMMARY TABLE
+----------------------------------------------------------------------------------------------------
+config/params                   | audio_file                  | avg processing  | avg WER   
+----------------------------------------------------------------------------------------------------
+Adaptive-Sobol-9: agg=0, frames=9 | 10sec_test.mp3            | 0.958s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Adaptive-Sobol-16: agg=0, frames=23 | 10sec_test.mp3            | 1.357s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Adaptive-Sobol-5: agg=1, frames=10 | 10sec_test.mp3            | 1.059s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Adaptive-Sobol-4: agg=1, frames=19 | 10sec_test.mp3            | 1.194s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Adaptive-Sobol-12: agg=1, frames=14 | 10sec_test.mp3            | 1.209s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Adaptive-Sobol-2: agg=2, frames=13 | 10sec_test.mp3            | 1.054s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Adaptive-Sobol-15: agg=2, frames=12 | 10sec_test.mp3            | 1.017s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Adaptive-Sobol-10: agg=2, frames=20 | 10sec_test.mp3            | 1.210s          | 0.111     
+----------------------------------------------------------------------------------------------------
+
+
+DETAILED RESULTS
+====================================================================================================
+
+Test: Adaptive-Sobol-9: agg=0, frames=9 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 0.984s
+End-to-End Latency: 0.984s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.   is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+Iteration #2
+------------------------------
+Processing Latency: 0.932s
+End-to-End Latency: 0.932s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.   is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Adaptive-Sobol-16: agg=0, frames=23 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.415s
+End-to-End Latency: 1.415s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+Iteration #2
+------------------------------
+Processing Latency: 1.300s
+End-to-End Latency: 1.300s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Adaptive-Sobol-5: agg=1, frames=10 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.056s
+End-to-End Latency: 1.056s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+Iteration #2
+------------------------------
+Processing Latency: 1.062s
+End-to-End Latency: 1.062s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Adaptive-Sobol-4: agg=1, frames=19 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.185s
+End-to-End Latency: 1.185s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+Iteration #2
+------------------------------
+Processing Latency: 1.203s
+End-to-End Latency: 1.203s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Adaptive-Sobol-12: agg=1, frames=14 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.208s
+End-to-End Latency: 1.208s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+Iteration #2
+------------------------------
+Processing Latency: 1.210s
+End-to-End Latency: 1.210s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Adaptive-Sobol-2: agg=2, frames=13 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.062s
+End-to-End Latency: 1.062s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+Iteration #2
+------------------------------
+Processing Latency: 1.047s
+End-to-End Latency: 1.047s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Adaptive-Sobol-15: agg=2, frames=12 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.018s
+End-to-End Latency: 1.018s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+Iteration #2
+------------------------------
+Processing Latency: 1.015s
+End-to-End Latency: 1.015s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Adaptive-Sobol-10: agg=2, frames=20 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.249s
+End-to-End Latency: 1.249s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+Iteration #2
+------------------------------
+Processing Latency: 1.171s
+End-to-End Latency: 1.171s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================

@@ -6,37 +6,37 @@ SUMMARY TABLE
 ----------------------------------------------------------------------------------------------------
 config/params                   | audio_file                  | avg processing  | avg WER   
 ----------------------------------------------------------------------------------------------------
-Sobol-1: agg=0, frames=2       | 10sec_test.mp3            | 0.866s          | 0.185     
+Sobol-1: agg=0, frames=2       | 10sec_test.mp3            | 0.850s          | 0.185     
 ----------------------------------------------------------------------------------------------------
-Sobol-9: agg=0, frames=9       | 10sec_test.mp3            | 0.856s          | 0.111     
+Sobol-9: agg=0, frames=9       | 10sec_test.mp3            | 0.885s          | 0.111     
 ----------------------------------------------------------------------------------------------------
-Sobol-8: agg=0, frames=16      | 10sec_test.mp3            | 0.995s          | 0.111     
+Sobol-8: agg=0, frames=16      | 10sec_test.mp3            | 1.006s          | 0.111     
 ----------------------------------------------------------------------------------------------------
-Sobol-16: agg=0, frames=23     | 10sec_test.mp3            | 1.185s          | 0.111     
+Sobol-16: agg=0, frames=23     | 10sec_test.mp3            | 1.311s          | 0.111     
 ----------------------------------------------------------------------------------------------------
-Sobol-13: agg=1, frames=6      | 10sec_test.mp3            | 1.108s          | 0.185     
+Sobol-13: agg=1, frames=6      | 10sec_test.mp3            | 0.913s          | 0.185     
 ----------------------------------------------------------------------------------------------------
-Sobol-5: agg=1, frames=10      | 10sec_test.mp3            | 0.929s          | 0.111     
+Sobol-5: agg=1, frames=10      | 10sec_test.mp3            | 0.992s          | 0.111     
 ----------------------------------------------------------------------------------------------------
-Sobol-12: agg=1, frames=14     | 10sec_test.mp3            | 1.184s          | 0.111     
+Sobol-12: agg=1, frames=14     | 10sec_test.mp3            | 1.138s          | 0.111     
 ----------------------------------------------------------------------------------------------------
-Sobol-4: agg=1, frames=19      | 10sec_test.mp3            | 1.141s          | 0.111     
+Sobol-4: agg=1, frames=19      | 10sec_test.mp3            | 1.161s          | 0.111     
 ----------------------------------------------------------------------------------------------------
-Sobol-7: agg=2, frames=4       | 10sec_test.mp3            | 0.890s          | 0.185     
+Sobol-7: agg=2, frames=4       | 10sec_test.mp3            | 0.896s          | 0.185     
 ----------------------------------------------------------------------------------------------------
-Sobol-15: agg=2, frames=12     | 10sec_test.mp3            | 0.980s          | 0.111     
+Sobol-15: agg=2, frames=12     | 10sec_test.mp3            | 0.939s          | 0.111     
 ----------------------------------------------------------------------------------------------------
-Sobol-2: agg=2, frames=13      | 10sec_test.mp3            | 0.946s          | 0.111     
+Sobol-2: agg=2, frames=13      | 10sec_test.mp3            | 0.973s          | 0.111     
 ----------------------------------------------------------------------------------------------------
-Sobol-10: agg=2, frames=20     | 10sec_test.mp3            | 1.105s          | 0.111     
+Sobol-10: agg=2, frames=20     | 10sec_test.mp3            | 1.099s          | 0.111     
 ----------------------------------------------------------------------------------------------------
-Sobol-11: agg=3, frames=3      | 10sec_test.mp3            | 1.312s          | 0.148     
+Sobol-11: agg=3, frames=3      | 10sec_test.mp3            | 1.767s          | 0.222     
 ----------------------------------------------------------------------------------------------------
-Sobol-3: agg=3, frames=7       | 10sec_test.mp3            | 1.454s          | 0.167     
+Sobol-3: agg=3, frames=7       | 10sec_test.mp3            | 1.580s          | 0.185     
 ----------------------------------------------------------------------------------------------------
-Sobol-14: agg=3, frames=17     | 10sec_test.mp3            | 1.737s          | 0.185     
+Sobol-14: agg=3, frames=17     | 10sec_test.mp3            | 1.771s          | 0.278     
 ----------------------------------------------------------------------------------------------------
-Sobol-6: agg=3, frames=22      | 10sec_test.mp3            | 0.928s          | 0.185     
+Sobol-6: agg=3, frames=22      | 10sec_test.mp3            | 0.986s          | 0.185     
 ----------------------------------------------------------------------------------------------------
 
 
@@ -48,8 +48,8 @@ Test: Sobol-1: agg=0, frames=2 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 0.931s
-End-to-End Latency: 0.931s
+Processing Latency: 0.889s
+End-to-End Latency: 0.889s
 Word Count: 27
 WER Score: 0.185
 
@@ -61,8 +61,8 @@ But what I thought I'd do today is just talk about one of the examples in this b
 
 Iteration #2
 ------------------------------
-Processing Latency: 0.801s
-End-to-End Latency: 0.801s
+Processing Latency: 0.811s
+End-to-End Latency: 0.811s
 Word Count: 27
 WER Score: 0.185
 
@@ -79,8 +79,8 @@ Test: Sobol-9: agg=0, frames=9 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 0.847s
-End-to-End Latency: 0.847s
+Processing Latency: 0.891s
+End-to-End Latency: 0.891s
 Word Count: 27
 WER Score: 0.111
 
@@ -92,8 +92,8 @@ But what I thought I'd do today is just talk about one of the examples in this b
 
 Iteration #2
 ------------------------------
-Processing Latency: 0.866s
-End-to-End Latency: 0.866s
+Processing Latency: 0.878s
+End-to-End Latency: 0.878s
 Word Count: 27
 WER Score: 0.111
 
@@ -110,8 +110,8 @@ Test: Sobol-8: agg=0, frames=16 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 1.048s
-End-to-End Latency: 1.048s
+Processing Latency: 1.011s
+End-to-End Latency: 1.011s
 Word Count: 27
 WER Score: 0.111
 
@@ -123,8 +123,8 @@ But what I thought I'd do today is just talk about one of the examples in this b
 
 Iteration #2
 ------------------------------
-Processing Latency: 0.942s
-End-to-End Latency: 0.942s
+Processing Latency: 1.000s
+End-to-End Latency: 1.000s
 Word Count: 27
 WER Score: 0.111
 
@@ -141,8 +141,8 @@ Test: Sobol-16: agg=0, frames=23 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 1.246s
-End-to-End Latency: 1.246s
+Processing Latency: 1.160s
+End-to-End Latency: 1.160s
 Word Count: 27
 WER Score: 0.111
 
@@ -154,8 +154,8 @@ But what I thought I'd do today is just talk about one of the examples in this b
 
 Iteration #2
 ------------------------------
-Processing Latency: 1.124s
-End-to-End Latency: 1.124s
+Processing Latency: 1.461s
+End-to-End Latency: 1.461s
 Word Count: 27
 WER Score: 0.111
 
@@ -172,8 +172,8 @@ Test: Sobol-13: agg=1, frames=6 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 1.304s
-End-to-End Latency: 1.304s
+Processing Latency: 0.887s
+End-to-End Latency: 0.887s
 Word Count: 27
 WER Score: 0.185
 
@@ -185,8 +185,8 @@ But what I thought I'd do today is just talk about one of the examples in this b
 
 Iteration #2
 ------------------------------
-Processing Latency: 0.912s
-End-to-End Latency: 0.912s
+Processing Latency: 0.939s
+End-to-End Latency: 0.939s
 Word Count: 27
 WER Score: 0.185
 
@@ -203,8 +203,8 @@ Test: Sobol-5: agg=1, frames=10 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 0.940s
-End-to-End Latency: 0.940s
+Processing Latency: 1.039s
+End-to-End Latency: 1.039s
 Word Count: 27
 WER Score: 0.111
 
@@ -216,8 +216,8 @@ But what I thought I'd do today is just talk about one of the examples in this b
 
 Iteration #2
 ------------------------------
-Processing Latency: 0.917s
-End-to-End Latency: 0.917s
+Processing Latency: 0.945s
+End-to-End Latency: 0.945s
 Word Count: 27
 WER Score: 0.111
 
@@ -234,8 +234,8 @@ Test: Sobol-12: agg=1, frames=14 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 1.161s
-End-to-End Latency: 1.161s
+Processing Latency: 1.154s
+End-to-End Latency: 1.154s
 Word Count: 27
 WER Score: 0.111
 
@@ -247,8 +247,8 @@ But what I thought I'd do today is just talk about one of the examples in this b
 
 Iteration #2
 ------------------------------
-Processing Latency: 1.206s
-End-to-End Latency: 1.206s
+Processing Latency: 1.123s
+End-to-End Latency: 1.123s
 Word Count: 27
 WER Score: 0.111
 
@@ -265,8 +265,8 @@ Test: Sobol-4: agg=1, frames=19 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 1.127s
-End-to-End Latency: 1.127s
+Processing Latency: 1.144s
+End-to-End Latency: 1.144s
 Word Count: 27
 WER Score: 0.111
 
@@ -278,8 +278,8 @@ But what I thought I'd do today is just talk about one of the examples in this b
 
 Iteration #2
 ------------------------------
-Processing Latency: 1.154s
-End-to-End Latency: 1.154s
+Processing Latency: 1.177s
+End-to-End Latency: 1.177s
 Word Count: 27
 WER Score: 0.111
 
@@ -296,8 +296,8 @@ Test: Sobol-7: agg=2, frames=4 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 0.919s
-End-to-End Latency: 0.919s
+Processing Latency: 0.926s
+End-to-End Latency: 0.926s
 Word Count: 27
 WER Score: 0.185
 
@@ -309,8 +309,8 @@ But what I thought I'd do today is just talk about one of the examples in this b
 
 Iteration #2
 ------------------------------
-Processing Latency: 0.860s
-End-to-End Latency: 0.860s
+Processing Latency: 0.867s
+End-to-End Latency: 0.867s
 Word Count: 27
 WER Score: 0.185
 
@@ -327,8 +327,8 @@ Test: Sobol-15: agg=2, frames=12 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 0.945s
-End-to-End Latency: 0.945s
+Processing Latency: 0.939s
+End-to-End Latency: 0.939s
 Word Count: 27
 WER Score: 0.111
 
@@ -340,8 +340,8 @@ But what I thought I'd do today is just talk about one of the examples in this b
 
 Iteration #2
 ------------------------------
-Processing Latency: 1.015s
-End-to-End Latency: 1.015s
+Processing Latency: 0.939s
+End-to-End Latency: 0.939s
 Word Count: 27
 WER Score: 0.111
 
@@ -358,8 +358,8 @@ Test: Sobol-2: agg=2, frames=13 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 0.972s
-End-to-End Latency: 0.972s
+Processing Latency: 0.963s
+End-to-End Latency: 0.963s
 Word Count: 27
 WER Score: 0.111
 
@@ -371,8 +371,8 @@ But what I thought I'd do today is just talk about one of the examples in this b
 
 Iteration #2
 ------------------------------
-Processing Latency: 0.921s
-End-to-End Latency: 0.921s
+Processing Latency: 0.983s
+End-to-End Latency: 0.983s
 Word Count: 27
 WER Score: 0.111
 
@@ -389,8 +389,8 @@ Test: Sobol-10: agg=2, frames=20 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 1.139s
-End-to-End Latency: 1.139s
+Processing Latency: 1.081s
+End-to-End Latency: 1.081s
 Word Count: 27
 WER Score: 0.111
 
@@ -402,8 +402,8 @@ But what I thought I'd do today is just talk about one of the examples in this b
 
 Iteration #2
 ------------------------------
-Processing Latency: 1.070s
-End-to-End Latency: 1.070s
+Processing Latency: 1.118s
+End-to-End Latency: 1.118s
 Word Count: 27
 WER Score: 0.111
 
@@ -420,26 +420,26 @@ Test: Sobol-11: agg=3, frames=3 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 1.449s
-End-to-End Latency: 1.449s
-Word Count: 27
-WER Score: 0.148
+Processing Latency: 1.748s
+End-to-End Latency: 1.748s
+Word Count: 30
+WER Score: 0.259
 
 Recorded Transcript:
-  But what I thought I'd do today is just talk about...  one of the examples in this book.  She's called.  scaling from zero to a million years.
+  But what I thought I'd do today is just talk about...  one of the examples in this book.  Ms. hunter has called but  scaling from zero to a million years.
 
 Reference Transcript:
 But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
 
 Iteration #2
 ------------------------------
-Processing Latency: 1.175s
-End-to-End Latency: 1.175s
-Word Count: 27
-WER Score: 0.148
+Processing Latency: 1.786s
+End-to-End Latency: 1.786s
+Word Count: 26
+WER Score: 0.185
 
 Recorded Transcript:
-  But what I thought I'd do today is just talk about...  one of the examples in this book.  He's called.  scaling from zero to a million years.
+  But what I thought I'd do today is just talk about...  one of the examples in this book.  calls.  scaling from zero to a million years.
 
 Reference Transcript:
 But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
@@ -451,26 +451,26 @@ Test: Sobol-3: agg=3, frames=7 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 1.432s
-End-to-End Latency: 1.432s
+Processing Latency: 1.524s
+End-to-End Latency: 1.524s
 Word Count: 26
 WER Score: 0.185
 
 Recorded Transcript:
-  But what I thought I'd do today is just talk about...  one of the examples in this book.  code  scaling from zero to a million years.
+  But what I thought I'd do today is just talk about...  one of the examples in this book.  are  scaling from zero to a million years.
 
 Reference Transcript:
 But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
 
 Iteration #2
 ------------------------------
-Processing Latency: 1.476s
-End-to-End Latency: 1.476s
+Processing Latency: 1.637s
+End-to-End Latency: 1.637s
 Word Count: 27
-WER Score: 0.148
+WER Score: 0.185
 
 Recorded Transcript:
-  But what I thought I'd do today is just talk about...  one of the examples in this book.  It's called...  scaling from zero to a million years.
+  But what I thought I'd do today is just talk about...  one of the examples in this book.  It's cool.  scaling from zero to a million years.
 
 Reference Transcript:
 But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
@@ -482,26 +482,26 @@ Test: Sobol-14: agg=3, frames=17 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 1.753s
-End-to-End Latency: 1.753s
-Word Count: 26
-WER Score: 0.185
+Processing Latency: 1.791s
+End-to-End Latency: 1.791s
+Word Count: 34
+WER Score: 0.444
 
 Recorded Transcript:
-  But what I thought I'd do today is just talk about one of the examples in this book.  cause?  scaling from zero to a million years.
+  But what I thought I'd do today is just talk about one of the examples in this book.  but they are just flexible. And getting these calls.  scaling from zero to a million years.
 
 Reference Transcript:
 But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
 
 Iteration #2
 ------------------------------
-Processing Latency: 1.721s
-End-to-End Latency: 1.721s
+Processing Latency: 1.751s
+End-to-End Latency: 1.751s
 Word Count: 27
-WER Score: 0.185
+WER Score: 0.111
 
 Recorded Transcript:
-  But what I thought I'd do today is just talk about one of the examples in this book.  CT-40S calls.  scaling from zero to a million years.
+  But what I thought I'd do today is just talk about one of the examples in this book.  is called.  scaling from zero to a million years.
 
 Reference Transcript:
 But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
@@ -513,8 +513,8 @@ Test: Sobol-6: agg=3, frames=22 - 10sec_test.mp3
 
 Iteration #1
 ------------------------------
-Processing Latency: 0.936s
-End-to-End Latency: 0.936s
+Processing Latency: 1.010s
+End-to-End Latency: 1.010s
 Word Count: 26
 WER Score: 0.185
 
@@ -526,8 +526,8 @@ But what I thought I'd do today is just talk about one of the examples in this b
 
 Iteration #2
 ------------------------------
-Processing Latency: 0.921s
-End-to-End Latency: 0.921s
+Processing Latency: 0.963s
+End-to-End Latency: 0.963s
 Word Count: 26
 WER Score: 0.185
 

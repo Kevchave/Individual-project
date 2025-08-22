@@ -1,0 +1,17 @@
+rank,config,avg_wer,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_end_to_end_latency,p50_end_to_end_latency,p90_end_to_end_latency,num_runs,test_mode,audio_source
+1,"Adaptive-Sobol-2: agg=2, frames=13",0.111111,0.995855,1.013035,1.071319,0.995855,1.013035,1.071319,2,phase_a_r1,10sec
+2,"Adaptive-Sobol-15: agg=2, frames=12",0.111111,0.997553,1.013260,1.084699,0.997553,1.013260,1.084699,2,phase_a_r1,10sec
+3,"Adaptive-Sobol-5: agg=1, frames=10",0.111111,1.011572,1.019322,1.095210,1.011572,1.019322,1.095210,2,phase_a_r1,10sec
+4,"Adaptive-Sobol-9: agg=0, frames=9",0.111111,0.976225,0.988499,1.149005,0.976225,0.988499,1.149005,2,phase_a_r1,10sec
+5,"Adaptive-Sobol-10: agg=2, frames=20",0.111111,1.185482,1.185482,1.292256,1.185482,1.185482,1.292256,2,phase_a_r1,10sec
+6,"Adaptive-Sobol-4: agg=1, frames=19",0.111111,1.211990,1.211990,1.342791,1.211990,1.211990,1.342791,2,phase_a_r1,10sec
+7,"Adaptive-Sobol-16: agg=0, frames=23",0.111111,1.231408,1.231408,1.346883,1.231408,1.231408,1.346883,2,phase_a_r1,10sec
+8,"Adaptive-Sobol-12: agg=1, frames=14",0.111111,1.220668,1.220668,1.384005,1.220668,1.220668,1.384005,2,phase_a_r1,10sec
+9,"Adaptive-Sobol-8: agg=0, frames=16",0.111111,1.208832,1.381371,1.480049,1.208832,1.381371,1.480049,2,phase_a_r1,10sec
+10,"Adaptive-Sobol-1: agg=0, frames=2",0.185185,0.891895,0.915265,1.060922,0.891895,0.915265,1.060922,2,phase_a_r1,10sec
+11,"Adaptive-Sobol-13: agg=1, frames=6",0.185185,0.933475,0.915954,1.066034,0.933475,0.915954,1.066034,2,phase_a_r1,10sec
+12,"Adaptive-Sobol-7: agg=2, frames=4",0.185185,0.993562,1.000783,1.092748,0.993562,1.000783,1.092748,2,phase_a_r1,10sec
+13,"Adaptive-Sobol-6: agg=3, frames=22",0.185185,0.997536,0.992205,1.175427,0.997536,0.992205,1.175427,2,phase_a_r1,10sec
+14,"Adaptive-Sobol-14: agg=3, frames=17",0.185185,1.768815,1.067091,3.291793,1.768815,1.067091,3.291793,2,phase_a_r1,10sec
+15,"Adaptive-Sobol-11: agg=3, frames=3",0.185185,1.741914,0.917611,3.524545,1.741914,0.917611,3.524545,2,phase_a_r1,10sec
+16,"Adaptive-Sobol-3: agg=3, frames=7",0.222222,1.664237,0.935732,3.265714,1.664237,0.935732,3.265714,2,phase_a_r1,10sec

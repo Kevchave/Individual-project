@@ -1,0 +1,3 @@
+rank,config,avg_wer,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_end_to_end_latency,p50_end_to_end_latency,p90_end_to_end_latency,num_runs,test_mode,audio_source
+1,FIXED-Sobol-3 (3.2s),0.185185,1.080280,1.077433,1.152765,1.080280,1.077433,1.152765,2,phase_b_r1,10sec
+2,FIXED-Sobol-7 (2.8s),0.185185,1.279627,1.186009,1.594317,1.279627,1.186009,1.594317,2,phase_b_r1,10sec

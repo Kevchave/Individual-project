@@ -1,0 +1,17 @@
+config,audio_file,model_type,wer_score,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_end_to_end_latency,p50_end_to_end_latency,p90_end_to_end_latency,word_count,test_mode,audio_source
+"Adaptive-Sobol-9: agg=0, frames=9",10sec_test.mp3,adaptive,0.1111111111111111,0.931795,0.970590,1.076647,0.931795,0.970590,1.076647,27,phase_a_r2,10sec
+"Adaptive-Sobol-9: agg=0, frames=9",10sec_test.mp3,adaptive,0.1111111111111111,0.927828,0.949885,1.079432,0.927828,0.949885,1.079432,27,phase_a_r2,10sec
+"Adaptive-Sobol-16: agg=0, frames=23",10sec_test.mp3,adaptive,0.1111111111111111,1.213001,1.213001,1.348199,1.213001,1.213001,1.348199,27,phase_a_r2,10sec
+"Adaptive-Sobol-16: agg=0, frames=23",10sec_test.mp3,adaptive,0.1111111111111111,1.212879,1.212879,1.345308,1.212879,1.212879,1.345308,27,phase_a_r2,10sec
+"Adaptive-Sobol-5: agg=1, frames=10",10sec_test.mp3,adaptive,0.1111111111111111,1.037047,1.060778,1.144536,1.037047,1.060778,1.144536,27,phase_a_r2,10sec
+"Adaptive-Sobol-5: agg=1, frames=10",10sec_test.mp3,adaptive,0.1111111111111111,1.012689,1.033134,1.099224,1.012689,1.033134,1.099224,27,phase_a_r2,10sec
+"Adaptive-Sobol-4: agg=1, frames=19",10sec_test.mp3,adaptive,0.1111111111111111,1.197070,1.197070,1.311853,1.197070,1.197070,1.311853,27,phase_a_r2,10sec
+"Adaptive-Sobol-4: agg=1, frames=19",10sec_test.mp3,adaptive,0.1111111111111111,1.156212,1.156212,1.258835,1.156212,1.156212,1.258835,27,phase_a_r2,10sec
+"Adaptive-Sobol-12: agg=1, frames=14",10sec_test.mp3,adaptive,0.1111111111111111,1.217327,1.217327,1.351270,1.217327,1.217327,1.351270,27,phase_a_r2,10sec
+"Adaptive-Sobol-12: agg=1, frames=14",10sec_test.mp3,adaptive,0.1111111111111111,1.194627,1.194627,1.291806,1.194627,1.194627,1.291806,27,phase_a_r2,10sec
+"Adaptive-Sobol-2: agg=2, frames=13",10sec_test.mp3,adaptive,0.1111111111111111,1.001582,1.032021,1.073031,1.001582,1.032021,1.073031,27,phase_a_r2,10sec
+"Adaptive-Sobol-2: agg=2, frames=13",10sec_test.mp3,adaptive,0.1111111111111111,1.065057,1.098028,1.098716,1.065057,1.098028,1.098716,27,phase_a_r2,10sec
+"Adaptive-Sobol-15: agg=2, frames=12",10sec_test.mp3,adaptive,0.1111111111111111,1.062870,1.086415,1.169202,1.062870,1.086415,1.169202,27,phase_a_r2,10sec
+"Adaptive-Sobol-15: agg=2, frames=12",10sec_test.mp3,adaptive,0.1111111111111111,1.064237,1.098347,1.186372,1.064237,1.098347,1.186372,27,phase_a_r2,10sec
+"Adaptive-Sobol-10: agg=2, frames=20",10sec_test.mp3,adaptive,0.1111111111111111,1.275618,1.275618,1.454637,1.275618,1.275618,1.454637,27,phase_a_r2,10sec
+"Adaptive-Sobol-10: agg=2, frames=20",10sec_test.mp3,adaptive,0.1111111111111111,1.294842,1.294842,1.484348,1.294842,1.294842,1.484348,27,phase_a_r2,10sec

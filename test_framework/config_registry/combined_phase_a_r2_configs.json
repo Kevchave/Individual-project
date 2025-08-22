@@ -1,0 +1,87 @@
+{
+  "model_type": "combined",
+  "phase": "phase_a_r2",
+  "source": "phase_a_r1",
+  "selection_criteria": "top_50_percent",
+  "generated_at": "2025-08-22T15:01:27.450021",
+  "description": "Top 50% configurations from Phase A Round 1",
+  "configs": [
+    {
+      "chunk_size": 3.2,
+      "description": "FIXED-Sobol-3 (3.2s)"
+    },
+    {
+      "chunk_size": 2.8,
+      "description": "FIXED-Sobol-7 (2.8s)"
+    },
+    {
+      "chunk_size": 2.0,
+      "description": "FIXED-Sobol-5 (2.0s)"
+    },
+    {
+      "chunk_size": 2.4,
+      "description": "FIXED-Sobol-2 (2.4s)"
+    },
+    {
+      "aggressiveness": 2,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 13,
+      "description": "Adaptive-Sobol-2: agg=2, frames=13",
+      "starting_aggressiveness": 2
+    },
+    {
+      "aggressiveness": 2,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 12,
+      "description": "Adaptive-Sobol-15: agg=2, frames=12",
+      "starting_aggressiveness": 2
+    },
+    {
+      "aggressiveness": 1,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 10,
+      "description": "Adaptive-Sobol-5: agg=1, frames=10",
+      "starting_aggressiveness": 1
+    },
+    {
+      "aggressiveness": 0,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 9,
+      "description": "Adaptive-Sobol-9: agg=0, frames=9",
+      "starting_aggressiveness": 0
+    },
+    {
+      "aggressiveness": 2,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 20,
+      "description": "Adaptive-Sobol-10: agg=2, frames=20",
+      "starting_aggressiveness": 2
+    },
+    {
+      "aggressiveness": 1,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 19,
+      "description": "Adaptive-Sobol-4: agg=1, frames=19",
+      "starting_aggressiveness": 1
+    },
+    {
+      "aggressiveness": 0,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 23,
+      "description": "Adaptive-Sobol-16: agg=0, frames=23",
+      "starting_aggressiveness": 0
+    },
+    {
+      "aggressiveness": 1,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 14,
+      "description": "Adaptive-Sobol-12: agg=1, frames=14",
+      "starting_aggressiveness": 1
+    }
+  ],
+  "metadata": {
+    "source_phase": "phase_a_r1",
+    "total_configs": 12,
+    "selection_criteria": "top_50_percent"
+  }
+}

@@ -1,0 +1,332 @@
+====================================================================================================
+TRANSCRIPTION TEST RESULTS REPORT
+====================================================================================================
+
+SUMMARY TABLE
+----------------------------------------------------------------------------------------------------
+config/params                   | audio_file                  | avg processing  | avg WER   
+----------------------------------------------------------------------------------------------------
+Sobol-1: agg=0, frames=2       | 10sec_test.mp3            | 0.981s          | 0.185     
+----------------------------------------------------------------------------------------------------
+Sobol-9: agg=0, frames=9       | 10sec_test.mp3            | 1.195s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Sobol-8: agg=0, frames=16      | 10sec_test.mp3            | 1.173s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Sobol-16: agg=0, frames=23     | 10sec_test.mp3            | 1.842s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Sobol-13: agg=1, frames=6      | 10sec_test.mp3            | 1.008s          | 0.185     
+----------------------------------------------------------------------------------------------------
+Sobol-5: agg=1, frames=10      | 10sec_test.mp3            | 1.133s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Sobol-12: agg=1, frames=14     | 10sec_test.mp3            | 1.453s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Sobol-4: agg=1, frames=19      | 10sec_test.mp3            | 1.203s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Sobol-7: agg=2, frames=4       | 10sec_test.mp3            | 0.984s          | 0.185     
+----------------------------------------------------------------------------------------------------
+Sobol-15: agg=2, frames=12     | 10sec_test.mp3            | 0.995s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Sobol-2: agg=2, frames=13      | 10sec_test.mp3            | 1.062s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Sobol-10: agg=2, frames=20     | 10sec_test.mp3            | 1.151s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Sobol-11: agg=3, frames=3      | 10sec_test.mp3            | 1.563s          | 0.148     
+----------------------------------------------------------------------------------------------------
+Sobol-3: agg=3, frames=7       | 10sec_test.mp3            | 1.613s          | 0.185     
+----------------------------------------------------------------------------------------------------
+Sobol-14: agg=3, frames=17     | 10sec_test.mp3            | 1.231s          | 0.185     
+----------------------------------------------------------------------------------------------------
+Sobol-6: agg=3, frames=22      | 10sec_test.mp3            | 0.925s          | 0.185     
+----------------------------------------------------------------------------------------------------
+
+
+DETAILED RESULTS
+====================================================================================================
+
+Test: Sobol-1: agg=0, frames=2 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 0.981s
+End-to-End Latency: 0.981s
+Word Count: 27
+WER Score: 0.185
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.   It's cool.  scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Sobol-9: agg=0, frames=9 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.195s
+End-to-End Latency: 1.195s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.   is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Sobol-8: agg=0, frames=16 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.173s
+End-to-End Latency: 1.173s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about one of the examples in this book.   is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Sobol-16: agg=0, frames=23 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.842s
+End-to-End Latency: 1.842s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Sobol-13: agg=1, frames=6 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.008s
+End-to-End Latency: 1.008s
+Word Count: 27
+WER Score: 0.185
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.  It's cool.  scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Sobol-5: agg=1, frames=10 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.133s
+End-to-End Latency: 1.133s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Sobol-12: agg=1, frames=14 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.453s
+End-to-End Latency: 1.453s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Sobol-4: agg=1, frames=19 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.203s
+End-to-End Latency: 1.203s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Sobol-7: agg=2, frames=4 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 0.984s
+End-to-End Latency: 0.984s
+Word Count: 27
+WER Score: 0.185
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.  It's cool.  scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Sobol-15: agg=2, frames=12 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 0.995s
+End-to-End Latency: 0.995s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Sobol-2: agg=2, frames=13 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.062s
+End-to-End Latency: 1.062s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Sobol-10: agg=2, frames=20 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.151s
+End-to-End Latency: 1.151s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Sobol-11: agg=3, frames=3 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.563s
+End-to-End Latency: 1.563s
+Word Count: 27
+WER Score: 0.148
+
+Recorded Transcript:
+  But what I thought I'd do today is just talk about...  one of the examples in this book.  be called.  scaling from zero to a million years.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Sobol-3: agg=3, frames=7 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.613s
+End-to-End Latency: 1.613s
+Word Count: 26
+WER Score: 0.185
+
+Recorded Transcript:
+  But what I thought I'd do today is just talk about...  one of the examples in this book.  cold.  scaling from zero to a million years.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Sobol-14: agg=3, frames=17 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.231s
+End-to-End Latency: 1.231s
+Word Count: 27
+WER Score: 0.185
+
+Recorded Transcript:
+  But what I thought I'd do today is just talk about one of the examples in this book.  It's cold.  scaling from zero to a million years.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Sobol-6: agg=3, frames=22 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 0.925s
+End-to-End Latency: 0.925s
+Word Count: 26
+WER Score: 0.185
+
+Recorded Transcript:
+  But what I thought I'd do today is just talk about one of the examples in this book.  calls scaling from zero to a million years.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================

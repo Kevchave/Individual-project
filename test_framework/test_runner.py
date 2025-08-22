@@ -225,6 +225,91 @@ class TestRunner:
             avg_csv_path = None
         self.print_summary(model_display_name, total_tests, json_path, csv_path, avg_csv_path)
 
+    def run_specific_configs(self, model_type, configs, num_runs_per_config=1):
+        """Run tests for a specific model type with provided configurations"""
+        import sys
+        
+        model_display_name = self.get_model_display_name(model_type)
+        
+        print("\n" + ("=" * 100))
+        print("Testing Session (Specific Configs)")
+        print("=" * 100)
+        
+        # Find audio files
+        audio_files = self.find_audio_files()
+        if not audio_files:
+            print("No audio files found. Please add audio files to audio_files/ directory")
+            return
+        
+        # Sort configurations for logical execution order
+        configs = self.sort_configurations(configs, model_type)
+        
+        # Calculate total tests
+        total_tests = len(audio_files) * len(configs) * num_runs_per_config
+        
+        print(f"-> Testing {model_display_name} model")
+        print(f"-> Testing {len(audio_files)} audio files ({self.get_audio_source_display()})")
+        print(f"-> Testing {len(configs)} specific configurations")
+        print(f"-> Testing {num_runs_per_config} iterations per audio per configuration")
+        print(f"-> TOTAL: {total_tests} tests")
+        print()
+        sys.stdout.flush()
+        
+        current_test = 0
+        
+        # For each audio file
+        for audio_idx, audio_file in enumerate(audio_files, 1):
+            print(f"Audio {audio_idx}/{len(audio_files)} ({audio_file.name})")
+            print("-" * 80)
+            
+            # Print table header
+            print(f"| {'config/params':<35} | {'iteration':<12} | {'Processing':<12} | {'WER':<8} |")
+            print("-" * 80)
+            sys.stdout.flush()
+            
+            # For each configuration
+            for config in configs:
+                # Add model type to config
+                config_with_type = config.copy()
+                config_with_type['model_type'] = model_type
+                
+                # Run test multiple times if specified
+                for iteration in range(num_runs_per_config):
+                    current_test += 1
+                    
+                    # Print row header
+                    config_display = config['description']
+                    print(f"| {config_display:<35} | {current_test:>2}/{total_tests:<9} |", end="")
+                    sys.stdout.flush()
+                    
+                    # Run the test
+                    result = self.run_single_test(audio_file, config_with_type, current_test, total_tests)
+                    self.results.append(result)
+                    
+                    # Print results in the same row
+                    if 'error' in result:
+                        print(f" {'ERROR':<12} | {'N/A':<8} |")
+                    else:
+                        latency = f"{result['processing_latency']:.3f}s"
+                        wer = f"{result['wer_score']:.3f}" if result['wer_score'] is not None else "N/A"
+                        print(f" {latency:<12} | {wer:<8} |")
+                    
+                    print("-" * 80)
+                    sys.stdout.flush()
+            
+            print()  # Empty line between audio files
+            sys.stdout.flush()
+        
+        # Save results
+        json_path = self.save_results(model_type)
+        csv_path = self.save_results_csv(model_type)
+        config_averages = self.calculate_config_averages()
+        if config_averages:
+            avg_csv_path = self.save_averages_csv(model_type, config_averages)
+        else:
+            avg_csv_path = None
+        self.print_summary(model_display_name, total_tests, json_path, csv_path, avg_csv_path)
+    
     def sort_configurations(self, configs, model_type):
         """Sort configurations for logical execution order"""
         if model_type == 'fixed':
@@ -577,12 +662,37 @@ class TestRunner:
         config_averages = self.calculate_config_averages()
         return self.zoom_search.run_zoom_in_search(config_averages, model_type)
 
-def main():
+def main(model_type=None, test_mode=None, audio_source=None, configs=None):
+    """
+    Main function for test runner
+    
+    Args:
+        model_type: 'fixed', 'vad', or 'adaptive'
+        test_mode: 'phase_a_r1', 'phase_a_r2', etc.
+        audio_source: '10sec', '5min', or '30min'
+        configs: List of configs to test (if None, uses all configs for model_type)
+    """
+    # Use provided parameters or fall back to global variables
+    model_type = model_type or CURRENT_MODEL
+    test_mode = test_mode or TEST_MODE
+    audio_source = audio_source or AUDIO_SOURCE
+    
+    print(f"🚀 TestRunner: Running {model_type} model in {test_mode} mode with {audio_source} audio")
+    
     # Create test runner
-    runner = TestRunner(audio_source=AUDIO_SOURCE, test_mode=TEST_MODE)
+    runner = TestRunner(audio_source=audio_source, test_mode=test_mode)
     
     # Run tests for specified model_type
-    runner.run_model_tests(CURRENT_MODEL, num_runs_per_config=2)
+    if configs:
+        # Use provided configs (for evolved phases)
+        print(f"📋 Testing {len(configs)} provided configurations")
+        runner.run_specific_configs(model_type, configs, num_runs_per_config=2)
+    else:
+        # Use all configs for model_type (for initial phases)
+        print(f"📋 Testing all configurations for {model_type}")
+        runner.run_model_tests(model_type, num_runs_per_config=1)
+    
+    return runner.results
 
 if __name__ == "__main__":
     main() 
