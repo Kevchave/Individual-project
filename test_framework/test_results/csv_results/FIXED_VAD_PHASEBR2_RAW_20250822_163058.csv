@@ -1,3 +1,0 @@
-config,audio_file,model_type,wer_score,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_end_to_end_latency,p50_end_to_end_latency,p90_end_to_end_latency,word_count,test_mode,audio_source
-ZOOM-MIDPOINT: frames=10 (between 12 and 9),10sec_test.mp3,vad,0.18518518518518517,0.907060,0.894329,1.034171,0.907060,0.894329,1.034171,27,phase_b_r2,10sec
-ZOOM-MIDPOINT: frames=10 (between 12 and 9),10sec_test.mp3,vad,0.18518518518518517,0.955024,0.948559,1.081716,0.955024,0.948559,1.081716,27,phase_b_r2,10sec

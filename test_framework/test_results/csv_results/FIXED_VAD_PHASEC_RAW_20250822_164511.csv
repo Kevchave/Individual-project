@@ -1,3 +1,0 @@
-config,audio_file,model_type,wer_score,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_end_to_end_latency,p50_end_to_end_latency,p90_end_to_end_latency,word_count,test_mode,audio_source
-"Sobol-15: agg=2, frames=12",10sec_test.mp3,vad,0.1111111111111111,1.005117,1.021760,1.100780,1.005117,1.021760,1.100780,27,phase_c,10sec
-"Sobol-15: agg=2, frames=12",10sec_test.mp3,vad,0.1111111111111111,0.987227,1.007702,1.068708,0.987227,1.007702,1.068708,27,phase_c,10sec

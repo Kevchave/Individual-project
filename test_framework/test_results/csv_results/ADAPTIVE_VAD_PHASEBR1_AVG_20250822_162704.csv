@@ -1,4 +1,0 @@
-rank,config,avg_wer,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_end_to_end_latency,p50_end_to_end_latency,p90_end_to_end_latency,num_runs,test_mode,audio_source
-1,"Adaptive-Sobol-15: agg=2, frames=12",0.111111,0.979695,0.996029,1.053981,0.979695,0.996029,1.053981,2,phase_b_r1,10sec
-2,"Adaptive-Sobol-9: agg=0, frames=9",0.111111,0.918666,0.949519,1.066474,0.918666,0.949519,1.066474,2,phase_b_r1,10sec
-3,"Adaptive-Sobol-5: agg=1, frames=10",0.111111,1.019757,1.035979,1.115080,1.019757,1.035979,1.115080,2,phase_b_r1,10sec

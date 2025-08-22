@@ -657,7 +657,7 @@ class TestRunner:
 
 
 
-def main(model_type=None, test_mode=None, audio_source=None, configs=None):
+def main(model_type=None, test_mode=None, audio_source=None, configs=None, iterations=None):
     """
     Main function for test runner
     
@@ -681,11 +681,11 @@ def main(model_type=None, test_mode=None, audio_source=None, configs=None):
     if configs:
         # Use provided configs (for evolved phases)
         print(f"📋 Testing {len(configs)} provided configurations")
-        runner.run_specific_configs(model_type, configs, num_runs_per_config=2)
+        runner.run_specific_configs(model_type, configs, num_runs_per_config=iterations or 2)
     else:
         # Use all configs for model_type (for initial phases)
         print(f"📋 Testing all configurations for {model_type}")
-        runner.run_model_tests(model_type, num_runs_per_config=1)
+        runner.run_model_tests(model_type, num_runs_per_config=iterations or 1)
     
     return runner.results
 

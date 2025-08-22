@@ -168,12 +168,34 @@ class MetaTestRunner:
         
         sys.stdout.flush()
         
-        # Run test_runner
+        # Run test_runner with appropriate iterations for each phase
+        # Change these numbers to adjust iterations per phase:
+        # - phase_a_r1: 1 iteration (quick screening)
+        # - phase_a_r2: 2 iterations (more reliable)
+        # - phase_b_r1: 3 iterations (detailed evaluation)
+        # - phase_b_r2: 3 iterations (zoom validation)
+        # - phase_c: 5 iterations (final comparison)
+        
+        # For quick testing, use fewer iterations
+        if self.quick_testing_mode:
+            iterations = 1  # Quick testing: 1 iteration
+        else:
+            # Real evaluation: more iterations for important phases
+            if test_mode == 'phase_c':
+                iterations = 3  # Final comparison: 5 iterations
+            elif test_mode in ['phase_b_r1', 'phase_b_r2']:
+                iterations = 3  # Detailed phases: 3 iterations
+            elif test_mode == 'phase_a_r2':
+                iterations = 3  # Selection phase: 2 iterations
+            else:
+                iterations = 3  # Initial screening: 1 iteration
+        
         results = test_runner.main(
             model_type=model_type,
             test_mode=test_mode,
             audio_source=audio_source,
-            configs=configs
+            configs=configs,
+            iterations=iterations
         )
         
         print(f"✅ TestRunner completed for {model_type}")

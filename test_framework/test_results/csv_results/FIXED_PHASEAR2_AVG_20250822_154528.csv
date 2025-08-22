@@ -1,5 +1,0 @@
-rank,config,avg_wer,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_end_to_end_latency,p50_end_to_end_latency,p90_end_to_end_latency,num_runs,test_mode,audio_source
-1,FIXED-Sobol-3 (3.2s),0.185185,1.089491,1.117850,1.145605,1.089491,1.117850,1.145605,2,phase_a_r2,10sec
-2,FIXED-Sobol-7 (2.8s),0.185185,1.067106,1.058120,1.199860,1.067106,1.058120,1.199860,2,phase_a_r2,10sec
-3,FIXED-Sobol-2 (2.4s),0.222222,1.312771,1.347566,1.443130,1.312771,1.347566,1.443130,2,phase_a_r2,10sec
-4,FIXED-Sobol-5 (2.0s),0.222222,1.162703,1.071908,1.449121,1.162703,1.071908,1.449121,2,phase_a_r2,10sec
