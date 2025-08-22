@@ -11,7 +11,6 @@ This module handles the automatic evolution of configurations through testing ph
 """
 
 import json
-import shutil
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Any, Optional
@@ -491,44 +490,4 @@ class ConfigManager:
         
         return config_averages
     
-    def show_config_evolution(self, model_type: str) -> None:
-        """Show how configurations evolved through phases"""
-        print(f"\nConfiguration Evolution for {model_type.upper()}")
-        print("=" * 60)
-        
-        for phase in ['phase_a_r1', 'phase_a_r2', 'phase_b_r1', 'phase_b_r2', 'phase_c']:
-            configs = self.load_phase_configs(model_type, phase)
-            if configs:
-                print(f"{phase:12}: {len(configs):2d} configs")
-            else:
-                print(f"{phase:12}: Not generated yet")
-    
-    def validate_phase_configs(self, model_type: str, phase: str) -> bool:
-        """Validate that phase configs exist and are properly formatted"""
-        configs = self.load_phase_configs(model_type, phase)
-        if not configs:
-            print(f"Error: No configurations found for {model_type} {phase}")
-            return False
-        
-        print(f"✓ Validated {phase}: {len(configs)} configurations")
-        return True
-    
-    def rollback_to_phase(self, model_type: str, target_phase: str) -> bool:
-        """Rollback to a specific phase (delete all subsequent phase configs)"""
-        phases = ['phase_a_r1', 'phase_a_r2', 'phase_b_r1', 'phase_b_r2', 'phase_c']
-        
-        try:
-            target_index = phases.index(target_phase)
-        except ValueError:
-            print(f"Error: Invalid phase '{target_phase}'")
-            return False
-        
-        # Delete all phases after target_phase
-        for phase in phases[target_index + 1:]:
-            config_file = self.registry_dir / f"{model_type}_{phase}_configs.json"
-            if config_file.exists():
-                config_file.unlink()
-                print(f"Deleted {phase} configs")
-        
-        print(f"Rolled back to {target_phase}")
-        return True 
+ 

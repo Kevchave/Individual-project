@@ -1,0 +1,3 @@
+config,audio_file,model_type,wer_score,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_end_to_end_latency,p50_end_to_end_latency,p90_end_to_end_latency,word_count,test_mode,audio_source
+ZOOM-MIDPOINT: chunk_size=3.0s (between 3.2s and 2.8s),10sec_test.mp3,fixed,0.14814814814814814,1.295054,1.036307,1.684623,1.295054,1.036307,1.684623,26,phase_b_r2,10sec
+ZOOM-MIDPOINT: chunk_size=3.0s (between 3.2s and 2.8s),10sec_test.mp3,fixed,0.14814814814814814,1.035885,1.016469,1.082421,1.035885,1.016469,1.082421,26,phase_b_r2,10sec

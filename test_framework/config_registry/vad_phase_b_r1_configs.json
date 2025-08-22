@@ -3,7 +3,7 @@
   "phase": "phase_b_r1",
   "source": "phase_a_r2",
   "selection_criteria": "best_2_fixed_3_vad_adaptive",
-  "generated_at": "2025-08-22T16:10:17.324332",
+  "generated_at": "2025-08-22T16:25:41.589015",
   "description": "Best 2 from fixed, best 3 from VAD, best 3 from adaptive (8 total)",
   "configs": [
     {

@@ -1,0 +1,45 @@
+====================================================================================================
+TRANSCRIPTION TEST RESULTS REPORT
+====================================================================================================
+
+SUMMARY TABLE
+----------------------------------------------------------------------------------------------------
+config/params                   | audio_file                  | avg processing  | avg WER   
+----------------------------------------------------------------------------------------------------
+ZOOM-MIDPOINT: chunk_size=3.0s (between 3.2s and 2.8s) | 10sec_test.mp3            | 0.970s          | 0.222     
+----------------------------------------------------------------------------------------------------
+
+
+DETAILED RESULTS
+====================================================================================================
+
+Test: ZOOM-MIDPOINT: chunk_size=3.0s (between 3.2s and 2.8s) - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.046s
+End-to-End Latency: 1.046s
+Word Count: 25
+WER Score: 0.222
+
+Recorded Transcript:
+ But what I thought I'd do is...  Just talk about one of these.  in this book.  is called scaling from  zero to a million uses.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+Iteration #2
+------------------------------
+Processing Latency: 0.893s
+End-to-End Latency: 0.893s
+Word Count: 25
+WER Score: 0.222
+
+Recorded Transcript:
+ But what I thought I'd do is...  Just talk about one of these.  in this book.  is called scaling from  zero to a million uses.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================

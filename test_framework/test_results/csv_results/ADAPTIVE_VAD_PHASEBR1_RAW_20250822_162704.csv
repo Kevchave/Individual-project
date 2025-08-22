@@ -1,0 +1,7 @@
+config,audio_file,model_type,wer_score,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_end_to_end_latency,p50_end_to_end_latency,p90_end_to_end_latency,word_count,test_mode,audio_source
+"Adaptive-Sobol-9: agg=0, frames=9",10sec_test.mp3,adaptive,0.1111111111111111,0.924057,0.950803,1.076206,0.924057,0.950803,1.076206,27,phase_b_r1,10sec
+"Adaptive-Sobol-9: agg=0, frames=9",10sec_test.mp3,adaptive,0.1111111111111111,0.913274,0.948235,1.056743,0.913274,0.948235,1.056743,27,phase_b_r1,10sec
+"Adaptive-Sobol-5: agg=1, frames=10",10sec_test.mp3,adaptive,0.1111111111111111,1.004280,1.024203,1.084762,1.004280,1.024203,1.084762,27,phase_b_r1,10sec
+"Adaptive-Sobol-5: agg=1, frames=10",10sec_test.mp3,adaptive,0.1111111111111111,1.035234,1.047755,1.145398,1.035234,1.047755,1.145398,27,phase_b_r1,10sec
+"Adaptive-Sobol-15: agg=2, frames=12",10sec_test.mp3,adaptive,0.1111111111111111,0.992380,1.006292,1.059650,0.992380,1.006292,1.059650,27,phase_b_r1,10sec
+"Adaptive-Sobol-15: agg=2, frames=12",10sec_test.mp3,adaptive,0.1111111111111111,0.967010,0.985767,1.048312,0.967010,0.985767,1.048312,27,phase_b_r1,10sec

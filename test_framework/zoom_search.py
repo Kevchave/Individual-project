@@ -35,10 +35,16 @@ class ZoomSearch:
             print(f"⚠️  Only {len(best_configs)} configs available for {model_type}, skipping zoom search")
             return []
         
+        # Store the best original config for comparison
+        best_original_config = best_configs[0]
+        best_original_wer = self._get_config_wer(results_data, best_original_config)
+        
         # Generate midpoint configs
         midpoint_configs = self._generate_midpoint_configs(best_configs, model_type)
         
         print(f"✅ Generated {len(midpoint_configs)} midpoint configs for {model_type}")
+        print(f"   📊 Original best: {best_original_config.get('description', 'Unknown')} (WER: {best_original_wer:.3f})")
+        
         return midpoint_configs
     
     def _get_best_2_configs(self, results_data: List[Dict], model_type: str) -> List[Dict]:
@@ -52,14 +58,28 @@ class ZoomSearch:
         # Calculate averages for each config
         config_averages = self._calculate_config_averages(model_results)
         
+        # Debug: Print all configs and their metrics
+        print(f"   🔍 Debug: All {model_type} configs and their metrics:")
+        for i, (config_desc, metrics) in enumerate(config_averages):
+            print(f"      {i+1}. {config_desc}: WER={metrics['avg_wer']:.3f}, p90_latency={metrics['avg_p90_latency']:.3f}s")
+        
         # Sort by WER, then by p90 latency
         config_averages.sort(key=lambda x: (
             x[1]['avg_wer'] if x[1]['avg_wer'] is not None else float('inf'),
             x[1]['avg_p90_latency']
         ))
         
+        # Debug: Print sorted configs
+        print(f"   🔍 Debug: Sorted {model_type} configs:")
+        for i, (config_desc, metrics) in enumerate(config_averages):
+            print(f"      {i+1}. {config_desc}: WER={metrics['avg_wer']:.3f}, p90_latency={metrics['avg_p90_latency']:.3f}s")
+        
         # Get best 2 configs
         best_2 = config_averages[:2]
+        
+        print(f"   🔍 Debug: Selected top 2 {model_type} configs:")
+        for i, (config_desc, metrics) in enumerate(best_2):
+            print(f"      {i+1}. {config_desc}: WER={metrics['avg_wer']:.3f}, p90_latency={metrics['avg_p90_latency']:.3f}s")
         
         # Extract the config objects (not just descriptions)
         best_configs = []
@@ -112,9 +132,14 @@ class ZoomSearch:
         frames1 = config1.get('max_silence_frames', 0)
         frames2 = config2.get('max_silence_frames', 0)
         
+        # Debug: Print the frames values being used
+        print(f"   🔍 Debug: Config1 frames = {frames1}, Config2 frames = {frames2}")
+        
         # Find midpoint of frames
         midpoint_frames = (frames1 + frames2) / 2
         midpoint_frames = int(round(midpoint_frames))  # Round to integer
+        
+        print(f"   🔍 Debug: Midpoint calculation = ({frames1} + {frames2}) / 2 = {midpoint_frames}")
         
         # Create midpoint config
         midpoint_config = config1.copy()
@@ -201,3 +226,79 @@ class ZoomSearch:
         config['description'] = result.get('config', 'Unknown')
         
         return config 
+
+    def _get_config_wer(self, results_data: List[Dict], config: Dict) -> float:
+        """Get the WER for a specific config from results data"""
+        config_desc = config.get('description', '')
+        model_type = config.get('model_type', '')
+        
+        # Find matching results
+        matching_results = []
+        for result in results_data:
+            if (result.get('config') == config_desc and 
+                result.get('model_type') == model_type):
+                matching_results.append(result)
+        
+        if not matching_results:
+            return float('inf')
+        
+        # Calculate average WER
+        wer_scores = [r['wer_score'] for r in matching_results if r['wer_score'] is not None]
+        if not wer_scores:
+            return float('inf')
+        
+        return sum(wer_scores) / len(wer_scores) 
+
+    def compare_zoom_results(self, original_results: List[Dict], zoom_results: List[Dict], model_type: str) -> Dict:
+        """
+        Compare zoom search results with original best config
+        
+        Args:
+            original_results: Results from previous phase
+            zoom_results: Results from zoom search tests
+            model_type: 'fixed', 'vad', or 'adaptive'
+            
+        Returns:
+            Dict with comparison summary
+        """
+        # Get best original config
+        model_results = [r for r in original_results if r.get('model_type') == model_type]
+        config_averages = self._calculate_config_averages(model_results)
+        
+        if not config_averages:
+            return {'improved': False, 'summary': 'No original results to compare'}
+        
+        # Sort by WER, then by p90 latency
+        config_averages.sort(key=lambda x: (
+            x[1]['avg_wer'] if x[1]['avg_wer'] is not None else float('inf'),
+            x[1]['avg_p90_latency']
+        ))
+        
+        best_original_config = config_averages[0][0]
+        best_original_wer = config_averages[0][1]['avg_wer']
+        
+        # Get zoom search results
+        if not zoom_results:
+            return {'improved': False, 'summary': 'No zoom search results'}
+        
+        # Calculate average WER for zoom search results
+        zoom_wer_scores = [r['wer_score'] for r in zoom_results if r['wer_score'] is not None]
+        if not zoom_wer_scores:
+            return {'improved': False, 'summary': 'No valid WER scores in zoom results'}
+        
+        zoom_avg_wer = sum(zoom_wer_scores) / len(zoom_wer_scores)
+        
+        # Compare performance
+        improved = zoom_avg_wer < best_original_wer if best_original_wer is not None else False
+        
+        summary = f"Zoom search {'✅ IMPROVED' if improved else '❌ WORSENED'} performance:"
+        summary += f"\n   Original best: {best_original_config} (WER: {best_original_wer:.3f})"
+        summary += f"\n   Zoom result: WER: {zoom_avg_wer:.3f}"
+        summary += f"\n   Recommendation: {'KEEP' if improved else 'REJECT'} zoom config"
+        
+        return {
+            'improved': improved,
+            'original_wer': best_original_wer,
+            'zoom_wer': zoom_avg_wer,
+            'summary': summary
+        } 

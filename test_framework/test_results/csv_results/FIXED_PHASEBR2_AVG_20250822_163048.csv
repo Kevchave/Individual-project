@@ -1,0 +1,2 @@
+rank,config,avg_wer,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_end_to_end_latency,p50_end_to_end_latency,p90_end_to_end_latency,num_runs,test_mode,audio_source
+1,ZOOM-MIDPOINT: chunk_size=3.0s (between 3.2s and 2.8s),0.148148,1.160286,1.003439,1.394763,1.160286,1.003439,1.394763,2,phase_b_r2,10sec

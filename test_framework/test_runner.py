@@ -26,7 +26,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from metrics_collector import MetricsCollector
 from configs import TEST_CONFIGS
-from zoom_search import ZoomSearch
 from transcriber_app.main import start_transcription_pipeline_with_virtual_audio, stop_transcription_pipeline
 import transcriber_app.main as main_module
 
@@ -44,7 +43,6 @@ class TestRunner:
         self.csv_dir = self.results_dir / "csv_results"
         self.audio_source = audio_source
         self.test_mode = test_mode
-        self.zoom_search = ZoomSearch()
         
         # Set duration limits based on test mode
         self.duration_limits = {
@@ -657,10 +655,7 @@ class TestRunner:
         
         return config_averages
 
-    def run_zoom_in_search(self, model_type):
-        """Run zoom-in search for Phase B Round 2 using the ZoomSearch module"""
-        config_averages = self.calculate_config_averages()
-        return self.zoom_search.run_zoom_in_search(config_averages, model_type)
+
 
 def main(model_type=None, test_mode=None, audio_source=None, configs=None):
     """

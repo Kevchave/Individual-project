@@ -1,0 +1,2 @@
+rank,config,avg_wer,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_end_to_end_latency,p50_end_to_end_latency,p90_end_to_end_latency,num_runs,test_mode,audio_source
+1,ZOOM-MIDPOINT: frames=10 (between 12 and 9),0.185185,0.985517,0.932173,1.180386,0.985517,0.932173,1.180386,2,phase_b_r2,10sec

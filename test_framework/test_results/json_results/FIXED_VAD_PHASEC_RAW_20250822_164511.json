@@ -1,0 +1,32 @@
+[
+  {
+    "audio_file": "10sec_test.mp3",
+    "model_type": "vad",
+    "config": "Sobol-15: agg=2, frames=12",
+    "word_count": 27,
+    "processing_latency": 1.005116860071818,
+    "p50_processing_latency": 1.0217599868774414,
+    "p90_processing_latency": 1.1007797241210937,
+    "end_to_end_latency": 1.005116860071818,
+    "p50_end_to_end_latency": 1.0217599868774414,
+    "p90_end_to_end_latency": 1.1007797241210937,
+    "wer_score": 0.1111111111111111,
+    "recorded_transcript": " But what I thought I'd do today is just talk about...  one of the examples in this book.  is called scaling from zero to a million music.",
+    "correct_transcript": "But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users."
+  },
+  {
+    "audio_file": "10sec_test.mp3",
+    "model_type": "vad",
+    "config": "Sobol-15: agg=2, frames=12",
+    "word_count": 27,
+    "processing_latency": 0.9872268040974935,
+    "p50_processing_latency": 1.007702112197876,
+    "p90_processing_latency": 1.0687077045440674,
+    "end_to_end_latency": 0.9872268040974935,
+    "p50_end_to_end_latency": 1.007702112197876,
+    "p90_end_to_end_latency": 1.0687077045440674,
+    "wer_score": 0.1111111111111111,
+    "recorded_transcript": " But what I thought I'd do today is just talk about...  one of the examples in this book.  is called scaling from zero to a million music.",
+    "correct_transcript": "But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users."
+  }
+]

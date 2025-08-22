@@ -316,6 +316,7 @@ class MetaTestRunner:
         # Get evolved configs for each model type
         model_types = ['fixed', 'vad', 'adaptive']
         all_results = []
+        zoom_comparisons = {}
         
         for model_type in model_types:
             configs = self.config_manager.get_phase_configs(model_type, 'phase_b_r2')
@@ -324,8 +325,25 @@ class MetaTestRunner:
                 print(f"📋 Testing {len(configs)} zoom search configurations")
                 results = self.run_test_runner_for_model(model_type, 'phase_b_r2', configs)
                 all_results.extend(results)
+                
+                # Compare zoom results with original
+                from zoom_search import ZoomSearch
+                zoom_search = ZoomSearch()
+                comparison = zoom_search.compare_zoom_results(results_data, results, model_type)
+                zoom_comparisons[model_type] = comparison
             else:
                 print(f"⚠️  No zoom search configs found for {model_type} in phase_b_r2")
+        
+        # Print zoom search comparison summary
+        print(f"\n{'='*80}")
+        print("🔍 ZOOM SEARCH PERFORMANCE COMPARISON")
+        print(f"{'='*80}")
+        
+        for model_type in model_types:
+            if model_type in zoom_comparisons:
+                comparison = zoom_comparisons[model_type]
+                print(f"\n{model_type.upper()} Model:")
+                print(comparison['summary'])
         
         print(f"\n✅ Phase B Round 2 completed")
         print(f"📊 Total results: {len(all_results)}")
@@ -334,16 +352,146 @@ class MetaTestRunner:
         return all_results
     
     def run_phase_c(self):
-        """Run Phase C: Best config from B2"""
-        print("=== Phase C: Running final best config ===")
+        """Run Phase C: Final comparison of best configs from each model"""
+        print("=== Phase C: Final comparison of best configs ===")
         
-        # TODO: Load results from Phase B Round 2
-        # TODO: Select best config
-        # TODO: Run test_runner with best config
+        # Determine which results to use for selecting best configs
+        # Check if Phase B Round 2 improved any models
+        phase_b_r2_results = self.load_phase_results('phase_b_r2')
+        phase_b_r1_results = self.load_phase_results('phase_b_r1')
         
-        print("✅ Phase C completed")
-        print("📊 Final results saved to test_results/")
-        print("🎉 Evaluation pipeline complete!")
+        if not phase_b_r1_results:
+            print("❌ No results found for Phase B Round 1")
+            return None
+        
+        # Select best configs for each model type
+        best_configs = self._select_best_configs_for_phase_c(phase_b_r1_results, phase_b_r2_results)
+        
+        if not best_configs:
+            print("❌ No best configs found for Phase C")
+            return None
+        
+        print(f"📋 Selected best configs for Phase C:")
+        for model_type, config in best_configs.items():
+            print(f"   {model_type.upper()}: {config.get('description', 'Unknown')}")
+        
+        # Run tests for each best config
+        all_results = []
+        
+        for model_type, config in best_configs.items():
+            print(f"\n--- Testing {model_type.upper()} best config ---")
+            results = self.run_test_runner_for_model(model_type, 'phase_c', [config])
+            all_results.extend(results)
+        
+        # Determine overall winner
+        winner = self._determine_overall_winner(all_results)
+        
+        # Print final results
+        print(f"\n{'='*80}")
+        print("🏆 PHASE C FINAL RESULTS")
+        print(f"{'='*80}")
+        
+        for model_type in ['fixed', 'vad', 'adaptive']:
+            model_results = [r for r in all_results if r.get('model_type') == model_type]
+            if model_results:
+                avg_wer = sum(r['wer_score'] for r in model_results if r['wer_score'] is not None) / len(model_results)
+                avg_latency = sum(r['processing_latency'] for r in model_results) / len(model_results)
+                print(f"\n{model_type.upper()} Model:")
+                print(f"   Config: {model_results[0].get('config', 'Unknown')}")
+                print(f"   WER: {avg_wer:.3f}")
+                print(f"   Avg Latency: {avg_latency:.3f}s")
+        
+        print(f"\n🏆 OVERALL WINNER: {winner.upper()} MODEL")
+        print(f"✅ Phase C completed successfully!")
+        
+        return all_results
+    
+    def _select_best_configs_for_phase_c(self, phase_b_r1_results, phase_b_r2_results):
+        """Select the best config for each model type for Phase C"""
+        from zoom_search import ZoomSearch
+        zoom_search = ZoomSearch()
+        
+        best_configs = {}
+        
+        for model_type in ['fixed', 'vad', 'adaptive']:
+            # Get Phase B Round 1 best config
+            phase_b_r1_model_results = [r for r in phase_b_r1_results if r.get('model_type') == model_type]
+            if not phase_b_r1_model_results:
+                continue
+            
+            config_averages = zoom_search._calculate_config_averages(phase_b_r1_model_results)
+            if not config_averages:
+                continue
+            
+            # Sort by WER, then by p90 latency
+            config_averages.sort(key=lambda x: (
+                x[1]['avg_wer'] if x[1]['avg_wer'] is not None else float('inf'),
+                x[1]['avg_p90_latency']
+            ))
+            
+            best_phase_b_r1_config_desc = config_averages[0][0]
+            best_phase_b_r1_wer = config_averages[0][1]['avg_wer']
+            
+            # Check if Phase B Round 2 improved this model
+            phase_b_r2_model_results = [r for r in phase_b_r2_results if r.get('model_type') == model_type]
+            improved = False
+            best_config = None
+            
+            if phase_b_r2_model_results:
+                # Compare with zoom search results
+                comparison = zoom_search.compare_zoom_results(phase_b_r1_model_results, phase_b_r2_model_results, model_type)
+                improved = comparison['improved']
+                
+                if improved:
+                    # Use zoom search config
+                    best_config = zoom_search._reconstruct_config_from_result(phase_b_r2_model_results[0])
+                    print(f"   ✅ {model_type.upper()}: Using improved zoom config (WER: {comparison['zoom_wer']:.3f} vs {comparison['original_wer']:.3f})")
+                else:
+                    # Use original best config
+                    for result in phase_b_r1_model_results:
+                        if result.get('config') == best_phase_b_r1_config_desc:
+                            best_config = zoom_search._reconstruct_config_from_result(result)
+                            break
+                    print(f"   ❌ {model_type.upper()}: Using original best config (zoom worsened performance)")
+            else:
+                # No zoom search results, use original best
+                for result in phase_b_r1_model_results:
+                    if result.get('config') == best_phase_b_r1_config_desc:
+                        best_config = zoom_search._reconstruct_config_from_result(result)
+                        break
+                print(f"   📊 {model_type.upper()}: Using original best config (no zoom search)")
+            
+            if best_config:
+                best_configs[model_type] = best_config
+        
+        return best_configs
+    
+    def _determine_overall_winner(self, results):
+        """Determine the overall winner based on WER and latency"""
+        model_performance = {}
+        
+        for model_type in ['fixed', 'vad', 'adaptive']:
+            model_results = [r for r in results if r.get('model_type') == model_type]
+            if not model_results:
+                continue
+            
+            # Calculate averages
+            avg_wer = sum(r['wer_score'] for r in model_results if r['wer_score'] is not None) / len(model_results)
+            avg_latency = sum(r['processing_latency'] for r in model_results) / len(model_results)
+            
+            model_performance[model_type] = {
+                'avg_wer': avg_wer,
+                'avg_latency': avg_latency
+            }
+        
+        if not model_performance:
+            return "unknown"
+        
+        # Find best model (lowest WER, then lowest latency as tie-breaker)
+        best_model = min(model_performance.keys(), 
+                        key=lambda m: (model_performance[m]['avg_wer'], model_performance[m]['avg_latency']))
+        
+        return best_model
     
     def run_phase(self, phase_name: str):
         """Run a specific phase with validation and automatic clearing"""

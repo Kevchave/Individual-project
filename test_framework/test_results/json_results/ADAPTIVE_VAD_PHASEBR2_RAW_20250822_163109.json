@@ -1,0 +1,32 @@
+[
+  {
+    "audio_file": "10sec_test.mp3",
+    "model_type": "adaptive",
+    "config": "ZOOM-MIDPOINT: frames=10 (between 12 and 9)",
+    "word_count": 27,
+    "processing_latency": 0.9356260895729065,
+    "p50_processing_latency": 0.9109576940536499,
+    "p90_processing_latency": 1.077897310256958,
+    "end_to_end_latency": 0.9356260895729065,
+    "p50_end_to_end_latency": 0.9109576940536499,
+    "p90_end_to_end_latency": 1.077897310256958,
+    "wer_score": 0.18518518518518517,
+    "recorded_transcript": " But what I thought I'd do today is just talk about...  one of the examples in this book.  It's cool.  scaling from zero to a million music.",
+    "correct_transcript": "But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users."
+  },
+  {
+    "audio_file": "10sec_test.mp3",
+    "model_type": "adaptive",
+    "config": "ZOOM-MIDPOINT: frames=10 (between 12 and 9)",
+    "word_count": 27,
+    "processing_latency": 0.9135058522224426,
+    "p50_processing_latency": 0.9203375577926636,
+    "p90_processing_latency": 1.033516240119934,
+    "end_to_end_latency": 0.9135058522224426,
+    "p50_end_to_end_latency": 0.9203375577926636,
+    "p90_end_to_end_latency": 1.033516240119934,
+    "wer_score": 0.18518518518518517,
+    "recorded_transcript": " But what I thought I'd do today is just talk about...  one of the examples in this book.  It's cool.  scaling from zero to a million music.",
+    "correct_transcript": "But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users."
+  }
+]
