@@ -1,2 +1,0 @@
-config,audio_file,model_type,wer_score,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_callback_latency,p50_callback_latency,p90_callback_latency,word_count,test_mode,audio_source
-FIXED-TEST: chunk_size=3.0s,10sec_test.mp3,fixed,0.14814814814814814,1.242209,1.018016,1.564627,1.242209,1.018016,1.564627,26,phase_c,10sec
