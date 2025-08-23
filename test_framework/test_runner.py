@@ -88,6 +88,12 @@ class TestRunner:
                 return audio_files
             for pattern in ('*.mp3', '*.wav'):
                 audio_files.extend(base_dir.glob(pattern))
+            
+            # Limit to 2 files for Phase C to keep testing time reasonable
+            if len(audio_files) > 2:
+                print(f"📊 Found {len(audio_files)} 30min files, using first 2 for testing")
+                audio_files = sorted(audio_files)[:2]  # Sort and take first 2
+            
             return audio_files
         else:
             # Fallback to 10sec if misconfigured
