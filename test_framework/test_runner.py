@@ -258,6 +258,12 @@ class TestRunner:
         # For each audio file
         for audio_idx, audio_file in enumerate(audio_files, 1):
             print(f"Audio {audio_idx}/{len(audio_files)} ({audio_file.name})")
+            
+            # Phase C: Show monitoring info before table
+            if self.test_mode == 'phase_c':
+                print("🕐 Phase C: 30-minute test with 5-minute monitoring intervals")
+                print()
+            
             print("-" * 80)
             
             # Print table header
@@ -281,7 +287,11 @@ class TestRunner:
                     sys.stdout.flush()
                     
                     # Run the test
-                    result = self.run_single_test(audio_file, config_with_type, current_test, total_tests)
+                    if self.test_mode == 'phase_c':
+                        # Phase C: Run with 5-minute interval monitoring
+                        result = self.run_single_test_with_monitoring(audio_file, config_with_type, current_test, total_tests)
+                    else:
+                        result = self.run_single_test(audio_file, config_with_type, current_test, total_tests)
                     self.results.append(result)
                     
                     # Print results in the same row
@@ -306,7 +316,11 @@ class TestRunner:
             avg_csv_path = self.save_averages_csv(model_type, config_averages)
         else:
             avg_csv_path = None
-        self.print_summary(model_display_name, total_tests, json_path, csv_path, avg_csv_path)
+        
+        if self.test_mode == 'phase_c':
+            self.print_phase_c_summary(model_display_name, total_tests, json_path, csv_path, avg_csv_path)
+        else:
+            self.print_summary(model_display_name, total_tests, json_path, csv_path, avg_csv_path)
     
     def sort_configurations(self, configs, model_type):
         """Sort configurations for logical execution order"""
@@ -403,6 +417,122 @@ class TestRunner:
                 'wer_score': None,
                 'recorded_transcript': '',
                 'correct_transcript': reference_transcript if reference_transcript else '',
+                'error': str(e)
+            }
+
+    def run_single_test_with_monitoring(self, audio_file, config, current_test, total_tests):
+        """Run a single test with 5-minute interval monitoring for Phase C"""
+        import time
+        
+        # Create metrics collector for this test
+        metrics_collector = MetricsCollector()
+        metrics_collector.start_test()
+        
+        # Initialize monitoring variables
+        start_time = time.time()
+        last_report_time = start_time
+        report_interval = 300  # 5 minutes in seconds
+        monitoring_data = []
+        
+        try:
+            # Load reference transcript for WER calculation
+            reference_transcript = self.load_reference_transcript(audio_file)
+            
+            # Start transcription pipeline with virtual audio injection
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                start_transcription_pipeline_with_virtual_audio(
+                    audio_file_path=str(audio_file),
+                    metrics_collector=metrics_collector,
+                    real_time_simulation=False,
+                    config=config
+                )
+                
+                # Monitor and report every 5 minutes
+                while main_module.transcription_thread and main_module.transcription_thread.is_alive():
+                    current_time = time.time()
+                    elapsed_time = current_time - start_time
+                    
+                    # Check if it's time for a 5-minute report
+                    if current_time - last_report_time >= report_interval:
+                        # Get current metrics
+                        current_latency_metrics = metrics_collector.calculate_latency()
+                        current_transcript = metrics_collector.get_final_transcript()
+                        
+                        # Calculate current WER
+                        current_wer = None
+                        if reference_transcript:
+                            current_wer = metrics_collector.calculate_wer(reference_transcript)
+                        
+                        # Store monitoring data
+                        monitoring_data.append({
+                            'time_minutes': int(elapsed_time / 60),
+                            'wer': current_wer,
+                            'avg_latency': current_latency_metrics['avg_processing_latency'],
+                            'p90_latency': current_latency_metrics['p90_processing_latency'],
+                            'word_count': len(current_transcript.split())
+                        })
+                        
+                        # Print 5-minute report
+                        print(f"📊 {int(elapsed_time/60)}min: WER={current_wer:.3f}" if current_wer is not None else f"📊 {int(elapsed_time/60)}min: WER=N/A")
+                        print(f"   Latency: {current_latency_metrics['avg_processing_latency']:.3f}s (P90: {current_latency_metrics['p90_processing_latency']:.3f}s) | Words: {len(current_transcript.split())}")
+                        
+                        last_report_time = current_time
+                    
+                    # Check for duration limit
+                    if self.max_duration and elapsed_time > self.max_duration:
+                        print(f"\n⏱️  Stopping test after {self.max_duration}s (duration limit)")
+                        break
+                    
+                    time.sleep(1)  # Check every second
+                
+                # Stop transcription
+                stop_transcription_pipeline()
+            
+            # Get final results
+            latency_metrics = metrics_collector.calculate_latency()
+            final_transcript = metrics_collector.get_final_transcript()
+            
+            # Calculate final WER
+            wer_score = None
+            if reference_transcript:
+                wer_score = metrics_collector.calculate_wer(reference_transcript)
+            
+            # Create result record with monitoring data
+            result = {
+                'audio_file': audio_file.name,
+                'model_type': config.get('model_type', 'unknown'),
+                'config': config['description'],
+                'word_count': len(final_transcript.split()),
+                'processing_latency': latency_metrics['avg_processing_latency'],
+                'p50_processing_latency': latency_metrics['p50_processing_latency'],
+                'p90_processing_latency': latency_metrics['p90_processing_latency'],
+                'callback_latency': latency_metrics['avg_callback_latency'],
+                'p50_callback_latency': latency_metrics['p50_callback_latency'],
+                'p90_callback_latency': latency_metrics['p90_callback_latency'],
+                'wer_score': wer_score,
+                'recorded_transcript': final_transcript,
+                'correct_transcript': reference_transcript,
+                'monitoring_data': monitoring_data  # Add monitoring data for Phase C
+            }
+            
+            return result
+            
+        except Exception as e:
+            return {
+                'audio_file': audio_file.name,
+                'model_type': config.get('model_type', 'unknown'),
+                'config': config.get('description', 'unknown'),
+                'word_count': 0,
+                'processing_latency': 0,
+                'p50_processing_latency': 0,
+                'p90_processing_latency': 0,
+                'callback_latency': 0,
+                'p50_callback_latency': 0,
+                'p90_callback_latency': 0,
+                'wer_score': None,
+                'recorded_transcript': '',
+                'correct_transcript': reference_transcript if reference_transcript else '',
+                'monitoring_data': [],
                 'error': str(e)
             }
 
@@ -605,6 +735,95 @@ class TestRunner:
             
             print("-" * 100)
             print()
+
+    def print_phase_c_summary(self, model_display_name, total_tests, json_path, csv_path, avg_csv_path):
+        """Print Phase C summary with overall performance and 5-minute bin breakdown"""
+        if not self.results:
+            print("No results to summarize")
+            return
+        
+        print("Testing Complete")
+        print(f"-> Tested {model_display_name} model")
+        print(f"-> Testing ({self.get_audio_source_display()}) audio files")
+        print(f"-> Test mode: {self.test_mode}")
+        print(f"-> {len(self.results)}/{total_tests} tests complete")
+        print(f"-> Results saved to: {json_path}")
+        print(f"-> CSV results saved to: {csv_path}")
+        if avg_csv_path:
+            print(f"-> Averages CSV saved to: {avg_csv_path}")
+        print()
+        
+        # 1. Overall Performance Summary (with variation metrics)
+        print("\n" + "=" * 100)
+        print("🏆 OVERALL PERFORMANCE SUMMARY")
+        print("=" * 100)
+        
+        config_averages = self.calculate_config_averages()
+        if config_averages:
+            print(f"| {'Rank':<4} | {'Configuration':<50} | {'Avg WER':<8} | {'WER Range':<12} | {'Avg Latency':<12} | {'Latency Range':<15} |")
+            print("-" * 100)
+            
+            for i, (config, metrics) in enumerate(config_averages, 1):
+                config_name = config[:49]  # Truncate if too long
+                avg_wer = f"{metrics['avg_wer']:.3f}" if metrics['avg_wer'] is not None else "N/A"
+                avg_latency = f"{metrics['avg_latency']:.3f}s"
+                
+                # Calculate variation metrics
+                config_results = [r for r in self.results if r['config'] == config and 'error' not in r]
+                if config_results:
+                    wer_scores = [r['wer_score'] for r in config_results if r['wer_score'] is not None]
+                    latency_scores = [r['processing_latency'] for r in config_results]
+                    
+                    if wer_scores:
+                        wer_range = f"{max(wer_scores)-min(wer_scores):.3f}"
+                    else:
+                        wer_range = "N/A"
+                    
+                    if latency_scores:
+                        latency_range = f"{max(latency_scores)-min(latency_scores):.3f}s"
+                    else:
+                        latency_range = "N/A"
+                else:
+                    wer_range = "N/A"
+                    latency_range = "N/A"
+                
+                print(f"| {i:<4} | {config_name:<50} | {avg_wer:<8} | {wer_range:<12} | {avg_latency:<12} | {latency_range:<15} |")
+            
+            print("-" * 100)
+            print()
+        
+        # 2. 5-Minute Bin Breakdown
+        print("\n" + "=" * 100)
+        print("📊 5-MINUTE BIN BREAKDOWN")
+        print("=" * 100)
+        
+        for config, metrics in config_averages:
+            config_results = [r for r in self.results if r['config'] == config and 'error' not in r]
+            if not config_results:
+                continue
+            
+            # Get monitoring data from the first result (should be the same for all iterations)
+            monitoring_data = config_results[0].get('monitoring_data', [])
+            if not monitoring_data:
+                continue
+            
+            print(f"\n🔹 {config}")
+            print("-" * 80)
+            print(f"| {'Time':<8} | {'WER':<8} | {'Avg Latency':<12} | {'P90 Latency':<12} | {'Words':<8} |")
+            print("-" * 80)
+            
+            for data_point in monitoring_data:
+                time_str = f"{data_point['time_minutes']}min"
+                wer_str = f"{data_point['wer']:.3f}" if data_point['wer'] is not None else "N/A"
+                avg_latency_str = f"{data_point['avg_latency']:.3f}s"
+                p90_latency_str = f"{data_point['p90_latency']:.3f}s"
+                words_str = f"{data_point['word_count']}"
+                
+                print(f"| {time_str:<8} | {wer_str:<8} | {avg_latency_str:<12} | {p90_latency_str:<12} | {words_str:<8} |")
+            
+            print("-" * 80)
+        
+        print("\n" + "=" * 100)
 
     def calculate_config_averages(self):
         """Calculate average metrics for each configuration across all runs"""

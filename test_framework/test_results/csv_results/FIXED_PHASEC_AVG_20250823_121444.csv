@@ -1,0 +1,2 @@
+rank,config,avg_wer,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_callback_latency,p50_callback_latency,p90_callback_latency,num_runs,test_mode,audio_source
+1,FIXED-TEST: chunk_size=3.0s,0.148148,1.242209,1.018016,1.564627,1.242209,1.018016,1.564627,1,phase_c,10sec

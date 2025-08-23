@@ -1,0 +1,2 @@
+config,audio_file,model_type,wer_score,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_callback_latency,p50_callback_latency,p90_callback_latency,word_count,test_mode,audio_source
+"VAD-TEST: agg=2, frames=12",10sec_test.mp3,vad,0.1111111111111111,1.031245,1.072821,1.108170,1.031245,1.072821,1.108170,27,phase_c,10sec
