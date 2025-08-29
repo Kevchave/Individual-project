@@ -1,0 +1,17 @@
+config,audio_file,model_type,wer_score,avg_callback_latency,p50_callback_latency,p90_callback_latency,word_count,test_mode,audio_source
+"Sobol-1: agg=0, frames=2",10sec_test.mp3,vad,0.18518518518518517,0.992088,0.870759,1.445495,27,phase_a_r1,10sec
+"Sobol-9: agg=0, frames=9",10sec_test.mp3,vad,0.1111111111111111,0.886774,0.928560,1.023296,27,phase_a_r1,10sec
+"Sobol-8: agg=0, frames=16",10sec_test.mp3,vad,0.1111111111111111,1.007311,1.025948,1.270968,27,phase_a_r1,10sec
+"Sobol-16: agg=0, frames=23",10sec_test.mp3,vad,0.1111111111111111,1.144266,1.144266,1.252751,27,phase_a_r1,10sec
+"Sobol-13: agg=1, frames=6",10sec_test.mp3,vad,0.18518518518518517,0.897581,0.873914,1.034043,27,phase_a_r1,10sec
+"Sobol-5: agg=1, frames=10",10sec_test.mp3,vad,0.1111111111111111,1.040242,1.012819,1.137586,27,phase_a_r1,10sec
+"Sobol-12: agg=1, frames=14",10sec_test.mp3,vad,0.1111111111111111,1.096806,1.096806,1.194768,27,phase_a_r1,10sec
+"Sobol-4: agg=1, frames=19",10sec_test.mp3,vad,0.1111111111111111,1.210946,1.210946,1.309011,27,phase_a_r1,10sec
+"Sobol-7: agg=2, frames=4",10sec_test.mp3,vad,0.18518518518518517,0.899532,0.872867,1.039832,27,phase_a_r1,10sec
+"Sobol-15: agg=2, frames=12",10sec_test.mp3,vad,0.1111111111111111,1.036597,1.026994,1.185449,27,phase_a_r1,10sec
+"Sobol-2: agg=2, frames=13",10sec_test.mp3,vad,0.1111111111111111,1.030365,0.986588,1.187931,27,phase_a_r1,10sec
+"Sobol-10: agg=2, frames=20",10sec_test.mp3,vad,0.1111111111111111,1.158682,1.158682,1.245242,27,phase_a_r1,10sec
+"Sobol-11: agg=3, frames=3",10sec_test.mp3,vad,0.18518518518518517,1.558119,1.038867,2.845560,26,phase_a_r1,10sec
+"Sobol-3: agg=3, frames=7",10sec_test.mp3,vad,0.18518518518518517,1.479250,0.930106,2.765669,27,phase_a_r1,10sec
+"Sobol-14: agg=3, frames=17",10sec_test.mp3,vad,0.25925925925925924,1.728203,1.043854,3.150084,29,phase_a_r1,10sec
+"Sobol-6: agg=3, frames=22",10sec_test.mp3,vad,0.18518518518518517,0.915983,0.908432,1.083777,26,phase_a_r1,10sec

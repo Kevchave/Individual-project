@@ -1,0 +1,36 @@
+{
+  "model_type": "adaptive",
+  "phase": "phase_b_r1",
+  "source": "phase_a_r2",
+  "selection_criteria": "best_2_fixed_3_vad_adaptive",
+  "generated_at": "2025-08-23T19:20:35.099909",
+  "description": "Best 2 from fixed, best 3 from VAD, best 3 from adaptive (8 total)",
+  "configs": [
+    {
+      "aggressiveness": 2,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 12,
+      "description": "Adaptive-Sobol-15: agg=2, frames=12",
+      "starting_aggressiveness": 2
+    },
+    {
+      "aggressiveness": 1,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 10,
+      "description": "Adaptive-Sobol-5: agg=1, frames=10",
+      "starting_aggressiveness": 1
+    },
+    {
+      "aggressiveness": 0,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 9,
+      "description": "Adaptive-Sobol-9: agg=0, frames=9",
+      "starting_aggressiveness": 0
+    }
+  ],
+  "metadata": {
+    "source_phase": "phase_a_r2",
+    "total_configs": 8,
+    "selection_criteria": "best_2_fixed_3_vad_adaptive"
+  }
+}

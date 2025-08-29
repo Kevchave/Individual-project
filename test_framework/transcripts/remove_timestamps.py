@@ -72,16 +72,16 @@ def process_all_transcripts():
     base_dir = Path(__file__).parent
     original_base = base_dir / 'original_transcripts'
     edited_base = base_dir / 'edited_transcripts'
-
+    
     # Ensure edited base exists
     edited_base.mkdir(exist_ok=True)
-
+    
     # Check if original_transcripts folder exists
     if not original_base.exists():
         print(f"Error: {original_base} folder not found!")
         print("Please create the folder and add your transcript files.")
         return
-
+    
     def process_folder(original_folder: Path, edited_folder: Path) -> int:
         """Process all .txt files from original_folder into edited_folder."""
         processed_count = 0
@@ -91,24 +91,24 @@ def process_all_transcripts():
         # Gather .txt files if the original subfolder exists
         if not original_folder.exists():
             return 0
-        transcript_files = list(original_folder.glob('*.txt'))
-        if not transcript_files:
+    transcript_files = list(original_folder.glob('*.txt'))
+    if not transcript_files:
             return 0
-
-        for file_path in transcript_files:
-            try:
-                with open(file_path, 'r', encoding='utf-8') as file:
-                    transcript_text = file.read()
-                cleaned_text = clean_transcript(transcript_text)
-
-                output_path = edited_folder / file_path.name
-                with open(output_path, 'w', encoding='utf-8') as file:
-                    file.write(cleaned_text)
-
+    
+    for file_path in transcript_files:
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                transcript_text = file.read()
+            cleaned_text = clean_transcript(transcript_text)
+            
+            output_path = edited_folder / file_path.name
+            with open(output_path, 'w', encoding='utf-8') as file:
+                file.write(cleaned_text)
+            
                 print(f"✓ Processed: {file_path.name} -> {edited_folder.relative_to(base_dir)}")
-                processed_count += 1
-            except Exception as e:
-                print(f"✗ Error processing {file_path.name}: {e}")
+            processed_count += 1
+        except Exception as e:
+            print(f"✗ Error processing {file_path.name}: {e}")
         return processed_count
 
     total_processed = 0

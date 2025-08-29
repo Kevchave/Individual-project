@@ -1,0 +1,20 @@
+{
+  "model_type": "fixed",
+  "phase": "phase_b_r2",
+  "source": "phase_b_r1",
+  "selection_criteria": "zoom_search",
+  "generated_at": "2025-08-24T16:44:46.872682",
+  "description": "Zoom search configurations around best from Phase B Round 1",
+  "configs": [
+    {
+      "model_type": "fixed",
+      "chunk_size": 3.0,
+      "description": "ZOOM-MIDPOINT: chunk_size=3.0s (between 3.2s and 2.8s)"
+    }
+  ],
+  "metadata": {
+    "source_phase": "phase_b_r1",
+    "total_configs": 3,
+    "selection_criteria": "zoom_search"
+  }
+}

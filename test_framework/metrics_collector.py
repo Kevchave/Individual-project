@@ -29,6 +29,7 @@ import time
 import numpy as np
 from jiwer import wer, Compose, ToLowerCase, RemovePunctuation, RemoveMultipleSpaces, Strip
 
+
 def split_into_words(sentences):
     """Custom function to split sentences into words"""
     if isinstance(sentences, str):
@@ -42,6 +43,7 @@ transform = Compose([
     Strip(),
     split_into_words
 ])
+
 
 class MetricsCollector:
     def __init__(self):
@@ -68,7 +70,7 @@ class MetricsCollector:
         self.transcripts.append(transcript)
 
     def record_chunk_callback(self):
-        """ 
+        """
         Records when transcription callback completes (callback latency measurement)
         
         Note: This measures the time from audio reception to callback completion,
@@ -79,40 +81,36 @@ class MetricsCollector:
         self.chunk_callback_times.append(time.time())
 
     def calculate_latency(self):
-        """ 
-        Calculates both processing latency and callback latency
-        
-        Processing Latency: Time from audio chunk reception to transcription completion
-        Callback Latency: Time from audio chunk reception to callback completion
-                        (includes processing + callback overhead, but NOT UI rendering)
-        
-        Note: True end-to-end latency (including UI rendering) would require
-        visual analysis of screen updates, which is not implemented here.
         """
-        if not self.chunk_start_times or not self.chunk_end_times:
-            return {'avg_processing_latency': 0, 'avg_callback_latency': 0, 'p50_processing_latency': 0, 'p90_processing_latency': 0, 'p50_callback_latency': 0, 'p90_callback_latency': 0}
+        Calculates callback latency only (single source of truth)
         
-        # Calculate processing time for each chunk
-        processing_times = []
-        for start, end in zip(self.chunk_start_times, self.chunk_end_times):
-            processing_times.append(end - start)
+        Callback Latency: Time from audio chunk reception to callback completion
+                          (includes processing + callback overhead, but NOT UI rendering)
+        """
+        if not self.chunk_start_times:
+            return {
+                'avg_callback_latency': 0,
+                'p50_callback_latency': 0,
+                'p90_callback_latency': 0,
+                'callback_latencies': []
+            }
         
-        # Calculate callback time for each chunk (processing + callback overhead)
+        # Prefer true callback timestamps; if missing, fall back to transcription end
         callback_times = []
         if self.chunk_callback_times and len(self.chunk_callback_times) == len(self.chunk_start_times):
             for start, callback in zip(self.chunk_start_times, self.chunk_callback_times):
                 callback_times.append(callback - start)
+        elif self.chunk_end_times and len(self.chunk_end_times) == len(self.chunk_start_times):
+            # Fallback: approximate callback as processing completion
+            for start, end in zip(self.chunk_start_times, self.chunk_end_times):
+                callback_times.append(end - start)
         else:
-            callback_times = processing_times  # Fallback to processing times
+            callback_times = [0] * len(self.chunk_start_times)
         
         return {
-            'avg_processing_latency': np.mean(processing_times),
-            'avg_callback_latency': np.mean(callback_times),
-            'p50_processing_latency': np.percentile(processing_times, 50),
-            'p90_processing_latency': np.percentile(processing_times, 90),
-            'p50_callback_latency': np.percentile(callback_times, 50),
-            'p90_callback_latency': np.percentile(callback_times, 90),
-            'processing_latencies': processing_times,
+            'avg_callback_latency': np.mean(callback_times) if callback_times else 0,
+            'p50_callback_latency': np.percentile(callback_times, 50) if callback_times else 0,
+            'p90_callback_latency': np.percentile(callback_times, 90) if callback_times else 0,
             'callback_latencies': callback_times
         }
     

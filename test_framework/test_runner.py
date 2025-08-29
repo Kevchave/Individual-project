@@ -186,7 +186,7 @@ class TestRunner:
             print("-" * 80)
             
             # Print table header
-            print(f"| {'config/params':<35} | {'iteration':<12} | {'Processing':<12} | {'WER':<8} |")
+            print(f"| {'config/params':<35} | {'iteration':<12} | {'Callback':<12} | {'WER':<8} |")
             print("-" * 80)
             
             # For each configuration of the specified model
@@ -211,7 +211,7 @@ class TestRunner:
                     if 'error' in result:
                         print(f" {'ERROR':<12} | {'N/A':<8} |")
                     else:
-                        latency = f"{result['processing_latency']:.3f}s"
+                        latency = f"{result['callback_latency']:.3f}s"
                         wer = f"{result['wer_score']:.3f}" if result['wer_score'] is not None else "N/A"
                         print(f" {latency:<12} | {wer:<8} |")
                     
@@ -273,7 +273,7 @@ class TestRunner:
             print("-" * 80)
             
             # Print table header
-            print(f"| {'config/params':<35} | {'iteration':<12} | {'Processing':<12} | {'WER':<8} |")
+            print(f"| {'config/params':<35} | {'iteration':<12} | {'Callback':<12} | {'WER':<8} |")
             print("-" * 80)
             sys.stdout.flush()
             
@@ -304,7 +304,7 @@ class TestRunner:
                     if 'error' in result:
                         print(f" {'ERROR':<12} | {'N/A':<8} |")
                     else:
-                        latency = f"{result['processing_latency']:.3f}s"
+                        latency = f"{result['callback_latency']:.3f}s"
                         wer = f"{result['wer_score']:.3f}" if result['wer_score'] is not None else "N/A"
                         print(f" {latency:<12} | {wer:<8} |")
                     
@@ -395,9 +395,6 @@ class TestRunner:
                 'model_type': config.get('model_type', 'unknown'),
                 'config': config['description'],
                 'word_count': len(final_transcript.split()),
-                'processing_latency': latency_metrics['avg_processing_latency'],
-                'p50_processing_latency': latency_metrics['p50_processing_latency'],
-                'p90_processing_latency': latency_metrics['p90_processing_latency'],
                 'callback_latency': latency_metrics['avg_callback_latency'],
                 'p50_callback_latency': latency_metrics['p50_callback_latency'],
                 'p90_callback_latency': latency_metrics['p90_callback_latency'],
@@ -414,9 +411,6 @@ class TestRunner:
                 'model_type': config.get('model_type', 'unknown'),
                 'config': config.get('description', 'unknown'),
                 'word_count': 0,
-                'processing_latency': 0,
-                'p50_processing_latency': 0,
-                'p90_processing_latency': 0,
                 'callback_latency': 0,
                 'p50_callback_latency': 0,
                 'p90_callback_latency': 0,
@@ -473,14 +467,14 @@ class TestRunner:
                         monitoring_data.append({
                             'time_minutes': int(elapsed_time / 60),
                             'wer': current_wer,
-                            'avg_latency': current_latency_metrics['avg_processing_latency'],
-                            'p90_latency': current_latency_metrics['p90_processing_latency'],
+                            'avg_latency': current_latency_metrics['avg_callback_latency'],
+                            'p90_latency': current_latency_metrics['p90_callback_latency'],
                             'word_count': len(current_transcript.split())
                         })
                         
                         # Print 5-minute report
                         print(f"📊 {int(elapsed_time/60)}min: WER={current_wer:.3f}" if current_wer is not None else f"📊 {int(elapsed_time/60)}min: WER=N/A")
-                        print(f"   Latency: {current_latency_metrics['avg_processing_latency']:.3f}s (P90: {current_latency_metrics['p90_processing_latency']:.3f}s) | Words: {len(current_transcript.split())}")
+                        print(f"   Latency: {current_latency_metrics['avg_callback_latency']:.3f}s (P90: {current_latency_metrics['p90_callback_latency']:.3f}s) | Words: {len(current_transcript.split())}")
                         
                         last_report_time = current_time
                     
@@ -509,9 +503,6 @@ class TestRunner:
                 'model_type': config.get('model_type', 'unknown'),
                 'config': config['description'],
                 'word_count': len(final_transcript.split()),
-                'processing_latency': latency_metrics['avg_processing_latency'],
-                'p50_processing_latency': latency_metrics['p50_processing_latency'],
-                'p90_processing_latency': latency_metrics['p90_processing_latency'],
                 'callback_latency': latency_metrics['avg_callback_latency'],
                 'p50_callback_latency': latency_metrics['p50_callback_latency'],
                 'p90_callback_latency': latency_metrics['p90_callback_latency'],
@@ -529,9 +520,6 @@ class TestRunner:
                 'model_type': config.get('model_type', 'unknown'),
                 'config': config.get('description', 'unknown'),
                 'word_count': 0,
-                'processing_latency': 0,
-                'p50_processing_latency': 0,
-                'p90_processing_latency': 0,
                 'callback_latency': 0,
                 'p50_callback_latency': 0,
                 'p90_callback_latency': 0,
@@ -573,7 +561,6 @@ class TestRunner:
             # Write header
             writer.writerow([
                 'config', 'audio_file', 'model_type', 'wer_score', 
-                'avg_processing_latency', 'p50_processing_latency', 'p90_processing_latency',
                 'avg_callback_latency', 'p50_callback_latency', 'p90_callback_latency',
                 'word_count', 'test_mode', 'audio_source'
             ])
@@ -585,9 +572,6 @@ class TestRunner:
                     result['audio_file'],
                     result['model_type'],
                     result['wer_score'] if result['wer_score'] is not None else '',
-                    f"{result['processing_latency']:.6f}",
-                    f"{result['p50_processing_latency']:.6f}",
-                    f"{result['p90_processing_latency']:.6f}",
                     f"{result['callback_latency']:.6f}",
                     f"{result['p50_callback_latency']:.6f}",
                     f"{result['p90_callback_latency']:.6f}",
@@ -610,9 +594,8 @@ class TestRunner:
             writer = csv.writer(f)
             # Write header
             writer.writerow([
-                'rank', 'config', 'avg_wer', 'avg_processing_latency', 
-                'p50_processing_latency', 'p90_processing_latency',
-                'avg_callback_latency', 'p50_callback_latency', 'p90_callback_latency',
+                'rank', 'config', 'avg_wer', 'avg_callback_latency', 
+                'p50_callback_latency', 'p90_callback_latency',
                 'num_runs', 'test_mode', 'audio_source'
             ])
             
@@ -622,9 +605,6 @@ class TestRunner:
                     i,
                     config,
                     f"{metrics['avg_wer']:.6f}" if metrics['avg_wer'] is not None else '',
-                    f"{metrics['avg_latency']:.6f}",
-                    f"{metrics['avg_p50_latency']:.6f}",
-                    f"{metrics['avg_p90_latency']:.6f}",
                     f"{metrics['avg_callback_latency']:.6f}",
                     f"{metrics['avg_p50_callback_latency']:.6f}",
                     f"{metrics['avg_p90_callback_latency']:.6f}",
@@ -656,14 +636,14 @@ class TestRunner:
             # Write summary table
             f.write("SUMMARY TABLE\n")
             f.write("-" * 100 + "\n")
-            f.write(f"{'config/params':<31} | {'audio_file':<27} | {'avg processing':<15} | {'avg WER':<10}\n")
+            f.write(f"{'config/params':<31} | {'audio_file':<27} | {'avg callback':<15} | {'avg WER':<10}\n")
             f.write("-" * 100 + "\n")
             
             for (config, audio_file), results in grouped_results.items():
                 if not results:
                     continue
                     
-                avg_latency = sum(r['processing_latency'] for r in results) / len(results)
+                avg_latency = sum(r['callback_latency'] for r in results) / len(results)
                 avg_wer = sum(r['wer_score'] for r in results if r['wer_score'] is not None) / len([r for r in results if r['wer_score'] is not None]) if any(r['wer_score'] is not None for r in results) else None
                 
                 latency_str = f"{avg_latency:.3f}s"
@@ -691,7 +671,6 @@ class TestRunner:
                 for i, result in enumerate(results, 1):
                     f.write(f"\nIteration #{i}\n")
                     f.write("-" * 30 + "\n")
-                    f.write(f"Processing Latency: {result['processing_latency']:.3f}s\n")
                     f.write(f"Callback Latency: {result['callback_latency']:.3f}s\n")
                     f.write(f"Word Count: {result['word_count']}\n")
                     f.write(f"WER Score: {result['wer_score']:.3f}\n" if result['wer_score'] is not None else "WER Score: N/A\n")
@@ -727,16 +706,16 @@ class TestRunner:
         # Rank configurations by their average performance
         config_averages = self.calculate_config_averages()
         if config_averages:
-            print("Configuration Rankings (by average WER, then p90 latency):")
+            print("Configuration Rankings (by average WER, then p90 callback latency):")
             print("-" * 100)
-            print(f"| {'Rank':<4} | {'Configuration':<50} | {'Avg WER':<8} | {'Avg p90 latency':<15} | {'Avg latency':<12} |")
+            print(f"| {'Rank':<4} | {'Configuration':<50} | {'Avg WER':<8} | {'Avg p90 cb':<15} | {'Avg cb':<12} |")
             print("-" * 100)
             
             for i, (config, metrics) in enumerate(config_averages, 1):
                 config_name = config[:49]  # Truncate if too long
                 avg_wer = f"{metrics['avg_wer']:.3f}" if metrics['avg_wer'] is not None else "N/A"
-                avg_p90 = f"{metrics['avg_p90_latency']:.3f}s"
-                avg_latency = f"{metrics['avg_latency']:.3f}s"
+                avg_p90 = f"{metrics['avg_p90_callback_latency']:.3f}s"
+                avg_latency = f"{metrics['avg_callback_latency']:.3f}s"
                 print(f"| {i:<4} | {config_name:<50} | {avg_wer:<8} | {avg_p90:<15} | {avg_latency:<12} |")
             
             print("-" * 100)
@@ -766,19 +745,19 @@ class TestRunner:
         
         config_averages = self.calculate_config_averages()
         if config_averages:
-            print(f"| {'Rank':<4} | {'Configuration':<50} | {'Avg WER':<8} | {'WER Range':<12} | {'Avg Latency':<12} | {'Latency Range':<15} |")
+            print(f"| {'Rank':<4} | {'Configuration':<50} | {'Avg WER':<8} | {'WER Range':<12} | {'Avg Callback':<12} | {'Callback Range':<15} |")
             print("-" * 100)
             
             for i, (config, metrics) in enumerate(config_averages, 1):
                 config_name = config[:49]  # Truncate if too long
                 avg_wer = f"{metrics['avg_wer']:.3f}" if metrics['avg_wer'] is not None else "N/A"
-                avg_latency = f"{metrics['avg_latency']:.3f}s"
+                avg_latency = f"{metrics['avg_callback_latency']:.3f}s"
                 
-                # Calculate variation metrics
+                # Calculate variation metrics (using callback latency)
                 config_results = [r for r in self.results if r['config'] == config and 'error' not in r]
                 if config_results:
                     wer_scores = [r['wer_score'] for r in config_results if r['wer_score'] is not None]
-                    latency_scores = [r['processing_latency'] for r in config_results]
+                    latency_scores = [r['callback_latency'] for r in config_results]
                     
                     if wer_scores:
                         wer_range = f"{max(wer_scores)-min(wer_scores):.3f}"
@@ -815,7 +794,7 @@ class TestRunner:
             
             print(f"\n🔹 {config}")
             print("-" * 80)
-            print(f"| {'Time':<8} | {'WER':<8} | {'Avg Latency':<12} | {'P90 Latency':<12} | {'Words':<8} |")
+            print(f"| {'Time':<8} | {'WER':<8} | {'Avg Callback':<12} | {'P90 Callback':<12} | {'Words':<8} |")
             print("-" * 80)
             
             for data_point in monitoring_data:
@@ -857,29 +836,22 @@ class TestRunner:
             if wer_scores:
                 avg_wer = sum(wer_scores) / len(wer_scores)
             
-            avg_latency = sum(r['processing_latency'] for r in runs) / len(runs)
-            avg_p90_latency = sum(r['p90_processing_latency'] for r in runs) / len(runs)
-            avg_p50_latency = sum(r['p50_processing_latency'] for r in runs) / len(runs)
             avg_callback_latency = sum(r['callback_latency'] for r in runs) / len(runs)
-            avg_p50_callback_latency = sum(r['p50_callback_latency'] for r in runs) / len(runs)
             avg_p90_callback_latency = sum(r['p90_callback_latency'] for r in runs) / len(runs)
+            avg_p50_callback_latency = sum(r['p50_callback_latency'] for r in runs) / len(runs)
             
             config_averages.append((config, {
                 'avg_wer': avg_wer,
-                'avg_latency': avg_latency,
-                'avg_p90_latency': avg_p90_latency,
-                'avg_p50_latency': avg_p50_latency,
                 'avg_callback_latency': avg_callback_latency,
-                'avg_p50_callback_latency': avg_p50_callback_latency,
                 'avg_p90_callback_latency': avg_p90_callback_latency,
+                'avg_p50_callback_latency': avg_p50_callback_latency,
                 'num_runs': len(runs)
             }))
         
-        # Sort by WER, then by p90 latency
-        config_averages.sort(key=lambda x: (x[1]['avg_wer'] if x[1]['avg_wer'] is not None else float('inf'), x[1]['avg_p90_latency']))
+        # Sort by WER, then by p90 callback latency
+        config_averages.sort(key=lambda x: (x[1]['avg_wer'] if x[1]['avg_wer'] is not None else float('inf'), x[1]['avg_p90_callback_latency']))
         
         return config_averages
-
 
 
 def main(model_type=None, test_mode=None, audio_source=None, configs=None, iterations=None):

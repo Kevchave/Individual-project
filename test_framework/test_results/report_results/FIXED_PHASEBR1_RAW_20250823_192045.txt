@@ -1,0 +1,52 @@
+====================================================================================================
+TRANSCRIPTION TEST RESULTS REPORT
+====================================================================================================
+
+SUMMARY TABLE
+----------------------------------------------------------------------------------------------------
+config/params                   | audio_file                  | avg processing  | avg WER   
+----------------------------------------------------------------------------------------------------
+FIXED-Sobol-7 (2.8s)           | 10sec_test.mp3            | 1.260s          | 0.185     
+----------------------------------------------------------------------------------------------------
+FIXED-Sobol-3 (3.2s)           | 10sec_test.mp3            | 1.081s          | 0.185     
+----------------------------------------------------------------------------------------------------
+
+
+DETAILED RESULTS
+====================================================================================================
+
+Test: FIXED-Sobol-7 (2.8s) - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.260s
+Callback Latency: 1.260s
+Word Count: 23
+WER Score: 0.185
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.  is called scaling from zero.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: FIXED-Sobol-3 (3.2s) - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.081s
+Callback Latency: 1.081s
+Word Count: 26
+WER Score: 0.185
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  One of the examples in this book.  calls scaling from zero to a million uses.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================

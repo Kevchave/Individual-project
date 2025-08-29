@@ -1,0 +1,121 @@
+{
+  "model_type": "adaptive",
+  "phase": "phase_a_r1",
+  "source": "configs.py",
+  "generated_at": "2025-08-23T13:55:32.706764",
+  "description": "All initial configurations from configs.py",
+  "configs": [
+    {
+      "aggressiveness": 0,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 2,
+      "description": "Adaptive-Sobol-1: agg=0, frames=2",
+      "starting_aggressiveness": 0
+    },
+    {
+      "aggressiveness": 2,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 13,
+      "description": "Adaptive-Sobol-2: agg=2, frames=13",
+      "starting_aggressiveness": 2
+    },
+    {
+      "aggressiveness": 3,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 7,
+      "description": "Adaptive-Sobol-3: agg=3, frames=7",
+      "starting_aggressiveness": 3
+    },
+    {
+      "aggressiveness": 1,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 19,
+      "description": "Adaptive-Sobol-4: agg=1, frames=19",
+      "starting_aggressiveness": 1
+    },
+    {
+      "aggressiveness": 1,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 10,
+      "description": "Adaptive-Sobol-5: agg=1, frames=10",
+      "starting_aggressiveness": 1
+    },
+    {
+      "aggressiveness": 3,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 22,
+      "description": "Adaptive-Sobol-6: agg=3, frames=22",
+      "starting_aggressiveness": 3
+    },
+    {
+      "aggressiveness": 2,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 4,
+      "description": "Adaptive-Sobol-7: agg=2, frames=4",
+      "starting_aggressiveness": 2
+    },
+    {
+      "aggressiveness": 0,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 16,
+      "description": "Adaptive-Sobol-8: agg=0, frames=16",
+      "starting_aggressiveness": 0
+    },
+    {
+      "aggressiveness": 0,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 9,
+      "description": "Adaptive-Sobol-9: agg=0, frames=9",
+      "starting_aggressiveness": 0
+    },
+    {
+      "aggressiveness": 2,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 20,
+      "description": "Adaptive-Sobol-10: agg=2, frames=20",
+      "starting_aggressiveness": 2
+    },
+    {
+      "aggressiveness": 3,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 3,
+      "description": "Adaptive-Sobol-11: agg=3, frames=3",
+      "starting_aggressiveness": 3
+    },
+    {
+      "aggressiveness": 1,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 14,
+      "description": "Adaptive-Sobol-12: agg=1, frames=14",
+      "starting_aggressiveness": 1
+    },
+    {
+      "aggressiveness": 1,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 6,
+      "description": "Adaptive-Sobol-13: agg=1, frames=6",
+      "starting_aggressiveness": 1
+    },
+    {
+      "aggressiveness": 3,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 17,
+      "description": "Adaptive-Sobol-14: agg=3, frames=17",
+      "starting_aggressiveness": 3
+    },
+    {
+      "aggressiveness": 2,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 12,
+      "description": "Adaptive-Sobol-15: agg=2, frames=12",
+      "starting_aggressiveness": 2
+    },
+    {
+      "aggressiveness": 0,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 23,
+      "description": "Adaptive-Sobol-16: agg=0, frames=23",
+      "starting_aggressiveness": 0
+    }
+  ]
+}

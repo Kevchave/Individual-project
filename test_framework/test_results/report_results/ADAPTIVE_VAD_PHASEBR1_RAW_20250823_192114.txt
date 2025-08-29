@@ -1,0 +1,72 @@
+====================================================================================================
+TRANSCRIPTION TEST RESULTS REPORT
+====================================================================================================
+
+SUMMARY TABLE
+----------------------------------------------------------------------------------------------------
+config/params                   | audio_file                  | avg processing  | avg WER   
+----------------------------------------------------------------------------------------------------
+Adaptive-Sobol-9: agg=0, frames=9 | 10sec_test.mp3            | 0.918s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Adaptive-Sobol-5: agg=1, frames=10 | 10sec_test.mp3            | 1.044s          | 0.111     
+----------------------------------------------------------------------------------------------------
+Adaptive-Sobol-15: agg=2, frames=12 | 10sec_test.mp3            | 1.015s          | 0.111     
+----------------------------------------------------------------------------------------------------
+
+
+DETAILED RESULTS
+====================================================================================================
+
+Test: Adaptive-Sobol-9: agg=0, frames=9 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 0.918s
+Callback Latency: 0.918s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.   is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Adaptive-Sobol-5: agg=1, frames=10 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.044s
+Callback Latency: 1.044s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================
+
+Test: Adaptive-Sobol-15: agg=2, frames=12 - 10sec_test.mp3
+================================================================================
+
+Iteration #1
+------------------------------
+Processing Latency: 1.015s
+Callback Latency: 1.015s
+Word Count: 27
+WER Score: 0.111
+
+Recorded Transcript:
+ But what I thought I'd do today is just talk about...  one of the examples in this book.  is called scaling from zero to a million music.
+
+Reference Transcript:
+But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users.
+
+================================================================================

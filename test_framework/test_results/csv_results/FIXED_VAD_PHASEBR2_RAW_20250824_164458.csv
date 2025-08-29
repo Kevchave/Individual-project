@@ -1,0 +1,2 @@
+config,audio_file,model_type,wer_score,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_callback_latency,p50_callback_latency,p90_callback_latency,word_count,test_mode,audio_source
+ZOOM-MIDPOINT: frames=12 (between 13 and 10),10sec_test.mp3,vad,0.1111111111111111,1.261779,1.018029,1.726147,1.261779,1.018029,1.726147,27,phase_b_r2,10sec

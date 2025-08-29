@@ -1,0 +1,17 @@
+[
+  {
+    "audio_file": "10sec_test.mp3",
+    "model_type": "adaptive",
+    "config": "ZOOM-MIDPOINT: frames=10 (between 9 and 10)",
+    "word_count": 27,
+    "processing_latency": 1.2301467657089233,
+    "p50_processing_latency": 1.1109981536865234,
+    "p90_processing_latency": 1.6021010398864748,
+    "callback_latency": 1.2301467657089233,
+    "p50_callback_latency": 1.1109981536865234,
+    "p90_callback_latency": 1.6021010398864748,
+    "wer_score": 0.1111111111111111,
+    "recorded_transcript": " But what I thought I'd do today is just talk about...  one of the examples in this book.   is called scaling from zero to a million music.",
+    "correct_transcript": "But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users."
+  }
+]

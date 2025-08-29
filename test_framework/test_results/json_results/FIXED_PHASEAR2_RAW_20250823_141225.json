@@ -1,0 +1,62 @@
+[
+  {
+    "audio_file": "10sec_test.mp3",
+    "model_type": "fixed",
+    "config": "FIXED-Sobol-5 (2.0s)",
+    "word_count": 25,
+    "processing_latency": 1.0129647731781006,
+    "p50_processing_latency": 0.8728539943695068,
+    "p90_processing_latency": 1.2990970134735107,
+    "callback_latency": 1.0129647731781006,
+    "p50_callback_latency": 0.8728539943695068,
+    "p90_callback_latency": 1.2990970134735107,
+    "wer_score": 0.2222222222222222,
+    "recorded_transcript": " But what I thought I'd do is...  Just talk about one of these.  in this book.  is called scaling from  zero to a million uses.",
+    "correct_transcript": "But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users."
+  },
+  {
+    "audio_file": "10sec_test.mp3",
+    "model_type": "fixed",
+    "config": "FIXED-Sobol-2 (2.4s)",
+    "word_count": 28,
+    "processing_latency": 0.9154281616210938,
+    "p50_processing_latency": 0.9196029901504517,
+    "p90_processing_latency": 0.9609111309051513,
+    "callback_latency": 0.9154281616210938,
+    "p50_callback_latency": 0.9196029901504517,
+    "p90_callback_latency": 0.9609111309051513,
+    "wer_score": 0.2222222222222222,
+    "recorded_transcript": " But what I thought I'd do today is just...  Let's talk about one of the examples in this book.  It's cool.  scaling from zero to a million uses.",
+    "correct_transcript": "But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users."
+  },
+  {
+    "audio_file": "10sec_test.mp3",
+    "model_type": "fixed",
+    "config": "FIXED-Sobol-7 (2.8s)",
+    "word_count": 23,
+    "processing_latency": 0.9837836424509684,
+    "p50_processing_latency": 0.9684338569641113,
+    "p90_processing_latency": 1.0393155097961426,
+    "callback_latency": 0.9837836424509684,
+    "p50_callback_latency": 0.9684338569641113,
+    "p90_callback_latency": 1.0393155097961426,
+    "wer_score": 0.18518518518518517,
+    "recorded_transcript": " But what I thought I'd do today is just talk about...  one of the examples in this book.  is called scaling from zero.",
+    "correct_transcript": "But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users."
+  },
+  {
+    "audio_file": "10sec_test.mp3",
+    "model_type": "fixed",
+    "config": "FIXED-Sobol-3 (3.2s)",
+    "word_count": 26,
+    "processing_latency": 1.0363276799519856,
+    "p50_processing_latency": 1.045348882675171,
+    "p90_processing_latency": 1.0539729595184326,
+    "callback_latency": 1.0363276799519856,
+    "p50_callback_latency": 1.045348882675171,
+    "p90_callback_latency": 1.0539729595184326,
+    "wer_score": 0.18518518518518517,
+    "recorded_transcript": " But what I thought I'd do today is just talk about...  One of the examples in this book.  calls scaling from zero to a million uses.",
+    "correct_transcript": "But what I thought I'd do today is just talk about one of the examples in this book is called scaling from 0 to 1 million users."
+  }
+]

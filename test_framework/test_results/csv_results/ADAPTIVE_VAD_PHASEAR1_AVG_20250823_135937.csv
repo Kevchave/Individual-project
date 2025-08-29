@@ -1,0 +1,17 @@
+rank,config,avg_wer,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_callback_latency,p50_callback_latency,p90_callback_latency,num_runs,test_mode,audio_source
+1,"Adaptive-Sobol-5: agg=1, frames=10",0.111111,1.021953,0.997621,1.114935,1.021953,0.997621,1.114935,1,phase_a_r1,10sec
+2,"Adaptive-Sobol-2: agg=2, frames=13",0.111111,1.061022,1.118147,1.169265,1.061022,1.118147,1.169265,1,phase_a_r1,10sec
+3,"Adaptive-Sobol-8: agg=0, frames=16",0.111111,1.017250,1.070631,1.266798,1.017250,1.070631,1.266798,1,phase_a_r1,10sec
+4,"Adaptive-Sobol-16: agg=0, frames=23",0.111111,1.191735,1.191735,1.325204,1.191735,1.191735,1.325204,1,phase_a_r1,10sec
+5,"Adaptive-Sobol-9: agg=0, frames=9",0.111111,1.245961,1.214185,1.348964,1.245961,1.214185,1.348964,1,phase_a_r1,10sec
+6,"Adaptive-Sobol-12: agg=1, frames=14",0.111111,1.281399,1.281399,1.360971,1.281399,1.281399,1.360971,1,phase_a_r1,10sec
+7,"Adaptive-Sobol-4: agg=1, frames=19",0.111111,1.366750,1.366750,1.632500,1.366750,1.366750,1.632500,1,phase_a_r1,10sec
+8,"Adaptive-Sobol-15: agg=2, frames=12",0.111111,1.345673,1.056628,1.860115,1.345673,1.056628,1.860115,1,phase_a_r1,10sec
+9,"Adaptive-Sobol-10: agg=2, frames=20",0.111111,2.122777,2.122777,2.597412,2.122777,2.122777,2.597412,1,phase_a_r1,10sec
+10,"Adaptive-Sobol-13: agg=1, frames=6",0.185185,0.910498,0.890422,1.027077,0.910498,0.890422,1.027077,1,phase_a_r1,10sec
+11,"Adaptive-Sobol-1: agg=0, frames=2",0.185185,0.909278,0.837237,1.160312,0.909278,0.837237,1.160312,1,phase_a_r1,10sec
+12,"Adaptive-Sobol-7: agg=2, frames=4",0.185185,1.031510,1.071886,1.234767,1.031510,1.071886,1.234767,1,phase_a_r1,10sec
+13,"Adaptive-Sobol-6: agg=3, frames=22",0.185185,1.155424,1.265783,1.376544,1.155424,1.265783,1.376544,1,phase_a_r1,10sec
+14,"Adaptive-Sobol-11: agg=3, frames=3",0.185185,1.771385,1.139199,3.201286,1.771385,1.139199,3.201286,1,phase_a_r1,10sec
+15,"Adaptive-Sobol-14: agg=3, frames=17",0.185185,1.916419,1.095192,3.734549,1.916419,1.095192,3.734549,1,phase_a_r1,10sec
+16,"Adaptive-Sobol-3: agg=3, frames=7",0.222222,1.700516,1.161600,3.145600,1.700516,1.161600,3.145600,1,phase_a_r1,10sec

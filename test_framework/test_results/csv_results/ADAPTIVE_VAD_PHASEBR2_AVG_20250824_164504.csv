@@ -1,0 +1,2 @@
+rank,config,avg_wer,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_callback_latency,p50_callback_latency,p90_callback_latency,num_runs,test_mode,audio_source
+1,ZOOM-MIDPOINT: frames=10 (between 9 and 10),0.111111,1.230147,1.110998,1.602101,1.230147,1.110998,1.602101,1,phase_b_r2,10sec
