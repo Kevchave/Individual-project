@@ -1,4 +1,0 @@
-config,audio_file,model_type,wer_score,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_callback_latency,p50_callback_latency,p90_callback_latency,word_count,test_mode,audio_source
-"Adaptive-Sobol-9: agg=0, frames=9",10sec_test.mp3,adaptive,0.1111111111111111,0.918009,0.939757,1.080273,0.918009,0.939757,1.080273,27,phase_b_r1,10sec
-"Adaptive-Sobol-5: agg=1, frames=10",10sec_test.mp3,adaptive,0.1111111111111111,1.043727,1.100696,1.102143,1.043727,1.100696,1.102143,27,phase_b_r1,10sec
-"Adaptive-Sobol-15: agg=2, frames=12",10sec_test.mp3,adaptive,0.1111111111111111,1.014629,1.023414,1.128076,1.014629,1.023414,1.128076,27,phase_b_r1,10sec

@@ -1,4 +1,0 @@
-rank,config,avg_wer,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_callback_latency,p50_callback_latency,p90_callback_latency,num_runs,test_mode,audio_source
-1,"Sobol-2: agg=2, frames=13",0.111111,0.994154,1.024297,1.076137,0.994154,1.024297,1.076137,1,phase_b_r1,10sec
-2,"Sobol-5: agg=1, frames=10",0.111111,1.018849,1.038688,1.116937,1.018849,1.038688,1.116937,1,phase_b_r1,10sec
-3,"Sobol-9: agg=0, frames=9",0.111111,1.005859,0.984019,1.179805,1.005859,0.984019,1.179805,1,phase_b_r1,10sec

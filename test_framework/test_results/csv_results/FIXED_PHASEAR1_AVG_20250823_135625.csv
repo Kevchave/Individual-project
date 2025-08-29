@@ -1,9 +1,0 @@
-rank,config,avg_wer,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_callback_latency,p50_callback_latency,p90_callback_latency,num_runs,test_mode,audio_source
-1,FIXED-Sobol-7 (2.8s),0.185185,1.017588,1.045657,1.062589,1.017588,1.045657,1.062589,1,phase_a_r1,10sec
-2,FIXED-Sobol-3 (3.2s),0.185185,1.056171,1.059034,1.070150,1.056171,1.059034,1.070150,1,phase_a_r1,10sec
-3,FIXED-Sobol-2 (2.4s),0.222222,0.931887,0.932749,1.001831,0.931887,0.932749,1.001831,1,phase_a_r1,10sec
-4,FIXED-Sobol-5 (2.0s),0.222222,1.015170,1.035797,1.086782,1.015170,1.035797,1.086782,1,phase_a_r1,10sec
-5,FIXED-Sobol-8 (1.2s),0.259259,0.861809,0.811714,1.025962,0.861809,0.811714,1.025962,1,phase_a_r1,10sec
-6,FIXED-Sobol-6 (3.6s),0.296296,1.341870,1.341870,1.457223,1.341870,1.341870,1.457223,1,phase_a_r1,10sec
-7,FIXED-Sobol-4 (1.6s),0.407407,0.949583,0.858667,1.188511,0.949583,0.858667,1.188511,1,phase_a_r1,10sec
-8,FIXED-Sobol-1 (0.8s),0.592593,0.803563,0.745061,0.843482,0.803563,0.745061,0.843482,1,phase_a_r1,10sec

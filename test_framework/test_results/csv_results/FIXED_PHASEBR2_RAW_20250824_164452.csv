@@ -1,2 +1,0 @@
-config,audio_file,model_type,wer_score,avg_processing_latency,p50_processing_latency,p90_processing_latency,avg_callback_latency,p50_callback_latency,p90_callback_latency,word_count,test_mode,audio_source
-ZOOM-MIDPOINT: chunk_size=3.0s (between 3.2s and 2.8s),10sec_test.mp3,fixed,0.14814814814814814,1.254619,1.019440,1.598897,1.254619,1.019440,1.598897,26,phase_b_r2,10sec
