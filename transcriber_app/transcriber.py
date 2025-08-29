@@ -197,9 +197,9 @@ class Transcriber:
                                 on_audio_chunk(audio_float, segment_duration)
 
                             result = self.model.transcribe(
-                                audio_float,
-                                fp16=(self.device != "cpu"),
-                                language="en"
+                                audio_float, 
+                                fp16=(self.device != "cpu"), 
+                                language="en"   
                             )
 
                             # Calculate chunk-level metrics for insider tracking
