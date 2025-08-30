@@ -81,24 +81,24 @@ class MetricsTracker:
         now = time.time()
         with self.audio_chunks_lock:
                 # Only keep chunks that are within the last window_seconds 
-                recent_chunks = [chunk for chunk, ts in self.all_audio_chunks if ts >= now - window_seconds]
-        if not recent_chunks:
-            print("[DEBUG] No recent chunks to process for VOLUME")
-            return
-        else:
+                recent_chunks = [chunk for chunk, ts in self.all_audio_chunks if ts >= now - window_seconds] 
+        if not recent_chunks: 
+            print("[DEBUG] No recent chunks to process for VOLUME") 
+            return 
+        else: 
             # Concatenate the recent chunks into a single array 
             recent_audio = np.concatenate(recent_chunks) 
 
-        rms = np.sqrt(np.mean(np.square(recent_audio)))
-        db = 20 * np.log10(rms + 1e-12) # 1e-12 avoids log(0)
+        rms = np.sqrt(np.mean(np.square(recent_audio))) 
+        db = 20 * np.log10(rms + 1e-12) # 1e-12 avoids log(0) 
         # Consider computing peak dbs 
-        # print(f"Number of chunks: {len(chunk)}")
-        self.current_volume = db
-        # print(f"Volume (last{window_seconds} seconds): {db:.2f} dB")
+        # print(f"Number of chunks: {len(chunk)}") 
+        self.current_volume = db 
+        # print(f"Volume (last{window_seconds} seconds): {db:.2f} dB") 
 
     def track_volume_average(self, start_time):
         """ This code is repeated in track_volume, find a way to reduce redundancy 
-            - the concatenation 
+            - the concatenation          
             - the rms and db calculation 
             - the print statement 
         """
