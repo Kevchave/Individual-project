@@ -101,11 +101,25 @@ def get_current_transcript():
 def get_current_metrics():
     global metrics
     if metrics is None:
-        return {'wpm': 0, 'volume': 0, 'pitch': 0}
+        return {
+            'wpm': 0, 
+            'volume': 0, 
+            'pitch': 0,
+            'sample_count': 0
+        }
+    
+    # Get the minimum queue length across all metrics for bounds checking
+    min_samples = min(
+        len(metrics.wpm_history),
+        len(metrics.vol_history), 
+        len(metrics.pitch_history)
+    )
+    
     return {
         'wpm': float(metrics.current_wpm),
         'volume': float(metrics.current_volume),
-        'pitch': float(metrics.current_pitch)
+        'pitch': float(metrics.current_pitch),
+        'sample_count': min_samples
     }
 
 def get_final_transcript():

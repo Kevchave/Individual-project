@@ -9,27 +9,35 @@ function pollTranscript(transcriptBox){
         });
 }
 
-function updateOutOfBounds(wpm, volume, pitch) {
+function updateOutOfBounds(wpm, volume, pitch, dataPointsCount) {
     const wpmBox = document.getElementById('wpm-box');
     const volumeBox = document.getElementById('volume-box');
     const pitchBox = document.getElementById('pitch-box');
 
+    // Skip bounds checking if we don't have enough data points (less than 5)
+    if (dataPointsCount < 5) {
+        wpmBox.classList.remove('out-of-bounds');
+        volumeBox.classList.remove('out-of-bounds');
+        pitchBox.classList.remove('out-of-bounds');
+        return;
+    }
+
     // WPM Boundaries 
-    if (wpm > 240 || wpm < 80){
+    if (wpm > 240 || wpm < 80) {
         wpmBox.classList.add('out-of-bounds');
     } else {
         wpmBox.classList.remove('out-of-bounds');
     }
 
-    // Volume Boundaries 
-    if (volume < -40){
+    // Volume Boundaries  
+    if (volume < -40) {
         volumeBox.classList.add('out-of-bounds');
     } else {
         volumeBox.classList.remove('out-of-bounds');
     }
 
-    // Pitch Boundaries 
-    if (pitch < 5){
+    // Pitch Boundaries
+    if (pitch < 5) {
         pitchBox.classList.add('out-of-bounds');
     } else {
         pitchBox.classList.remove('out-of-bounds');
@@ -51,7 +59,7 @@ function pollMetrics(wpmValue, volumeValue, pitchValue) {
 
                 // Update charts 
                 updateCharts(data.wpm, data.volume, data.pitch);
-                updateOutOfBounds(data.wpm, data.volume, data.pitch);
+                updateOutOfBounds(data.wpm, data.volume, data.pitch, data.sample_count || 0);
             } else {
                 console.log('Recording is paused, skipping chart update');
             }
@@ -61,4 +69,4 @@ function pollMetrics(wpmValue, volumeValue, pitchValue) {
         });
 }
 
-export { pollTranscript, pollMetrics};
+export { pollTranscript, pollMetrics };
