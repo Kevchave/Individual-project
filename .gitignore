@@ -12,3 +12,10 @@ test_framework/audio_files/uncropped/
 test_framework/audio_files/uncropped/
 # Large test audio files - keep locally but don't track in Git
 test_framework/audio_files/5min_versions/*.mp3
+test_framework/audio_files/30min_versions/*.mp3
+test_framework/audio_files/10sec_version/*.mp3
+# Ignore all audio files in test_framework to be safe
+test_framework/audio_files/**/*.mp3
+test_framework/audio_files/**/*.wav
+test_framework/audio_files/**/*.m4a
+test_framework/audio_files/**/*.flac
