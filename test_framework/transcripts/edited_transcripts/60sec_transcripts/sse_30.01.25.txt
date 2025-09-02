@@ -1,0 +1,12 @@
+So, uh, I wanted to talk today a little bit about some more aspects of scaling up our application.
+I think there's a few kind of dimensions that we might be scaling.
+Like it might be scaling to have more capacity to have more users.
+So if you're building a business, obviously you want to try and grow that business.
+Typically you want more users to use your product. You want to support that.
+How can we do that? There's also an aspect of reliability as well.
+So in the same case where we're starting to grow, we start to have more people using our system.
+We want it to be more reliable, so we don't want it to go down, especially when lots of people are using it.
+Maybe lots of people are spending money through it. There's also aspects which we've been thinking about a little bit this time about cost.
+So you could scale up everything just by spending loads of money on everything.
+But maybe there's an optimisation to be made that right. Maybe you don't want to spend too much money on things that you don't need to.
+Maybe there's a way for us to architect the system so we pay in money, but we need to pay money.

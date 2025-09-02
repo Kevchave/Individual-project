@@ -1,0 +1,28 @@
+It's kind of, um, exponentially growth because Moore's Law is saying we double every two years.
+After two years, we double and double again another two years.
+So two to power ten is a large number. Okay.
+Even though two is small. Okay. And so, so the complexity of our circuits.
+And now I see chips. I'm sure each one of us, uh, has something like this.
+Right? This is a supercomputer.
+The computational capability comparing with Bataan is 40 some years ago.
+This is a supercomputer. When I was at university, I was I worked as some as a part time computer operator.
+So I was my computer system that I was helping, um, probably occupy half,
+but maybe two thirds of the size of this room with so many, uh, you know, boxes, the whole with rank in the room, air conditioned.
+And it was only one computer and one computer system.
+Um, the computer system didn't do any anything close to what we we have in our pocket today.
+So this is a supercomputer relative to the vast and is keep on, uh, improving.
+Right. So resolution or the memory size and all the rest is still, um, uh, in some sense unlimited,
+although new technology will be, uh, uh, will be invented along the way.
+All right. So with this kind of, um, background.
+So our toy architecture was really very simple. Okay.
+What? I would not be able to help us to do some, uh, uh, practical, uh, calculations.
+So for Pentium, we have a number of registers.
+Remember the toy detector? We have only for general purpose registers.
+So now we have a whole set. Okay. We have a register eight here.
+Oh. Okay, that's just a, b, C, d.
+And we also have the source index, register of destination registers, stat pointer and based pointers.
+All these names to you do not mean very much at this point I understand.
+Okay. We'll come back to that very very soon so that you can understand all the names.
+All the register names carry some meaning.
+Okay. And but for each register you can see label at the top from 0 to 31.
+So essentially each register has 32 bits.

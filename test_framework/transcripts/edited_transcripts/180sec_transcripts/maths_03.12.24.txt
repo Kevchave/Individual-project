@@ -1,0 +1,27 @@
+I think. Okay, so this is the final topic that we hope to complete this week.
+I don't know how far we can go today. Um, and this is about the Fourier series.
+So the preamble, what is the Fourier series that can be captured from the diagram on the top right corner?
+So Fourier series basically helps us to represent any periodic thing.
+So here this is a periodic signal more or less approaching towards a square waveform.
+But that the Fourier series essentially helps us or tell us that if you use the basis function sinusoidal function signs and cosine um,
+in finite number of uh harmonics of the sine and cosine, and if you sum them up all, then you can create different kind of periodic waveforms.
+It could be uh, a square wave, triangular wave, any other shape,
+any periodic waveform can be constructed by infinite number of, um, sinusoidal signals.
+Essentially that is a Fourier series. And we need to find out what is the frequency of different, uh,
+sinusoidal signals and what are the amplitudes, the heights of those sinusoidal signals.
+So if we know that amplitude, if I and the frequency one period from the period,
+then we can represent starting from the first harmonic, second harmonic, third harmony.
+And it can go to any harmonic where n tends to infinity.
+So if we approach m to infinite anything at all these harmonics, we get any periodic function.
+That's the whole idea of the Fourier series. And as part of this we just look at what is the periodic function,
+how we can use the properties of orthogonality of the sinusoidal signals so that they become basis function.
+Using the combination of the basis function you can create the given uh periodic function.
+Then we represent the Fourier series as a trigonometric Fourier series in form of sine and cosine signals.
+And then we represent, uh, the Fourier series in the form of exponential.
+Using Euler's identity as, we know that um e to the power um g theta could be represented by sine, theta and cos theta.
+So if Fourier series can be represented by sine and cos, then it can also be represented by this series of uh exponential.
+So that's the overview of what the Fourier series is.
+And then we will look down into the smaller parts.
+Um before we achieve the Fourier series expansion for any periodic function.
+So it's a start, a little bit more into what we discussed just now as overview.
+There are many function that can be represented
