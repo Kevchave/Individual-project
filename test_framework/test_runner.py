@@ -4,7 +4,8 @@ Simplified Test Runner for Transcription Models
 
 To test different models:
 1. Change CURRENT_MODEL below to: 'fixed', 'vad', or 'adaptive'
-2. Run: python test_runner.py
+2. Change AUDIO_SOURCE to: '10sec', '60sec', '180sec', '5min', or '30min'
+3. Run: python test_runner.py
 
 This will test all parameters and audio files for the specified model.
 """
@@ -30,8 +31,8 @@ from transcriber_app.main import start_transcription_pipeline_with_virtual_audio
 import transcriber_app.main as main_module
 
 # Change these flags at the top of test_runner.py
-CURRENT_MODEL = 'vad'     # Select model: 'fixed', 'vad', 'adaptive'
-AUDIO_SOURCE = '10sec'      # Select which audio set to test: '10sec', '5min', or '30min'
+CURRENT_MODEL = 'fixed'     # Select model: 'fixed', 'vad', 'adaptive'
+AUDIO_SOURCE = '60sec'      # Select which audio set to test: '10sec', '60sec', '180sec', '5min', or '30min'
 TEST_MODE = 'phase_a_r1'    # Select test mode for different phases: 'phase_a_r1', 'phase_a_r2', 'phase_b_r1', 'phase_b_r2', 'phase_c'
 
 class TestRunner:
@@ -44,10 +45,10 @@ class TestRunner:
         self.audio_source = audio_source
         self.test_mode = test_mode
         
-        # Set duration limits based on test mode
+        # Set duration limits based on test mode (now using cropped files instead of time limits)
         self.duration_limits = {
-            'phase_a_r1': 60,    # 60 seconds
-            'phase_a_r2': 180,   # 180 seconds (3 minutes)
+            'phase_a_r1': None,  # Use 60sec cropped files
+            'phase_a_r2': None,  # Use 180sec cropped files
             'phase_b_r1': None,  # Full 5-minute clips
             'phase_b_r2': None,  # Full 5-minute clips
             'phase_c': None      # Full 30-minute clips
@@ -71,6 +72,24 @@ class TestRunner:
                 return [audio_path]
             print(f"Warning: {audio_path} not found")
             return []
+        elif source == '60sec':
+            base_dir = self.test_audio_dir / '60sec_versions'
+            audio_files = []
+            if not base_dir.exists():
+                print(f"Warning: {base_dir} directory not found")
+                return audio_files
+            for pattern in ('*.mp3', '*.wav'):
+                audio_files.extend(base_dir.glob(pattern))
+            return sorted(audio_files)  # Sort for consistent ordering
+        elif source == '180sec':
+            base_dir = self.test_audio_dir / '180sec_versions'
+            audio_files = []
+            if not base_dir.exists():
+                print(f"Warning: {base_dir} directory not found")
+                return audio_files
+            for pattern in ('*.mp3', '*.wav'):
+                audio_files.extend(base_dir.glob(pattern))
+            return sorted(audio_files)  # Sort for consistent ordering
         elif source == '5min':
             base_dir = self.test_audio_dir / '5min_versions'
             audio_files = []
@@ -104,7 +123,7 @@ class TestRunner:
             return []
 
     def get_audio_source_display(self):
-        mapping = {'10sec': '10sec', '5min': '5min', '30min': '30min'}
+        mapping = {'10sec': '10sec', '60sec': '60sec', '180sec': '180sec', '5min': '5min', '30min': '30min'}
         return mapping.get((self.audio_source or '').lower(), str(self.audio_source))
     
     def load_reference_transcript(self, audio_file):
@@ -117,6 +136,12 @@ class TestRunner:
             transcript_dir = Path("transcripts/edited_transcripts/30min_transcripts")
         elif source == '10sec':
             transcript_dir = Path("transcripts/edited_transcripts/10sec_transcript")
+        elif source == '60sec':
+            # Use 60sec transcripts for 60sec audio files
+            transcript_dir = Path("transcripts/edited_transcripts/60sec_transcripts")
+        elif source == '180sec':
+            # Use 180sec transcripts for 180sec audio files
+            transcript_dir = Path("transcripts/edited_transcripts/180sec_transcripts")
         else:
             # No reference transcripts for 10-second quick tests
             print(" -> No reference transcript for 10sec tests (WER disabled)")
@@ -183,11 +208,11 @@ class TestRunner:
         # For each audio file
         for audio_idx, audio_file in enumerate(audio_files, 1):
             print(f"Audio {audio_idx}/{len(audio_files)} ({audio_file.name})")
-            print("-" * 80)
+            print("-" * 93)
             
-            # Print table header
-            print(f"| {'config/params':<35} | {'iteration':<12} | {'Callback':<12} | {'WER':<8} |")
-            print("-" * 80)
+            # Print table header (now includes Chunks)
+            print(f"| {'config/params':<35} | {'iteration':<12} | {'Callback':<12} | {'WER':<8} | {'Chunks':<6} |")
+            print("-" * 93)
             
             # For each configuration of the specified model
             for config in configs:
@@ -209,13 +234,14 @@ class TestRunner:
                     
                     # Print results in the same row
                     if 'error' in result:
-                        print(f" {'ERROR':<12} | {'N/A':<8} |")
+                        print(f" {'ERROR':<12} | {'N/A':<8} | {'N/A':<6} |")
                     else:
                         latency = f"{result['callback_latency']:.3f}s"
                         wer = f"{result['wer_score']:.3f}" if result['wer_score'] is not None else "N/A"
-                        print(f" {latency:<12} | {wer:<8} |")
+                        chunks = f"{result.get('num_chunks', '')}"
+                        print(f" {latency:<12} | {wer:<8} | {chunks:<6} |")
                     
-                    print("-" * 80)
+                    print("-" * 93)
             
             print()  # Empty line between audio files
         
@@ -270,11 +296,11 @@ class TestRunner:
                 print("🕐 Phase C: 30-minute test with 5-minute monitoring intervals")
                 print()
             
-            print("-" * 80)
+            print("-" * 93)
             
-            # Print table header
-            print(f"| {'config/params':<35} | {'iteration':<12} | {'Callback':<12} | {'WER':<8} |")
-            print("-" * 80)
+            # Print table header (now includes Chunks)
+            print(f"| {'config/params':<35} | {'iteration':<12} | {'Callback':<12} | {'WER':<8} | {'Chunks':<6} |")
+            print("-" * 93)
             sys.stdout.flush()
             
             # For each configuration
@@ -302,13 +328,14 @@ class TestRunner:
                     
                     # Print results in the same row
                     if 'error' in result:
-                        print(f" {'ERROR':<12} | {'N/A':<8} |")
+                        print(f" {'ERROR':<12} | {'N/A':<8} | {'N/A':<6} |")
                     else:
                         latency = f"{result['callback_latency']:.3f}s"
                         wer = f"{result['wer_score']:.3f}" if result['wer_score'] is not None else "N/A"
-                        print(f" {latency:<12} | {wer:<8} |")
+                        chunks = f"{result.get('num_chunks', '')}"
+                        print(f" {latency:<12} | {wer:<8} | {chunks:<6} |")
                     
-                    print("-" * 80)
+                    print("-" * 93)
                     sys.stdout.flush()
             
             print()  # Empty line between audio files
@@ -383,6 +410,7 @@ class TestRunner:
             # Get results
             latency_metrics = metrics_collector.calculate_latency()
             final_transcript = metrics_collector.get_final_transcript()
+            num_chunks = len(latency_metrics.get('callback_latencies', [])) if latency_metrics else len(metrics_collector.transcripts)
             
             # Calculate WER if reference available
             wer_score = None
@@ -400,7 +428,8 @@ class TestRunner:
                 'p90_callback_latency': latency_metrics['p90_callback_latency'],
                 'wer_score': wer_score,
                 'recorded_transcript': final_transcript,
-                'correct_transcript': reference_transcript
+                'correct_transcript': reference_transcript,
+                'num_chunks': num_chunks
             }
             
             return result
@@ -417,6 +446,7 @@ class TestRunner:
                 'wer_score': None,
                 'recorded_transcript': '',
                 'correct_transcript': reference_transcript if reference_transcript else '',
+                'num_chunks': 0,
                 'error': str(e)
             }
 
@@ -509,7 +539,8 @@ class TestRunner:
                 'wer_score': wer_score,
                 'recorded_transcript': final_transcript,
                 'correct_transcript': reference_transcript,
-                'monitoring_data': monitoring_data  # Add monitoring data for Phase C
+                'monitoring_data': monitoring_data,  # Add monitoring data for Phase C
+                'num_chunks': len(latency_metrics.get('callback_latencies', [])) if latency_metrics else len(metrics_collector.transcripts)
             }
             
             return result
@@ -527,6 +558,7 @@ class TestRunner:
                 'recorded_transcript': '',
                 'correct_transcript': reference_transcript if reference_transcript else '',
                 'monitoring_data': [],
+                'num_chunks': 0,
                 'error': str(e)
             }
 
@@ -861,7 +893,7 @@ def main(model_type=None, test_mode=None, audio_source=None, configs=None, itera
     Args:
         model_type: 'fixed', 'vad', or 'adaptive'
         test_mode: 'phase_a_r1', 'phase_a_r2', etc.
-        audio_source: '10sec', '5min', or '30min'
+        audio_source: '10sec', '60sec', '180sec', '5min', or '30min'
         configs: List of configs to test (if None, uses all configs for model_type)
     """
     # Use provided parameters or fall back to global variables

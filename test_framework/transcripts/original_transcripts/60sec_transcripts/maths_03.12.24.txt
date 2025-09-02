@@ -1,0 +1,15 @@
+I think. Okay, so this is the final topic that we hope to complete this week.
+3:11
+I don't know how far we can go today. Um, and this is about the Fourier series.
+3:20
+So the preamble, what is the Fourier series that can be captured from the diagram on the top right corner?
+3:27
+So Fourier series basically helps us to represent any periodic thing.
+3:36
+So here this is a periodic signal more or less approaching towards a square waveform.
+3:42
+But that the Fourier series essentially helps us or tell us that if you use the basis function sinusoidal function signs and cosine um,
+3:48
+in finite number of uh harmonics of the sine and cosine, and if you sum them up all, then you can create different kind of periodic waveforms.
+3:59
+It could be uh, a square wave

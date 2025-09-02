@@ -1,0 +1,37 @@
+Higher level domains that include your specific subdomain is for convenience to sale or set to cool cataloguing and everyone can see it.
+41:24
+But then on maps say have the cookies of maps on on uh, sheets.
+41:32
+I have the, uh, the cookies, sheets and so on and so forth. Now.
+41:36
+More frequently, websites use the HTML storage interface because it gives more space than cookies, and it has a better programmatic interface.
+41:42
+You can effectively imagine that there is a persistent database in the browser, and one can access it in a in a very standard programmatic way.
+41:51
+So you can check how much data there is in there, uh, or read the, the,
+41:59
+the item number and or get to the item with the specific key, or set a new item using this key and putting this value in it.
+42:04
+Or remove an item or delete the whole database. So to which origin we can associate storage in the browser.
+42:13
+And that's very helpful for optimisation of reducing bandwidth.
+42:20
+When you have a web app that you keep loading new information, you can gradually build the data into this local storage and not always update it.
+42:25
+And then for implementing sessions. So again to keep track of what user is interacting with the web application
+42:33
+so we can give a relevant information and know that it was authorised okay.
+42:39
+So there is a general conceptual way to, to to see sessions.
+42:46
+So typically you start browsing by accessing a resource that is public.
+42:50
+So the target website doesn't know where you are. You can start some interaction expressing potentially some preferences in the browser.
+42:55
+Can use these cookies or localStorage to save data about you, but it doesn't know yet who you are.
+43:03
+And in this case, we to model it by saying you request some public resources,
+43:08
+you receive some new token that hasn't been used before to identify you as an unknown entity.
+43:12
+Then you can interact using that token to, for example, maybe change preferences

@@ -1,0 +1,19 @@
+
+It's kind of, um, exponentially growth because Moore's Law is saying we double every two years.
+18:02
+After two years, we double and double again another two years.
+18:09
+So two to power ten is a large number. Okay.
+18:14
+Even though two is small. Okay. And so, so the complexity of our circuits.
+18:18
+And now I see chips. I'm sure each one of us, uh, has something like this.
+18:24
+Right? This is a supercomputer.
+18:30
+The computational capability comparing with Bataan is 40 some years ago.
+18:35
+This is a supercomputer. When I was at university, I was I worked as some as a part time computer operator.
+18:42
+So I was my computer system that I was helping, um, probably occupy half,
+18:51

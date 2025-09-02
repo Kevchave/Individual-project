@@ -63,10 +63,11 @@ def clean_line_char_by_char(line):
 
 def process_all_transcripts():
     """
-    Process all transcript files in both '5min_transcripts' and '30min_transcripts'
-    inside original_transcripts, saving cleaned versions to the corresponding
-    subfolders in edited_transcripts. Also processes any .txt files at the root
-    of original_transcripts and saves to the root of edited_transcripts.
+    Process all transcript files in '60sec_transcripts', '180sec_transcripts', 
+    '5min_transcripts', and '30min_transcripts' inside original_transcripts, 
+    saving cleaned versions to the corresponding subfolders in edited_transcripts. 
+    Also processes any .txt files at the root of original_transcripts and saves 
+    to the root of edited_transcripts.
     """
     # Resolve base folder paths relative to this script file
     base_dir = Path(__file__).parent
@@ -91,24 +92,26 @@ def process_all_transcripts():
         # Gather .txt files if the original subfolder exists
         if not original_folder.exists():
             return 0
-    transcript_files = list(original_folder.glob('*.txt'))
-    if not transcript_files:
+        
+        transcript_files = list(original_folder.glob('*.txt'))
+        if not transcript_files:
             return 0
-    
-    for file_path in transcript_files:
-        try:
-            with open(file_path, 'r', encoding='utf-8') as file:
-                transcript_text = file.read()
-            cleaned_text = clean_transcript(transcript_text)
-            
-            output_path = edited_folder / file_path.name
-            with open(output_path, 'w', encoding='utf-8') as file:
-                file.write(cleaned_text)
-            
+        
+        for file_path in transcript_files:
+            try:
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    transcript_text = file.read()
+                cleaned_text = clean_transcript(transcript_text)
+                
+                output_path = edited_folder / file_path.name
+                with open(output_path, 'w', encoding='utf-8') as file:
+                    file.write(cleaned_text)
+                
                 print(f"✓ Processed: {file_path.name} -> {edited_folder.relative_to(base_dir)}")
-            processed_count += 1
-        except Exception as e:
-            print(f"✗ Error processing {file_path.name}: {e}")
+                processed_count += 1
+            except Exception as e:
+                print(f"✗ Error processing {file_path.name}: {e}")
+        
         return processed_count
 
     total_processed = 0
@@ -116,13 +119,25 @@ def process_all_transcripts():
     # 1) Root-level files (if any)
     total_processed += process_folder(original_base, edited_base)
 
-    # 2) 5-minute transcripts
+    # 2) 60-second transcripts
+    total_processed += process_folder(
+        original_base / '60sec_transcripts',
+        edited_base / '60sec_transcripts'
+    )
+
+    # 3) 180-second transcripts
+    total_processed += process_folder(
+        original_base / '180sec_transcripts',
+        edited_base / '180sec_transcripts'
+    )
+
+    # 4) 5-minute transcripts
     total_processed += process_folder(
         original_base / '5min_transcripts',
         edited_base / '5min_transcripts'
     )
 
-    # 3) 30-minute transcripts
+    # 5) 30-minute transcripts
     total_processed += process_folder(
         original_base / '30min_transcripts',
         edited_base / '30min_transcripts'

@@ -1,5 +1,6 @@
 # Python virtual environments
 venv/
+.venv/
 
 # Byte-compiled / cache
 __pycache__/
@@ -8,10 +9,21 @@ __pycache__/
 # OS files
 .DS_Store
 .env
-test_framework/audio_files/uncropped/
-test_framework/audio_files/uncropped/
+
 # Large test audio files - keep locally but don't track in Git
+test_framework/audio_files/10sec_version/*.mp3
+test_framework/audio_files/60sec_versions/*.mp3
+test_framework/audio_files/180sec_versions/*.mp3
 test_framework/audio_files/5min_versions/*.mp3
-venv/
-.venv/
 test_framework/audio_files/30min_versions/*.mp3
+
+# Audio file formats (globally)
+*.mp3
+*.wav
+*.m4a
+*.aac
+*.flac
+*.ogg
+
+# Generated transcript directories (processed from original_transcripts)
+test_framework/transcripts/edited_transcripts/
