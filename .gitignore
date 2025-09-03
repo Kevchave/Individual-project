@@ -26,4 +26,5 @@ test_framework/audio_files/30min_versions/*.mp3
 *.ogg
 
 # Generated transcript directories (processed from original_transcripts)
-test_framework/transcripts/edited_transcripts/
+# (unignored to allow tracking edited transcripts)
+# test_framework/transcripts/edited_transcripts/
