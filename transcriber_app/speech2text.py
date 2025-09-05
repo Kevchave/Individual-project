@@ -10,7 +10,7 @@ import librosa
 # MODEL_SIZE = "small" - transcribe.py
 # DEVICE = "cpu" - transcribe.py
 SAMPLE_RATE = 16000
-CHUNK_SEC = 3.0
+CHUNK_SEC = 1.0
 WPM_WINDOW_SECONDS = 6
 VOLUME_WINDOW_SECONDS = 6
 PITCH_WINDOW_SECONDS = 6
