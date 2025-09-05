@@ -86,7 +86,7 @@ function initialiseCharts(currentTheme) {
 
   setWpmChart(createChart('wpmChart', 'WPM', '#0077cc', 'rgba(0, 119, 204, 0.1)', 'Words per Minute', chartOptions));
   setVolumeChart(createChart('volumeChart', 'Volume', '#28a745', 'rgba(40, 167, 69, 0.1)', 'Volume (dBFS)', chartOptions));
-  setPitchChart(createChart('pitchChart', 'Pitch Variance', '#dc3545', 'rgba(220, 53, 69, 0.1)', 'Pitch Variance (Hz)', chartOptions));
+  setPitchChart(createChart('pitchChart', 'Pitch Variance', '#dc3545', 'rgba(220, 53, 69, 0.1)', 'Pitch Variance (%)', chartOptions));
 }
 
 // Update charts with new data

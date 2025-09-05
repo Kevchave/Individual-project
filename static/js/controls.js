@@ -12,14 +12,14 @@ function updateMetricsDisplay(metricsMode) {
     if (metricsMode === "live") {
         document.getElementById('wpm-label').textContent = 'Words per Minute';
         document.getElementById('volume-label').textContent = 'Volume (dBFS)';
-        document.getElementById('pitch-label').textContent = 'Pitch Variance (Hz)';
+        document.getElementById('pitch-label').textContent = 'Pitch Variance (%)';
         document.getElementById('wpm-value').textContent = '0';
         document.getElementById('volume-value').textContent = '0';
         document.getElementById('pitch-value').textContent = '0';
     } else {
         document.getElementById('wpm-label').textContent = 'Average Words per Minute';
         document.getElementById('volume-label').textContent = 'Average Volume (dBFS)';
-        document.getElementById('pitch-label').textContent = 'Average Pitch Variance (Hz)';
+        document.getElementById('pitch-label').textContent = 'Average Pitch Variance (%)';
     }
 }
 
