@@ -11,7 +11,7 @@ class AdaptiveController:
     
     # Constructor - initialises adaptive controller with configurable thresholds 
     def __init__(self, 
-                 confidence_threshold_low=0.4,
+                 confidence_threshold_low=0.5,
                  confidence_threshold_high=0.7,
                  silence_ratio_threshold_high=0.7,
                  silence_ratio_threshold_low=0.3,
@@ -31,7 +31,7 @@ class AdaptiveController:
         # Current parameter values
         self.current_aggressiveness = 3
         self.current_frame_duration_ms = 20
-        self.current_max_silence_frames = 10
+        self.current_max_silence_frames = 5
         
         # Parameter bounds
         self.aggressiveness_bounds = (0, 3)  # 0-3 for VAD 
@@ -111,75 +111,62 @@ class AdaptiveController:
         }
     
     def _check_adjustment_needed(self, avg_metrics: Dict) -> bool:
-        # Check if any averaged metric is outside optimal ranges
+        # Only confidence-based rule
 
         confidence = avg_metrics['confidence']
-        silence_ratio = avg_metrics['silence_ratio']
-        wpm = avg_metrics['wpm']
+        # Commented out other rules based on silence ratio and WPM
+        # silence_ratio = avg_metrics['silence_ratio']
+        # wpm = avg_metrics['wpm']
         
-        # Check if any metric is outside optimal ranges
-        confidence_needs_adjustment = (
-            confidence < self.confidence_threshold_low  # Only adjust if confidence is LOW
-        )
-        
-        silence_needs_adjustment = (
-            silence_ratio > self.silence_ratio_threshold_high or
-            silence_ratio < self.silence_ratio_threshold_low
-        )
-        
-        wpm_needs_adjustment = (
-            wpm > self.wpm_threshold_fast or
-            wpm < self.wpm_threshold_slow
-        )
-        
-        return confidence_needs_adjustment or silence_needs_adjustment or wpm_needs_adjustment
+        return confidence < self.confidence_threshold_low
     
     def calculate_parameter_adjustments(self, metrics: Dict, insider_metrics: Dict) -> Dict:
-        # Complete priority-based adjustment: confidence > silence_ratio > wpm
+        # Only confidence-based adjustment
         
         # Calculate averages
         avg_metrics = self._calculate_average_metrics()
         
         confidence = avg_metrics['confidence']
-        silence_ratio = avg_metrics['silence_ratio']
-        wpm = avg_metrics['wpm']
+        # silence_ratio = avg_metrics['silence_ratio']
+        # wpm = avg_metrics['wpm']
         
         new_aggressiveness = self.current_aggressiveness
         new_frame_duration_ms = self.current_frame_duration_ms
         new_max_silence_frames = self.current_max_silence_frames
         
-        # Priority 1: Adjust aggressiveness based on confidence (most critical)
-        # Low confidence - increase aggressiveness (more sensitive to silence)
-
+        # Priority 1 (only rule): Adjust aggressiveness based on confidence
         if confidence < self.confidence_threshold_low:
-            new_aggressiveness = min(new_aggressiveness + 1, self.aggressiveness_bounds[1])
-            print(f"[ADAPTIVE] Low confidence ({confidence:.3f}) - increasing aggressiveness to {new_aggressiveness}")
+            if self.current_aggressiveness < self.aggressiveness_bounds[1]:
+                new_aggressiveness = min(self.current_aggressiveness + 1, self.aggressiveness_bounds[1])
+                print(f"[ADAPTIVE] Low confidence ({confidence:.3f}) - increasing aggressiveness to {new_aggressiveness}")
+            else:
+                # At max aggressiveness already; decrease instead per requirement
+                new_aggressiveness = max(self.current_aggressiveness - 1, self.aggressiveness_bounds[0])
+                print(f"[ADAPTIVE] Low confidence ({confidence:.3f}) at max - decreasing aggressiveness to {new_aggressiveness}")
         
-        # Priority 2: Adjust max silence frames based on silence ratio (medium priority)
-        if silence_ratio > self.silence_ratio_threshold_high:
-
-            # Too much silence - reduce max silence frames for shorter chunks
-            new_max_silence_frames = max(new_max_silence_frames - 1, self.max_silence_frames_bounds[0])
-            print(f"[ADAPTIVE] High silence ratio ({silence_ratio:.3f}) - reducing max silence frames to {new_max_silence_frames}")
-        elif silence_ratio < self.silence_ratio_threshold_low:
-
-            # Too little silence - increase max silence frames for longer chunks
-            new_max_silence_frames = min(new_max_silence_frames + 1, self.max_silence_frames_bounds[1])
-            print(f"[ADAPTIVE] Low silence ratio ({silence_ratio:.3f}) - increasing max silence frames to {new_max_silence_frames}")
+        # Priority 2: Adjust max silence frames based on silence ratio (DISABLED)
+        # if silence_ratio > self.silence_ratio_threshold_high:
+        #     # Too much silence - reduce max silence frames for shorter chunks
+        #     new_max_silence_frames = max(new_max_silence_frames - 1, self.max_silence_frames_bounds[0])
+        #     print(f"[ADAPTIVE] High silence ratio ({silence_ratio:.3f}) - reducing max silence frames to {new_max_silence_frames}")
+        # elif silence_ratio < self.silence_ratio_threshold_low:
+        #     # Too little silence - increase max silence frames for longer chunks
+        #     new_max_silence_frames = min(new_max_silence_frames + 1, self.max_silence_frames_bounds[1])
+        #     print(f"[ADAPTIVE] Low silence ratio ({silence_ratio:.3f}) - increasing max silence frames to {new_max_silence_frames}")
         
-        # Priority 3: Adjust frame duration based on WPM (lowest priority)
-        if wpm > self.wpm_threshold_fast:
-            # Fast speech - smaller frames for precision
-            new_frame_duration_ms = 10
-            print(f"[ADAPTIVE] Fast speech ({wpm:.1f} WPM) - using 10ms frames")
-        elif wpm < self.wpm_threshold_slow:
-            # Slow speech - larger frames for efficiency
-            new_frame_duration_ms = 30
-            print(f"[ADAPTIVE] Slow speech ({wpm:.1f} WPM) - using 30ms frames")
-        else:
-            # Normal speech
-            new_frame_duration_ms = 20
-            print(f"[ADAPTIVE] Normal speech ({wpm:.1f} WPM) - using 20ms frames")
+        # Priority 3: Adjust frame duration based on WPM (DISABLED)
+        # if wpm > self.wpm_threshold_fast:
+        #     # Fast speech - smaller frames for precision
+        #     new_frame_duration_ms = 10
+        #     print(f"[ADAPTIVE] Fast speech ({wpm:.1f} WPM) - using 10ms frames")
+        # elif wpm < self.wpm_threshold_slow:
+        #     # Slow speech - larger frames for efficiency
+        #     new_frame_duration_ms = 30
+        #     print(f"[ADAPTIVE] Slow speech ({wpm:.1f} WPM) - using 30ms frames")
+        # else:
+        #     # Normal speech
+        #     new_frame_duration_ms = 20
+        #     print(f"[ADAPTIVE] Normal speech ({wpm:.1f} WPM) - using 20ms frames")
         
         return {
             'aggressiveness': new_aggressiveness,
