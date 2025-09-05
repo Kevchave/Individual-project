@@ -100,7 +100,7 @@ function initialiseCharts(currentTheme) {
   // Only create charts if the canvas elements exist (dashboard page)
   const wpmChartInstance = createChart('wpmChart', 'WPM', '#0077cc', 'rgba(0, 119, 204, 0.1)', 'Words per Minute', chartOptions);
   const volumeChartInstance = createChart('volumeChart', 'Volume', '#28a745', 'rgba(40, 167, 69, 0.1)', 'Volume (dBFS)', chartOptions);
-  const pitchChartInstance = createChart('pitchChart', 'Pitch Variance', '#dc3545', 'rgba(220, 53, 69, 0.1)', 'Pitch Variance (Hz)', chartOptions);
+  const pitchChartInstance = createChart('pitchChart', 'Pitch Variance', '#dc3545', 'rgba(220, 53, 69, 0.1)', 'Pitch Variance (%)', chartOptions);
   const confidenceChartInstance = createChart('confidenceChart', 'Confidence', '#ffc107', 'rgba(255, 193, 7, 0.1)', 'Confidence Score', chartOptions);
   const silenceChartInstance = createChart('silenceChart', 'Silence Ratio', '#6f42c1', 'rgba(111, 66, 193, 0.1)', 'Silence Ratio', chartOptions);
 

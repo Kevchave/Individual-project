@@ -15,21 +15,21 @@ function updateOutOfBounds(wpm, volume, pitch) {
     const pitchBox = document.getElementById('pitch-box');
 
     // WPM Boundaries 
-    if (wpm > 240 || wpm < 80){
+    if (wpm > 200 || wpm < 100){
         wpmBox.classList.add('out-of-bounds');
     } else {
         wpmBox.classList.remove('out-of-bounds');
     }
 
     // Volume Boundaries 
-    if (volume < -40){
+    if (volume < -50){
         volumeBox.classList.add('out-of-bounds');
     } else {
         volumeBox.classList.remove('out-of-bounds');
     }
 
     // Pitch Boundaries 
-    if (pitch < 5){
+    if (pitch < 10){
         pitchBox.classList.add('out-of-bounds');
     } else {
         pitchBox.classList.remove('out-of-bounds');

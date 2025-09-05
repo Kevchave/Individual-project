@@ -197,10 +197,17 @@ class MetricsTracker:
         if len(voiced) == 0:
             print("Pitch Variance: No voice audio detected")
             return
+        
+        # Compute Pitch Variation Quotient (PVQ) = (std / mean) * 100
         std_dev_pitch = float(np.std(voiced))
+        mean_pitch = float(np.mean(voiced))
+        if not np.isfinite(mean_pitch) or mean_pitch <= 0:
+            pvq_percent = 0.0
+        else:
+            pvq_percent = (std_dev_pitch / mean_pitch) * 100.0
 
-        # Add 'st_dev_pitch' into a deque list, then take the average
-        self.pitch_history.append(std_dev_pitch)
+        # Add PVQ into a deque list, then take the average
+        self.pitch_history.append(pvq_percent)
         self.current_pitch = float(np.mean(self.pitch_history))
 
     def track_overall_pitch(self):
@@ -216,7 +223,13 @@ class MetricsTracker:
             print("Pitch Variance: No voice audio detected")
             return
 
-        self.average_pitch = float(np.std(voiced))
+        std_dev_pitch = float(np.std(voiced))
+        mean_pitch = float(np.mean(voiced))
+        if not np.isfinite(mean_pitch) or mean_pitch <= 0:
+            pvq_percent = 0.0
+        else:
+            pvq_percent = (std_dev_pitch / mean_pitch) * 100.0
+        self.average_pitch = pvq_percent
 
     def track_average_confidence(self):
         """Calculate average confidence score for the session"""
