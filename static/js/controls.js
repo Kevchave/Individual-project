@@ -7,16 +7,17 @@ import {
     metricsInterval, setMetricsInterval, 
     isPaused, setIsPaused 
 } from './state.js';
+import { TRANSCRIPT_POLL_MS, METRICS_POLL_MS } from './config.js';
 
 function updateMetricsDisplay(metricsMode) {
     if (metricsMode === "live") {
-        document.getElementById('wpm-label').textContent = 'Words per Minute';
+        document.getElementById('wpm-label').textContent = 'WPM';
         document.getElementById('volume-label').textContent = 'Volume (dBFS)';
         document.getElementById('pitch-label').textContent = 'Pitch Variance (Hz)';
     } else {
-        document.getElementById('wpm-label').textContent = 'Average Words per Minute';
-        document.getElementById('volume-label').textContent = 'Average Volume (dBFS)';
-        document.getElementById('pitch-label').textContent = 'Average Pitch Variance (Hz)';
+        document.getElementById('wpm-label').textContent = 'AVG WPM';
+        document.getElementById('volume-label').textContent = 'AVG Volume (dBFS)';
+        document.getElementById('pitch-label').textContent = 'AVG Pitch Variance (Hz)';
     }
 }
 
@@ -37,8 +38,8 @@ function initialiseControls({
             .then(data => {
                 transcriptBox.textContent = data.status;
                 if (!transcriptInterval && !metricsInterval) {
-                    setTranscriptInterval(setInterval(() => pollTranscript(transcriptBox), 2000));
-                    setMetricsInterval(setInterval(() => pollMetrics(wpmValue, volumeValue, pitchValue), 6000));
+                    setTranscriptInterval(setInterval(() => pollTranscript(transcriptBox), TRANSCRIPT_POLL_MS));
+                    setMetricsInterval(setInterval(() => pollMetrics(wpmValue, volumeValue, pitchValue), METRICS_POLL_MS));
                 }
             })
             .catch(error => {

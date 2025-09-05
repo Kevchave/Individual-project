@@ -1,17 +1,18 @@
 from .audio_stream import AudioStream
 from .transcriber import Transcriber
 from .track_metrics import MetricsTracker
+from .config import (
+    SAMPLE_RATE,
+    CHUNK_SEC,
+    WPM_WINDOW_SECONDS,
+    VOLUME_WINDOW_SECONDS,
+    PITCH_WINDOW_SECONDS,
+    BLACKHOLE_ID,
+    MIC_INPUT,
+)
 import threading
 import time
 
-SAMPLE_RATE = 16000
-CHUNK_SEC = 1
-WPM_WINDOW_SECONDS = 6
-VOLUME_WINDOW_SECONDS = 6
-PITCH_WINDOW_SECONDS = 6
-
-BLACKHOLE_ID = 3 # Redirects output to microphone
-MIC_INPUT = None
 device_id = MIC_INPUT   # or MIC_INPUT
 
 audio_stream = None
