@@ -1,270 +1,81 @@
 from .audio_stream import AudioStream
-from .virtual_audio_stream import VirtualAudioStream
 from .transcriber import Transcriber
 from .track_metrics import MetricsTracker
-from .track_insider_metrics import TrackInsiderMetrics
-from .adaptive_controller import AdaptiveController
+from .config import (
+    SAMPLE_RATE,
+    CHUNK_SEC,
+    WPM_WINDOW_SECONDS,
+    VOLUME_WINDOW_SECONDS,
+    PITCH_WINDOW_SECONDS,
+    BLACKHOLE_ID,
+    MIC_INPUT,
+)
 import threading
 import time
-import numpy as np
 
-SAMPLE_RATE = 16000
-CHUNK_SEC = 1.5
-WPM_WINDOW_SECONDS = 6
-VOLUME_WINDOW_SECONDS = 6
-PITCH_WINDOW_SECONDS = 6
-
-# Adaptive chunking configuration
-VAD_AGGRESSIVENESS = 3      # 0-3, 0=more speech, 3=more silence
-FRAME_DURATION_MS = 20      # 10, 20, or 30ms
-MAX_SILENCE_FRAMES = 10      # Number of consecutive silence frames to end a speech segment
-
-BLACKHOLE_ID = 3 # Redirects output to microphone
-MIC_INPUT = None
 device_id = MIC_INPUT   # or MIC_INPUT
 
 audio_stream = None
 transcriber = None
 metrics = None
-track_insider_metrics = None  # Optional insider metrics for adaptive chunking
-adaptive_controller = None    # Adaptive controller for parameter tuning
 transcription_thread = None
 start_time = None
-metrics_collector = None  # For end-to-end latency measurement
 
 # Start the full pipeline: audio, transcription, metrics
-def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=True, enable_adaptive_control=True, metrics_collector=None, fixed_chunking_mode=False, fixed_chunk_seconds=3.0):
-    global audio_stream, transcriber, metrics, track_insider_metrics, adaptive_controller, transcription_thread, start_time
+def start_transcription_pipeline(device_id=MIC_INPUT):
+    global audio_stream, transcriber, metrics, transcription_thread, start_time
 
-    # Clear previous data if there exists
+    # Clear previous data if there is
     if metrics is not None: 
         if hasattr(metrics, 'accumulated'):
             metrics.accumulated.clear()
         if hasattr(metrics, 'all_audio_chunks'):
             metrics.all_audio_chunks.clear()
-    if track_insider_metrics is not None:
-        track_insider_metrics.reset()
-    if adaptive_controller is not None:
-        adaptive_controller.reset()
-    
     transcriber = None
     metrics = None 
-    track_insider_metrics = None
-    adaptive_controller = None
     transcription_thread = None
-    metrics_collector = metrics_collector
     
-    # Create all objects
+    start_time = time.time()
+
     if audio_stream is None:
         audio_stream = AudioStream(SAMPLE_RATE, device_id)
     if transcriber is None:
         transcriber = Transcriber("small", "cpu")
     if metrics is None:
         metrics = MetricsTracker(SAMPLE_RATE)
-    if enable_insider_metrics and track_insider_metrics is None:
-        track_insider_metrics = TrackInsiderMetrics()
-    if enable_adaptive_control and adaptive_controller is None:
-        adaptive_controller = AdaptiveController()
+
+    chunk_samples = int(CHUNK_SEC * SAMPLE_RATE)
+
+    # Start metrics reporting threads 
+    # - threads allow the different functions to run concurrently without blocking each other or the main thread/program 
+    threading.Thread(target=metrics.track_wpm, args=(WPM_WINDOW_SECONDS,), daemon=True).start()
+    threading.Thread(target=metrics.track_volume, args=(VOLUME_WINDOW_SECONDS,), daemon=True).start()
+    threading.Thread(target=metrics.track_pitch, args=(PITCH_WINDOW_SECONDS,), daemon=True).start()
 
     def run_transcription():
         if audio_stream is not None:
             audio_stream.start()
-            # Start session tracking when transcription begins
-            # print("[DEBUG] Starting session tracking...")
-            start_session_tracking()
-            
             if transcriber is not None:
-                # Get current parameters from adaptive controller (or use defaults)
-                if adaptive_controller is not None:
-                    aggressiveness, frame_duration_ms, max_silence_frames = adaptive_controller.get_current_parameters()
-                else:
-                    aggressiveness, frame_duration_ms, max_silence_frames = VAD_AGGRESSIVENESS, FRAME_DURATION_MS, MAX_SILENCE_FRAMES
-                
                 transcriber.transcribe_stream(
-                    audio_stream.audio_queue, 
-                    on_transcription, 
-                    on_audio_chunk, 
-                    track_insider_metrics,
-                    aggressiveness=aggressiveness,
-                    frame_duration_ms=frame_duration_ms,
-                    max_silence_frames=max_silence_frames,
-                    metrics_collector=metrics_collector,
-                    metrics=metrics,  # Pass metrics object for insider metrics storage
-                    fixed_chunking_mode=fixed_chunking_mode,
-                    fixed_chunk_seconds=fixed_chunk_seconds
+                    audio_stream.audio_queue, chunk_samples, on_transcription, on_audio_chunk
                 )
 
-    # Safeguard to ensure exactly one background thread is active 
     if transcription_thread is None or not transcription_thread.is_alive():
-        # Start a separate transcription thread 
-        # - the transcription can now run without blocking the main thread (or program)
-        transcription_thread = threading.Thread(target=run_transcription, daemon=True)
-        transcription_thread.start()
-
-# Start the pipeline with virtual audio (for testing)
-def start_transcription_pipeline_with_virtual_audio(audio_file_path, enable_insider_metrics=True, enable_adaptive_control=True, metrics_collector=None, real_time_simulation=True, config=None):
-    global audio_stream, transcriber, metrics, track_insider_metrics, adaptive_controller, transcription_thread, start_time
-
-    # Clear previous data if there exists
-    if metrics is not None: 
-        if hasattr(metrics, 'accumulated'):
-            metrics.accumulated.clear()
-        if hasattr(metrics, 'all_audio_chunks'):
-            metrics.all_audio_chunks.clear()
-    if track_insider_metrics is not None:
-        track_insider_metrics.reset()
-    if adaptive_controller is not None:
-        adaptive_controller.reset()
-    
-    transcriber = None
-    metrics = None 
-    track_insider_metrics = None
-    adaptive_controller = None
-    transcription_thread = None
-    metrics_collector = metrics_collector
-    
-    # Create virtual audio stream instead of real microphone stream
-    audio_stream = VirtualAudioStream(SAMPLE_RATE)
-    audio_stream.load_audio_file(audio_file_path)
-    
-    # Disable real-time simulation for faster testing if requested
-    if not real_time_simulation:
-        # Override the _stream_audio method to remove delays
-        def fast_stream_audio():
-            if audio_stream.audio_data is None:
-                print("No audio data loaded")
-                return
-                
-            position = 0
-            while audio_stream.is_playing and position < len(audio_stream.audio_data):
-                # Get next chunk
-                end_position = min(position + audio_stream.chunk_size, len(audio_stream.audio_data))
-                chunk = audio_stream.audio_data[position:end_position]
-                
-                # Pad with zeros if chunk is smaller than expected
-                if len(chunk) < audio_stream.chunk_size:
-                    chunk = np.pad(chunk, (0, audio_stream.chunk_size - len(chunk)), 'constant')
-                
-                # Put chunk in queue (same interface as AudioStream)
-                audio_stream.audio_queue.put(chunk)
-                
-                position = end_position
-                # No time.sleep() for faster testing
-            
-            # Signal end of stream
-            audio_stream.audio_queue.put(None)
-            print("Virtual audio stream finished (fast mode)")
-        
-        audio_stream._stream_audio = fast_stream_audio
-    
-    if transcriber is None:
-        transcriber = Transcriber("small", "cpu")
-    if metrics is None:
-        metrics = MetricsTracker(SAMPLE_RATE)
-    if enable_insider_metrics and track_insider_metrics is None:
-        track_insider_metrics = TrackInsiderMetrics()
-    if enable_adaptive_control and adaptive_controller is None:
-        adaptive_controller = AdaptiveController()
-
-    def run_transcription():
-        global track_insider_metrics, adaptive_controller
-        if audio_stream is not None:
-            audio_stream.start()
-            if transcriber is not None:
-                # Use configuration parameters if provided, otherwise use defaults
-                if config is not None:
-                    # Extract parameters based on model type
-                    if 'aggressiveness' in config:
-                        # VAD or adaptive model
-                        aggressiveness = config['aggressiveness']
-                        frame_duration_ms = config.get('frame_duration_ms', FRAME_DURATION_MS)
-                        max_silence_frames = config.get('max_silence_frames', MAX_SILENCE_FRAMES)
-                    elif 'starting_aggressiveness' in config:
-                        # Adaptive model with starting aggressiveness
-                        aggressiveness = config['starting_aggressiveness']
-                        frame_duration_ms = config.get('frame_duration_ms', FRAME_DURATION_MS)
-                        max_silence_frames = config.get('max_silence_frames', MAX_SILENCE_FRAMES)
-                    elif 'chunk_size' in config:
-                        # Fixed chunk model - these parameters don't apply
-                        aggressiveness = VAD_AGGRESSIVENESS
-                        frame_duration_ms = FRAME_DURATION_MS
-                        max_silence_frames = MAX_SILENCE_FRAMES
-                    else:
-                        # Fallback to defaults
-                        aggressiveness, frame_duration_ms, max_silence_frames = VAD_AGGRESSIVENESS, FRAME_DURATION_MS, MAX_SILENCE_FRAMES
-                else:
-                    # Use defaults if no config provided
-                    aggressiveness, frame_duration_ms, max_silence_frames = VAD_AGGRESSIVENESS, FRAME_DURATION_MS, MAX_SILENCE_FRAMES
-                
-                print(f"      Using config: aggressiveness={aggressiveness}, frame_duration_ms={frame_duration_ms}, max_silence_frames={max_silence_frames}")
-                
-                # Determine if we should use fixed chunking mode
-                fixed_chunking_mode = False
-                fixed_chunk_seconds = 3.0
-                
-                if config is not None and 'chunk_size' in config:
-                    # Fixed chunking mode
-                    fixed_chunking_mode = True
-                    fixed_chunk_seconds = config['chunk_size']
-                    # Disable insider metrics and adaptive control for fixed chunking
-                    track_insider_metrics = None
-                    adaptive_controller = None
-                
-                transcriber.transcribe_stream(
-                    audio_stream.audio_queue, 
-                    on_transcription, 
-                    on_audio_chunk, 
-                    track_insider_metrics,
-                    aggressiveness=aggressiveness,
-                    frame_duration_ms=frame_duration_ms,
-                    max_silence_frames=max_silence_frames,
-                    metrics_collector=metrics_collector,
-                    metrics=metrics,
-                    fixed_chunking_mode=fixed_chunking_mode,
-                    fixed_chunk_seconds=fixed_chunk_seconds
-                )
-
-    # Safeguard to ensure exactly one background thread is active 
-    if transcription_thread is None or not transcription_thread.is_alive():
-        # Start a separate transcription thread 
-        # - the transcription can now run without blocking the main thread (or program)
-        transcription_thread = threading.Thread(target=run_transcription, daemon=True)
-        transcription_thread.start()
+        # Start the transcription process in a background thread
+        # - ensures only one thread runs at a time 
+        # - if the thread dies, it can be restarted 
+        globals()['transcription_thread'] = threading.Thread(target=run_transcription, daemon=True)
+        globals()['transcription_thread'].start()
 
 # Stop the pipeline (implement as needed)
 def stop_transcription_pipeline():
-    global audio_stream, transcriber, metrics, track_insider_metrics, adaptive_controller, transcription_thread
-    
-    # End session tracking when pipeline stops
-    end_session_tracking()
-    
-    # Session data is now available for JavaScript to save
-    if metrics is not None and hasattr(metrics, 'accumulated') and metrics.accumulated:
-        print("[SESSION] Session data ready for saving")
-    
+    global audio_stream, transcriber, metrics, transcription_thread
     # You may need to add stop/cleanup logic to your classes
     if audio_stream is not None:
         audio_stream.stop()
-        
-        # Signals the transcription loop to exit
-        audio_stream.audio_queue.put(None)
-
-    if transcription_thread is not None:
-        transcription_thread.join(timeout=2.0)  # Wait up to 2 seconds for thread to finish
-        transcription_thread = None
-
-    # Clean up stream handle
-    audio_stream = None
-    
-    # Clear global references to help with garbage collection
-    transcriber = None
-    track_insider_metrics = None
-    adaptive_controller = None
-    
-    # Note: We don't clear metrics here to preserve the transcript data
-    # The metrics object will be cleaned up when the pipeline is restarted
-    
-    print("[CLEANUP] Transcription pipeline stopped and resources cleaned up")
+        audio_stream = None
+    # Optionally, add cleanup for transcriber and metrics if needed
+    # (e.g., set to None, stop threads, etc.)
 
 def pause_transcription_pipeline():
     global audio_stream
@@ -280,6 +91,7 @@ def resume_transcription_pipeline():
 def get_current_transcript():
     global metrics
     if metrics is not None and hasattr(metrics, 'accumulated') and metrics.accumulated:
+
         # Return only the most recent transcription
         # - [-1] for the last tuple in the list (latest transcription)
         # - [0] for the first element of the tuple (the transcription text)
@@ -290,107 +102,36 @@ def get_current_transcript():
 # Get the latest metrics
 def get_current_metrics():
     global metrics
-    if metrics is None:
-        return {'wpm': 0, 'volume': 0, 'pitch': 0, 'confidence': 0, 'silence': 0}
-    
-    # Store the current metrics for dashboard graphs (matches live experience)
     if metrics is not None:
-        print(f"[DEBUG] Storing polled metrics - current count: {len(metrics.polled_wpm_history)}")
-        metrics.store_polled_metrics()
-        print(f"[DEBUG] After storing - polled count: {len(metrics.polled_wpm_history)}")
-    
-    # Get current confidence and silence from the latest polled data
-    current_confidence = metrics.polled_confidence_history[-1] if metrics.polled_confidence_history else 0
-    current_silence = metrics.polled_silence_ratio_history[-1] if metrics.polled_silence_ratio_history else 0
-    
-    return {
-        'wpm': float(metrics.current_wpm),
-        'volume': float(metrics.current_volume),
-        'pitch': float(metrics.current_pitch),
-        'confidence': float(current_confidence),
-        'silence': float(current_silence)
-    }
+        metrics.track_wpm(WPM_WINDOW_SECONDS)
+        metrics.track_volume(VOLUME_WINDOW_SECONDS)
+        metrics.track_pitch(PITCH_WINDOW_SECONDS)
+        return {
+            'wpm': float(getattr(metrics, 'current_wpm', 0)),
+            'volume': float(getattr(metrics, 'current_volume', 0)),
+            'pitch': float(getattr(metrics, 'current_pitch', 0))
+        }
+    return {'wpm': 0, 'volume': 0, 'pitch': 0}
+
+def get_average_metrics():
+    global metrics
+    if metrics is not None:
+        # Call the average methods to update the attributes
+        metrics.track_wpm_average(start_time)
+        metrics.track_volume_average(start_time)
+        metrics.track_overall_pitch(start_time)
+        return {
+            'average_wpm': float(getattr(metrics, 'average_wpm', 0)),
+            'average_volume':float(getattr(metrics, 'average_volume', 0)),
+            'average_pitch': float(getattr(metrics, 'average_pitch', 0))
+        }
+    return {'average_wpm': 0, 'average_volume': 0, 'average_pitch': 0}
 
 def get_final_transcript():
     global metrics
     if metrics is not None and hasattr(metrics, 'accumulated'):
         return ' '.join(text for text, ts in metrics.accumulated).strip()
     return ""
-
-def get_average_metrics():
-    global metrics
-
-    # If we haven't initialized MetricsTracker yet, just zero‐fill.
-    if metrics is None:
-        return {
-            'average_wpm':     0.0,
-            'average_volume':  0.0,
-            'average_pitch':   0.0,
-            'average_confidence': 0.0,
-            'average_silence_ratio': 0.0
-        }
-
-    # Recompute the averages
-    metrics.track_wpm_average()
-    metrics.track_volume_average()
-    metrics.track_overall_pitch()
-    metrics.track_average_confidence()
-    metrics.track_average_silence_ratio()
-
-    return {
-        'average_wpm':     float(metrics.average_wpm),
-        'average_volume':  float(metrics.average_volume),
-        'average_pitch':   float(metrics.average_pitch),
-        'average_confidence': float(metrics.average_confidence or 0),
-        'average_silence_ratio': float(metrics.average_silence_ratio or 0)
-    }
-
-def get_adaptive_controller_status():
-    """Get the current status of the adaptive controller"""
-    global adaptive_controller
-    if adaptive_controller is None:
-        return None
-    return adaptive_controller.get_status()
-
-def start_session_tracking():
-    """Start tracking session timing"""
-    global metrics
-    if metrics is not None:
-        metrics.start_session()
-
-def end_session_tracking():
-    """End tracking session timing"""
-    global metrics
-    if metrics is not None:
-        metrics.end_session()
-
-def get_session_data_for_saving():
-    """Get session data ready for saving (called by JavaScript)"""
-    global metrics
-    print("[DEBUG] get_session_data_for_saving() called")
-    
-    if metrics is not None:
-        print("[DEBUG] Metrics object exists, getting session summary...")
-        session_data = metrics.get_session_summary()
-        
-        print(f"[DEBUG] Session summary keys: {list(session_data.keys())}")
-        print(f"[DEBUG] Has metrics_data: {'metrics_data' in session_data}")
-        
-        if 'metrics_data' in session_data:
-            print(f"[DEBUG] metrics_data length: {len(session_data['metrics_data'])}")
-            if len(session_data['metrics_data']) > 0:
-                print(f"[DEBUG] First chunk sample: {session_data['metrics_data'][0]}")
-        else:
-            print("[DEBUG] WARNING: metrics_data is missing from session_data!")
-        
-        print(f"[DEBUG] Has graph_data: {'graph_data' in session_data}")
-        print(f"[DEBUG] Session duration: {session_data.get('total_duration', 'N/A')}")
-        print(f"[DEBUG] Total words: {session_data.get('total_words', 'N/A')}")
-        
-        return session_data
-    else:
-        print("[DEBUG] ERROR: No metrics object available")
-        return None
 
 def main():
     # For manual testing: start the pipeline, print status, etc.
@@ -404,69 +145,16 @@ def main():
         stop_transcription_pipeline()
         print("Stopped.")
 
-def on_transcription(text, segment_duration):
-    global metrics, adaptive_controller, track_insider_metrics, metrics_collector
-    if metrics is not None:
-        metrics.add_transcription(text, segment_duration)
-        metrics.track_wpm()
-        print(f"\nTranscription: {text}\n") 
-
-        # Record when text appears on screen for end-to-end latency
-        if metrics_collector is not None:
-            metrics_collector.record_chunk_display()
-
-        # Print UI metrics summary after WPM is updated
-        metrics.print_ui_metrics_summary()
-        
-        # Print summary (aligned with UI metrics timing)
-        if track_insider_metrics is not None:
-            track_insider_metrics.print_summary()
-        
-        # Check if adaptive controller should adjust parameters
-        if adaptive_controller is not None and track_insider_metrics is not None:
-            # Get current metrics
-            current_metrics = {
-                'wpm': metrics.current_wpm,
-                'volume': metrics.current_volume,
-                'pitch': metrics.current_pitch,
-                'chunk_duration': metrics.current_chunk_duration
-            }
-            
-            insider_metrics = {
-                'silence_ratio': track_insider_metrics.get_silence_ratio(),
-                'confidence': track_insider_metrics.get_confidence()
-            }
-            
-            # Check if parameters should be adjusted
-            if adaptive_controller.should_adjust_parameters(current_metrics, insider_metrics):
-                print(f"[ADAPTIVE] Metrics suggest parameter adjustment needed")
-                print(f"[ADAPTIVE] Current metrics: WPM={current_metrics['wpm']:.1f}, "
-                      f"Confidence={insider_metrics['confidence']:.3f}, "
-                      f"Silence Ratio={insider_metrics['silence_ratio']:.3f}")
-                
-                # Calculate new parameters
-                new_parameters = adaptive_controller.calculate_parameter_adjustments(current_metrics, insider_metrics)
-                
-                # Update parameters in adaptive controller
-                if adaptive_controller.update_parameters(new_parameters):
-                    print(f"[ADAPTIVE] Parameters updated successfully")
-                    
-                    # Send parameter updates to transcriber
-                    if transcriber is not None:
-                        transcriber.update_parameters(
-                            new_parameters['aggressiveness'],
-                            new_parameters['frame_duration_ms'],
-                            new_parameters['max_silence_frames']
-                        )
-
-def on_audio_chunk(audio_float, segment_duration):
+def on_transcription(text):
     global metrics
     if metrics is not None:
-        # print("Audio chunk received, length:", len(audio_float)) DEBUGGING STATEMENT
-        metrics.add_audio_chunk(audio_float, segment_duration)
-        metrics.track_volume()
-        metrics.track_pitch()
-        # Note: UI metrics summary is printed in on_transcription to avoid duplicate output
+        # print(f"Transcription: {text} has been added")
+        metrics.add_transcription(text)
+
+def on_audio_chunk(audio_float):
+    global metrics
+    if metrics is not None:
+        metrics.add_audio_chunk(audio_float)
 
 if __name__ == "__main__":
     main()
