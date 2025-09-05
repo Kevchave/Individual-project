@@ -1,5 +1,6 @@
 import { initialiseCharts, resetCharts } from './charts.js';
-import { pollTranscript, pollMetrics } from './polling.js';
+import { pollTranscript, pollMetrics, resetMetricColors } from './polling.js';
+import { saveSessionData } from './supabase-cllient.js';
 import { 
     startTime, setStartTime, 
     metricsMode, setMetricsMode, 
@@ -7,39 +8,84 @@ import {
     metricsInterval, setMetricsInterval, 
     isPaused, setIsPaused 
 } from './state.js';
-import { TRANSCRIPT_POLL_MS, METRICS_POLL_MS } from './config.js';
+
+// Button state management functions
+function updateButtonStates(isRecording, isPaused) {
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const pauseResumeBtn = document.getElementById('pauseResumeBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    if (isRecording) {
+        // Recording is active
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        pauseResumeBtn.disabled = false;
+        resetBtn.disabled = true;
+        
+        // Update pause/resume button text
+        pauseResumeBtn.textContent = isPaused ? "Resume" : "Pause";
+    } else {
+        // Not recording
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        pauseResumeBtn.disabled = true;
+        resetBtn.disabled = false;
+        
+        // Reset pause/resume button text
+        pauseResumeBtn.textContent = "Pause";
+    }
+}
 
 function updateMetricsDisplay(metricsMode) {
     if (metricsMode === "live") {
-        document.getElementById('wpm-label').textContent = 'WPM';
+        document.getElementById('wpm-label').textContent = 'Words per Minute';
         document.getElementById('volume-label').textContent = 'Volume (dBFS)';
         document.getElementById('pitch-label').textContent = 'Pitch Variance (Hz)';
+        document.getElementById('wpm-value').textContent = '0';
+        document.getElementById('volume-value').textContent = '0';
+        document.getElementById('pitch-value').textContent = '0';
     } else {
-        document.getElementById('wpm-label').textContent = 'AVG WPM';
-        document.getElementById('volume-label').textContent = 'AVG Volume (dBFS)';
-        document.getElementById('pitch-label').textContent = 'AVG Pitch Variance (Hz)';
+        document.getElementById('wpm-label').textContent = 'Average Words per Minute';
+        document.getElementById('volume-label').textContent = 'Average Volume (dBFS)';
+        document.getElementById('pitch-label').textContent = 'Average Pitch Variance (Hz)';
     }
 }
 
 function initialiseControls({
-    startBtn, stopBtn, pauseResumeBtn,
-    transcriptBox, wpmValue, volumeValue, pitchValue
-}) {
-    // Start Recording
+    startBtn, stopBtn, pauseResumeBtn, resetBtn,
+    transcriptBox, wpmValue, volumeValue, pitchValue }) {
+    
+    // Initialize button states (not recording)
+    updateButtonStates(false, false);
+    
+        // Start Recording
     startBtn.addEventListener('click', function() {
+        if (metricsMode === "live") {
+            transcriptBox.textContent = "Recording already in progress.";
+            return;
+        }
+
+        if (isPaused) {
+            setIsPaused(false);
+            pauseResumeBtn.textContent = "Pause";
+        }
+
         setMetricsMode("live");
-        updateMetricsDisplay("live");
-        initialiseCharts();
-        resetCharts();
         setStartTime(Date.now());
         transcriptBox.textContent = "Recording started...";
+
         fetch('/start_recording', { method: 'POST' })
             .then(response => response.json())
             .then(data => {
                 transcriptBox.textContent = data.status;
+                updateMetricsDisplay(metricsMode);
+                updateButtonStates(true, false); // Enable recording buttons
+                resetMetricColors(); // Reset colors for new recording session
+                // This is only used if we want to poll on intervals 
                 if (!transcriptInterval && !metricsInterval) {
-                    setTranscriptInterval(setInterval(() => pollTranscript(transcriptBox), TRANSCRIPT_POLL_MS));
-                    setMetricsInterval(setInterval(() => pollMetrics(wpmValue, volumeValue, pitchValue), METRICS_POLL_MS));
+                    setTranscriptInterval(setInterval(() => pollTranscript(transcriptBox), 2000));
+                    setMetricsInterval(setInterval(() => pollMetrics(wpmValue, volumeValue, pitchValue), 6000));
                 }
             })
             .catch(error => {
@@ -50,23 +96,35 @@ function initialiseControls({
 
     // Stop Recording
     stopBtn.addEventListener('click', function() {
+        if (metricsMode != "live") {
+            transcriptBox.textContent = "Recording already stopped.";
+            return;
+        }
         setMetricsMode("average");
-        updateMetricsDisplay("average");
+        // Note: Removed resetCharts() call - graphs will be preserved
         fetch('/stop_recording', { method: 'POST' })
             .then(response => response.json())
             .then(data => {
                 transcriptBox.textContent = data.status;
+                updateMetricsDisplay(metricsMode);
+                updateButtonStates(false, false); // Disable recording buttons
+
                 if (transcriptInterval) {
                     clearInterval(transcriptInterval); // JavaScript function 
                     setTranscriptInterval(null);
                 }
+                
                 if (metricsInterval) {
                     clearInterval(metricsInterval);
                     setMetricsInterval(null);
                 }
-                resetCharts();
+                updateMetricsDisplay(metricsMode);
 
-                // Fetch the final transcript and metrics 
+                // Save session data to database
+                // console.log('[DEBUG] About to call saveSessionDataToDatabase()');
+                saveSessionDataToDatabase();
+
+                 // Fetch the final transcript and metrics 
                 fetch('/get_final_transcript')
                     .then(response => response.json())
                     .then(data => {
@@ -76,7 +134,7 @@ function initialiseControls({
                         transcriptBox.textContent = 'Error fetching final transcript.';
                         console.error('Error fetching final transcript:', error);
                     });
-              
+                
                 fetch('/get_average_metrics')
                     .then(response => response.json())
                     .then(data => {
@@ -85,9 +143,9 @@ function initialiseControls({
                         pitchValue.textContent = data.average_pitch !== undefined ? data.average_pitch.toFixed(2) : 'N/A';
                     })
                     .catch(error => {
-                        wpmValue.textContent = 'Error';
-                        volumeValue.textContent = 'Error';
-                        pitchValue.textContent = 'Error';
+                        wpmValue.textContent = 'N/A';
+                        volumeValue.textContent = 'N/A';
+                        pitchValue.textContent = 'N/A';
                         console.error('Error fetching average metrics:', error);
                     });
             })
@@ -99,12 +157,16 @@ function initialiseControls({
 
     // Pause/Resume Recording
     pauseResumeBtn.addEventListener('click', function() {
+        if (metricsMode !== "live") {
+            // transcriptBox.textContent = "Cannot pause/resume when not recording.";
+            return;
+        }
         if (!isPaused) {
             fetch('/pause_recording', { method: 'POST' })
                 .then(response => {
                     if (response.ok) {
                         setIsPaused(true);
-                        pauseResumeBtn.textContent = "Resume";
+                        updateButtonStates(true, true); // Update button states for paused state
                     } else {
                         alert("Failed to pause recording.");
                     }
@@ -117,7 +179,7 @@ function initialiseControls({
                 .then(response => {
                     if (response.ok) {
                         setIsPaused(false);
-                        pauseResumeBtn.textContent = "Pause";
+                        updateButtonStates(true, false); // Update button states for resumed state
                     } else {
                         alert("Failed to resume recording.");
                     }
@@ -127,6 +189,77 @@ function initialiseControls({
                 });
         }
     });
+
+    // Reset Button - clears graphs and transcript, only works when not recording
+    resetBtn.addEventListener('click', function() {
+        if (metricsMode === "live") {
+            transcriptBox.textContent = "Cannot reset while recording is in progress.";
+            return;
+        }
+        
+        // Clear the transcript
+        transcriptBox.textContent = "Live transcript will appear here...";
+        
+        // Reset the charts
+        resetCharts();
+        
+        // Reset metric box colors
+        resetMetricColors();
+        
+        // Reset metrics display to live mode labels
+        document.getElementById('wpm-label').textContent = 'Words per Minute';
+        document.getElementById('volume-label').textContent = 'Volume (dBFS)';
+        document.getElementById('pitch-label').textContent = 'Pitch Variance (Hz)';
+        document.getElementById('wpm-value').textContent = '0';
+        document.getElementById('volume-value').textContent = '0';
+        document.getElementById('pitch-value').textContent = '0';
+        
+        console.log("Reset completed - graphs, transcript, and metric colors cleared");
+    });
+}
+
+// Save session data to database
+async function saveSessionDataToDatabase() {
+    console.log('[DEBUG] saveSessionDataToDatabase function called');
+    try {
+        console.log('[DEBUG] Starting to save session data to database...');
+        
+        // Get session data from Python via Flask endpoint
+        const response = await fetch('/get_session_data');
+        console.log('[DEBUG] Response status:', response.status);
+        
+        if (!response.ok) {
+            console.log('No session data available to save');
+            return;
+        }
+        
+        const sessionData = await response.json();
+        console.log('[DEBUG] Session data received:', JSON.stringify(sessionData, null, 2));
+        
+        // Check if metrics_data exists
+        if (sessionData.metrics_data) {
+            console.log(`[DEBUG] metrics_data found with ${sessionData.metrics_data.length} chunks`);
+            if (sessionData.metrics_data.length > 0) {
+                console.log('[DEBUG] Sample chunk:', sessionData.metrics_data[0]);
+            }
+        } else {
+            console.log('[DEBUG] WARNING: metrics_data is missing from sessionData!');
+        }
+        
+        // Save to database using Supabase
+        console.log('[DEBUG] About to call saveSessionData with data:', sessionData);
+        const { data, error } = await saveSessionData(sessionData);
+        
+        if (error) {
+            console.error('Failed to save session data:', error);
+            console.error('Error details:', JSON.stringify(error, null, 2));
+        } else {
+            console.log('Session data saved successfully to database');
+            console.log('Saved session data:', data);
+        }
+    } catch (err) {
+        console.error('Error saving session data:', err);
+    }
 }
 
 export { initialiseControls, updateMetricsDisplay };
