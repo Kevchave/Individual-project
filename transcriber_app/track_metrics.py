@@ -151,14 +151,15 @@ class MetricsTracker:
             print("Pitch Variance: No voice audio detected")
             return 
         
-        # print(f"  Frames: {len(f0)}, Voiced frames: {len(voiced)}")
-        # print(f"  f₀ min/max: {voiced.min():.1f}/{voiced.max():.1f} Hz")
-        # print(f"  f₀ 5th/95th pct: {np.percentile(voiced, 5):.1f}/{np.percentile(voiced,95):.1f} Hz")
-
-        # iqr = np.percentile(voiced, 75) - np.percentile(voiced, 25)
+        # Calculate Pitch Variation Quotient (PVQ) = (std / mean) * 100
         std_dev_pitch = float(np.std(voiced))
-        self.current_pitch = std_dev_pitch
-        # print(f"Pitch Variance (last {window_seconds} seconds): {std_dev_pitch:.2f} Hz")
+        mean_pitch = float(np.mean(voiced)) if np.isfinite(np.mean(voiced)) else 0.0
+        if mean_pitch <= 0:
+            pvq_percent = 0.0
+        else:
+            pvq_percent = (std_dev_pitch / mean_pitch) * 100.0
+        self.current_pitch = pvq_percent
+        # print(f"Pitch Variation Quotient (last {window_seconds} seconds): {pvq_percent:.2f} %")
 
     def track_overall_pitch(self, start_time):
         with self.audio_chunks_lock:
@@ -173,8 +174,13 @@ class MetricsTracker:
             return 
 
         std_dev_pitch = float(np.std(voiced))
-        self.average_pitch = std_dev_pitch
-        # print(f"Overall Pitch Variance: {std_dev_pitch:.2f} Hz")
+        mean_pitch = float(np.mean(voiced)) if np.isfinite(np.mean(voiced)) else 0.0
+        if mean_pitch <= 0:
+            pvq_percent = 0.0
+        else:
+            pvq_percent = (std_dev_pitch / mean_pitch) * 100.0
+        self.average_pitch = pvq_percent
+        # print(f"Overall Pitch Variation Quotient: {pvq_percent:.2f} %")
 
 
 

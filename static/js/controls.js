@@ -13,11 +13,11 @@ function updateMetricsDisplay(metricsMode) {
     if (metricsMode === "live") {
         document.getElementById('wpm-label').textContent = 'WPM';
         document.getElementById('volume-label').textContent = 'Volume (dBFS)';
-        document.getElementById('pitch-label').textContent = 'Pitch Variance (Hz)';
+        document.getElementById('pitch-label').textContent = 'Pitch Variance (%)';
     } else {
         document.getElementById('wpm-label').textContent = 'AVG WPM';
         document.getElementById('volume-label').textContent = 'AVG Volume (dBFS)';
-        document.getElementById('pitch-label').textContent = 'AVG Pitch Variance (Hz)';
+        document.getElementById('pitch-label').textContent = 'AVG Pitch Variance (%)';
     }
 }
 
