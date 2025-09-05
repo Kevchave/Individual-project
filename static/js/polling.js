@@ -1,5 +1,5 @@
 import { updateCharts } from './charts.js';
-import { isPaused } from './state.js';
+import { isPaused, wpmData } from './state.js';
 
 function pollTranscript(transcriptBox){
     fetch('/get_live_transcript')
@@ -10,6 +10,10 @@ function pollTranscript(transcriptBox){
 }
 
 function updateOutOfBounds(wpm, volume, pitch) {
+    // Defer flashing until we have enough data
+    if (!wpmData || wpmData.length < 5) {
+        return;
+    }
     const wpmBox = document.getElementById('wpm-box');
     const volumeBox = document.getElementById('volume-box');
     const pitchBox = document.getElementById('pitch-box');
