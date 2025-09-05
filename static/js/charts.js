@@ -84,7 +84,7 @@ function initialiseCharts(currentTheme) {
   if (volumeChart) volumeChart.destroy();
   if (pitchChart) pitchChart.destroy();
 
-  setWpmChart(createChart('wpmChart', 'WPM', '#0077cc', 'rgba(0, 119, 204, 0.1)', 'WPM', chartOptions));
+  setWpmChart(createChart('wpmChart', 'WPM', '#0077cc', 'rgba(0, 119, 204, 0.1)', 'Words per Minute', chartOptions));
   setVolumeChart(createChart('volumeChart', 'Volume', '#28a745', 'rgba(40, 167, 69, 0.1)', 'Volume (dBFS)', chartOptions));
   setPitchChart(createChart('pitchChart', 'Pitch Variance', '#dc3545', 'rgba(220, 53, 69, 0.1)', 'Pitch Variance (Hz)', chartOptions));
 }
@@ -93,10 +93,12 @@ function initialiseCharts(currentTheme) {
 function updateCharts(wpm, volume, pitch) {
   if (!startTime) return;
   const currentTime = Math.floor((Date.now() - startTime) / 1000);
+
   wpmData.push(wpm);
   volumeData.push(volume);
   pitchData.push(pitch);
   timeLabels.push(currentTime);
+
   const maxPoints = 5;
   if (wpmData.length > maxPoints) {
     wpmData.shift(); // shift removes the first (oldest) element
@@ -104,16 +106,19 @@ function updateCharts(wpm, volume, pitch) {
     pitchData.shift();
     timeLabels.shift();
   }
+
   if (wpmChart) {
     wpmChart.data.labels = timeLabels;          // Sets chart labels to current timeLabels 
     wpmChart.data.datasets[0].data = wpmData;   // Sets chart data to latest data array 
     wpmChart.update('none');                    // No animation 
   }
+
   if (volumeChart) {
     volumeChart.data.labels = timeLabels;
     volumeChart.data.datasets[0].data = volumeData;
     volumeChart.update('none');
   }
+  
   if (pitchChart) {
     pitchChart.data.labels = timeLabels;
     pitchChart.data.datasets[0].data = pitchData;
