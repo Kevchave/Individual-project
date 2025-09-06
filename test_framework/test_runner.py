@@ -1,3 +1,7 @@
+import psutil
+import torch
+import psutil
+import torch
 #!/usr/bin/env python3
 """
 Simplified Test Runner for Transcription Models
@@ -377,6 +381,10 @@ class TestRunner:
             return configs
     
     def run_single_test(self, audio_file, config, current_test, total_tests):
+        
+        # Memory tracking - START
+        system_mem_start = psutil.virtual_memory().used / 1024**2
+        gpu_mem_start = torch.cuda.memory_allocated() / 1024**2 if torch.cuda.is_available() else 0
         """Run a single test with given audio file and configuration"""
         # Create metrics collector for this test
         metrics_collector = MetricsCollector()
@@ -418,6 +426,14 @@ class TestRunner:
                 wer_score = metrics_collector.calculate_wer(reference_transcript)
             
             # Create result record
+            # Memory tracking - END
+            system_mem_end = psutil.virtual_memory().used / 1024**2
+            gpu_mem_end = torch.cuda.memory_allocated() / 1024**2 if torch.cuda.is_available() else 0
+            
+            # Get adaptive adjustments (if adaptive controller used)
+            adaptation_count = 0
+            if hasattr(main_module, 'adaptive_controller') and main_module.adaptive_controller:
+                adaptation_count = main_module.adaptive_controller.get_status()['adjustment_count']
             result = {
                 'audio_file': audio_file.name,
                 'model_type': config.get('model_type', 'unknown'),
@@ -429,7 +445,14 @@ class TestRunner:
                 'wer_score': wer_score,
                 'recorded_transcript': final_transcript,
                 'correct_transcript': reference_transcript,
-                'num_chunks': num_chunks
+                'num_chunks': num_chunks,
+                'system_mem_start_mb': system_mem_start,
+                'system_mem_end_mb': system_mem_end,
+                'system_mem_delta_mb': system_mem_end - system_mem_start,
+                'gpu_mem_start_mb': gpu_mem_start,
+                'gpu_mem_end_mb': gpu_mem_end,
+                'gpu_mem_delta_mb': gpu_mem_end - gpu_mem_start,
+                'adaptation_count': adaptation_count
             }
             
             return result
@@ -528,6 +551,14 @@ class TestRunner:
                 wer_score = metrics_collector.calculate_wer(reference_transcript)
             
             # Create result record with monitoring data
+            # Memory tracking - END
+            system_mem_end = psutil.virtual_memory().used / 1024**2
+            gpu_mem_end = torch.cuda.memory_allocated() / 1024**2 if torch.cuda.is_available() else 0
+            
+            # Get adaptive adjustments (if adaptive controller used)
+            adaptation_count = 0
+            if hasattr(main_module, 'adaptive_controller') and main_module.adaptive_controller:
+                adaptation_count = main_module.adaptive_controller.get_status()['adjustment_count']
             result = {
                 'audio_file': audio_file.name,
                 'model_type': config.get('model_type', 'unknown'),
@@ -594,7 +625,7 @@ class TestRunner:
             writer.writerow([
                 'config', 'audio_file', 'model_type', 'wer_score', 
                 'avg_callback_latency', 'p50_callback_latency', 'p90_callback_latency',
-                'word_count', 'test_mode', 'audio_source'
+                'word_count', 'test_mode', 'audio_source', 'system_mem_start_mb', 'system_mem_end_mb', 'system_mem_delta_mb', 'gpu_mem_start_mb', 'gpu_mem_end_mb', 'gpu_mem_delta_mb', 'adaptation_count'
             ])
             
             # Write data rows
@@ -609,7 +640,14 @@ class TestRunner:
                     f"{result['p90_callback_latency']:.6f}",
                     result['word_count'],
                     self.test_mode,
-                    self.audio_source
+                    self.audio_source,
+                    result.get('system_mem_start_mb', ''),
+                    result.get('system_mem_end_mb', ''),
+                    result.get('system_mem_delta_mb', ''),
+                    result.get('gpu_mem_start_mb', ''),
+                    result.get('gpu_mem_end_mb', ''),
+                    result.get('gpu_mem_delta_mb', ''),
+                    result.get('adaptation_count', '')
                 ])
         
         return csv_path
@@ -642,7 +680,7 @@ class TestRunner:
                     f"{metrics['avg_p90_callback_latency']:.6f}",
                     metrics['num_runs'],
                     self.test_mode,
-                    self.audio_source
+                    self.audio_source,
                 ])
         
         return avg_csv_path
