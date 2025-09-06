@@ -1,0 +1,25 @@
+{
+  "model_type": "vad",
+  "phase": "phase_b_r1",
+  "source": "phase_a_r2",
+  "configs": [
+    {
+      "aggressiveness": 1,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 14,
+      "description": "Sobol-12: agg=1, frames=14"
+    },
+    {
+      "aggressiveness": 1,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 10,
+      "description": "Sobol-5: agg=1, frames=10"
+    },
+    {
+      "aggressiveness": 0,
+      "frame_duration_ms": 20,
+      "max_silence_frames": 16,
+      "description": "Sobol-8: agg=0, frames=16"
+    }
+  ]
+}

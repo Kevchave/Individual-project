@@ -174,7 +174,7 @@ class ZoomSearch:
             if wer_scores:
                 avg_wer = sum(wer_scores) / len(wer_scores)
             
-            avg_p90_latency = sum(r['p90_processing_latency'] for r in runs) / len(runs)
+            avg_p90_latency = sum(r['p90_callback_latency'] for r in runs) / len(runs)
             
             config_averages.append((config, {
                 'avg_wer': avg_wer,

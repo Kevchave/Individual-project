@@ -1,0 +1,10 @@
+{
+  "FIXED-Sobol-3 (3.2s)": {
+    "description": "FIXED-Sobol-3 (3.2s)",
+    "model_type": "fixed"
+  },
+  "FIXED-Sobol-6 (3.6s)": {
+    "description": "FIXED-Sobol-6 (3.6s)",
+    "model_type": "fixed"
+  }
+}
