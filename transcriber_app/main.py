@@ -58,7 +58,7 @@ def start_transcription_pipeline(device_id=MIC_INPUT, enable_insider_metrics=Tru
     if audio_stream is None:
         audio_stream = AudioStream(SAMPLE_RATE, device_id)
     if transcriber is None:
-        transcriber = Transcriber("small", "cpu")
+        transcriber = Transcriber("small", "cuda")
     if metrics is None:
         metrics = MetricsTracker(SAMPLE_RATE)
     if enable_insider_metrics and track_insider_metrics is None:
@@ -158,7 +158,7 @@ def start_transcription_pipeline_with_virtual_audio(audio_file_path, enable_insi
         audio_stream._stream_audio = fast_stream_audio
     
     if transcriber is None:
-        transcriber = Transcriber("small", "cpu")
+        transcriber = Transcriber("small", "cuda")
     if metrics is None:
         metrics = MetricsTracker(SAMPLE_RATE)
     if enable_insider_metrics and track_insider_metrics is None:
